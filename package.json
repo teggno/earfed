@@ -2,9 +2,18 @@
   "name": "earfed",
   "version": "0.0.1",
   "description": "A Single Page Podcast App made with Svelte",
+  "author": {
+    "name": "Christian Bär",
+    "url": "https://adwise.ch"
+  },
+  "license": "MIT",
+  "private": true,
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/teggno/earfed.git"
+  },
+  "bugs": {
+    "url": "https://github.com/teggno/earfed/issues"
   },
   "scripts": {
     "build": "rollup -c",
