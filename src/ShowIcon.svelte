@@ -7,11 +7,12 @@
   export let showName = "";
   export let playButtonRect;
 
-  let height = 0;
-  let wrapper;
-  let wrapperRect = {};
   const moveAvgSpeed = 0.3;
+  const playIconStartSize = 30;
 
+  let height = 0;
+  let playIconWrapper;
+  let playIconWrapperRect = {};
   let animationStatus = "notRunning";
 
   $: animationVisible = animationStatus !== "notRunning";
@@ -20,24 +21,28 @@
     animationStatus === "notRunning"
       ? ""
       : animationStatus === "entering"
-      ? getWrapperPositionCss()
+      ? `left:${playIconWrapperRect.left}px;top:${
+          playIconWrapperRect.top + window.scrollY
+        }px;`
       : `left:${$playButtonRect.left}px;top:${
           $playButtonRect.top + window.scrollY
         }px;`;
 
   $: moveDistance = Math.sqrt(
-    Math.pow($playButtonRect.left - wrapperRect.left, 2) +
-      Math.pow($playButtonRect.top - wrapperRect.top, 2)
+    Math.pow($playButtonRect.left - playIconWrapperRect.left, 2) +
+      Math.pow($playButtonRect.top - playIconWrapperRect.top, 2)
   );
 
   $: durationMillis = moveDistance / moveAvgSpeed;
 
-  $: animationVars = `--start-size:${30}px;--middle-size:${
-    3 * $playButtonRect.width
-  }px;--end-size:${$playButtonRect.width}px;--duration:${durationMillis}ms;`;
+  $: animationVars = `
+  --start-size:${playIconStartSize}px;
+  --middle-size:${3 * $playButtonRect.width}px;
+  --end-size:${$playButtonRect.width}px;
+  --duration:${durationMillis}ms;`;
 
-  function handleClick(e) {
-    wrapperRect = wrapper.getBoundingClientRect();
+  function handleClick() {
+    playIconWrapperRect = playIconWrapper.getBoundingClientRect();
     animationStatus = "entering";
     window.requestAnimationFrame(() => {
       setTimeout(() => {
@@ -48,55 +53,60 @@
       });
     });
   }
-
-  function getWrapperPositionCss() {
-    if (!wrapperRect) return "";
-    return `left:${wrapperRect.left}px;top:${
-      wrapperRect.top + window.scrollY
-    }px;`;
-  }
 </script>
 
 <style>
-  .wrapper {
+  button {
     background-color: bisque;
+    font-size: 0;
     position: relative;
+    margin: 0;
     padding: 0;
     border: 0 none;
-    margin: 0;
   }
 
-  img,
-  .placeholder {
-    border-radius: var(--spacing-2);
+  button > * {
+    z-index: 2;
+    position: relative;
   }
 
-  .placeholder {
+  button.noIcon::before {
+    content: var(--show-name-first-letter);
     background-color: yellowgreen;
-    color: rgba(255, 255, 255, 0.6);
-    width: 100%;
-    height: 100%;
+    color: white;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
     text-align: center;
     font-size: var(--font-size-large);
+    z-index: 1;
+  }
+
+  button,
+  button.noIcon::before {
+    border-radius: var(--spacing-2);
   }
 
   .playIconWrapper {
-    position: absolute;
+    display: inline-block;
+    /* position: absolute;
     font-size: 0;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%); */
   }
 
   .playIconWrapper :global(svg) {
     stroke: whitesmoke;
     fill: #666;
     stroke-width: 1;
-    width: 30px;
-    height: 30px;
+    width: var(--start-size);
+    height: var(--start-size);
   }
 
   .playAnimation {
@@ -131,18 +141,11 @@
 </style>
 
 <button
-  class="wrapper"
+  class={`${showIconUrl ? '' : 'noIcon'}`}
   bind:offsetHeight={height}
-  style={`width:${height}px`}
+  style={`--show-name-first-letter:'${showName.substr(0, 1)}';--start-size:${playIconStartSize}px;width:${height}px`}
   on:click={handleClick}>
-  {#if showIconUrl}
-    <img src={showIconUrl} alt="" />
-  {:else}
-    <span class="placeholder">
-      {showName ? showName.substr(0, 1).toUpperCase() : ''}
-    </span>
-  {/if}
-  <span class="playIconWrapper" bind:this={wrapper}>
+  <span class="playIconWrapper" bind:this={playIconWrapper}>
     <PlayIcon />
   </span>
 </button>
