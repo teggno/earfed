@@ -1,0 +1,126 @@
+:root {
+  --app-max-width: 100%;
+  --color-link: rgb(0, 100, 200);
+  --color-accent: #ff3e00;
+  --color-selected: #ff3e00;
+  --color-accent-pressed: #ff400046;
+  --color-success: rgb(0, 190, 0);
+  --color-danger: rgb(190, 0, 0);
+  --color-background: #f5f5f5;
+  --color-text: #333;
+  --color-text-muted: #888;
+  --input-border: 1px solid #aaa;
+  --spacing-1: 0.125rem;
+  --spacing-2: 0.25rem;
+  --spacing-3: 0.5rem;
+  --spacing-4: 1rem;
+  --font-size-tiny: 0.5rem;
+  --font-size-small: 0.75rem;
+  --font-size-medium: 1rem;
+  --font-size-large: 1.5rem;
+  --label-input-spacing: var(--spacing-2);
+  --field-spacing: var(--spacing-3);
+}
+
+html,
+body {
+  width: 100%;
+  /* height: 100%; */
+}
+
+html {
+  background-color: #eee;
+  font-size: 20px;
+}
+
+body {
+  color: var(--color-text);
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  /* height: 1px is a hack needed to fix a bug in firefox*/
+  /* height: 1px; */
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  max-width: var(--app-max-width);
+  background-color: var(--color-background);
+}
+
+body,
+body * {
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+a {
+  color: rgb(0, 100, 200);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a:visited {
+  color: rgb(0, 80, 160);
+}
+
+label {
+  display: block;
+}
+
+input,
+button,
+select,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  -webkit-padding: 0.4em 0;
+  padding: 0.4em;
+  margin: 0 0 0.5em 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+input:disabled {
+  color: #ccc;
+}
+
+button {
+  color: #333;
+  background-color: #f4f4f4;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:disabled {
+  color: #999;
+}
+
+button:focus {
+  border-color: #666;
+}
+
+@media screen and (min-width: 640px) {
+  :root {
+    --app-max-width: 640px;
+  }
+  body {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (pointer: fine) {
+  :root {
+    /* only highlight hovering not on phone*/
+    --background-hover-list: #eee;
+  }
+}
