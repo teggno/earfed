@@ -12,6 +12,7 @@
       episodes.push({
         showName: `Show ${i + 1}`,
         episodeTitle: "Episode foobar",
+        showIconUrl: "http://www.pwop.com/itunes_dnr2.jpg",
       });
     }
     return episodes;
@@ -19,8 +20,6 @@
 </script>
 
 <style>
-  .container {
-  }
 </style>
 
 <div class="container">

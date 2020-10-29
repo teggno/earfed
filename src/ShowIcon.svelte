@@ -14,19 +14,16 @@
   let playIconWrapper;
   let playIconWrapperRect = {};
   let animationStatus = "notRunning";
+  let scrolled = false;
 
-  $: animationVisible = animationStatus !== "notRunning";
+  $: animationVisible = animationStatus !== "notRunning" && !scrolled;
 
   $: animationPositionCss =
     animationStatus === "notRunning"
       ? ""
       : animationStatus === "entering"
-      ? `left:${playIconWrapperRect.left}px;top:${
-          playIconWrapperRect.top + window.scrollY
-        }px;`
-      : `left:${$playButtonRect.left}px;top:${
-          $playButtonRect.top + window.scrollY
-        }px;`;
+      ? `left:${playIconWrapperRect.left}px;top:${playIconWrapperRect.top}px;`
+      : `left:${$playButtonRect.left}px;top:${$playButtonRect.top}px;`;
 
   $: moveDistance = Math.sqrt(
     Math.pow($playButtonRect.left - playIconWrapperRect.left, 2) +
@@ -44,6 +41,7 @@
   function handleClick() {
     playIconWrapperRect = playIconWrapper.getBoundingClientRect();
     animationStatus = "entering";
+    scrolled = false;
     window.requestAnimationFrame(() => {
       setTimeout(() => {
         animationStatus = "notRunning";
@@ -52,6 +50,10 @@
         animationStatus = "running";
       });
     });
+  }
+
+  function handleWindowScroll() {
+    scrolled = true;
   }
 </script>
 
@@ -63,6 +65,8 @@
     margin: 0;
     padding: 0;
     border: 0 none;
+    background-repeat: no-repeat;
+    background-size: contain;
   }
 
   button > * {
@@ -70,6 +74,10 @@
     position: relative;
   }
 
+  /* 
+   This displays the placeholder (background and first letter of show name) 
+   in case there is no show icon
+   */
   button.noIcon::before {
     content: var(--show-name-first-letter);
     background-color: yellowgreen;
@@ -94,11 +102,6 @@
 
   .playIconWrapper {
     display: inline-block;
-    /* position: absolute;
-    font-size: 0;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); */
   }
 
   .playIconWrapper :global(svg) {
@@ -110,7 +113,7 @@
   }
 
   .playAnimation {
-    position: absolute;
+    position: fixed;
     display: inline-block;
     z-index: 10;
     transition: all ease var(--duration);
@@ -142,8 +145,8 @@
 
 <button
   class={`${showIconUrl ? '' : 'noIcon'}`}
+  style={`--show-name-first-letter:'${showName.substr(0, 1)}';--start-size:${playIconStartSize}px;width:${height}px;${showIconUrl ? `background-image:url('${showIconUrl}')` : ''}`}
   bind:offsetHeight={height}
-  style={`--show-name-first-letter:'${showName.substr(0, 1)}';--start-size:${playIconStartSize}px;width:${height}px`}
   on:click={handleClick}>
   <span class="playIconWrapper" bind:this={playIconWrapper}>
     <PlayIcon />
@@ -155,3 +158,5 @@
     <AnimatedPlayToPauseIcon {durationMillis} />
   </div>
 {/if}
+
+<svelte:window on:scroll={handleWindowScroll} />
