@@ -1,5 +1,5 @@
 <script>
-  import PlayAnimation from "./icons/PlayAnimation.svelte";
+  import AnimatedPlayToPauseIcon from "./icons/AnimatedPlayToPauseIcon.svelte";
 
   import PlayIcon from "./icons/PlayIcon.svelte";
 
@@ -20,11 +20,9 @@
     animationStatus === "notRunning"
       ? ""
       : animationStatus === "entering"
-      ? `${getWrapperPositionCss()}width:30px;height:30px;`
+      ? getWrapperPositionCss()
       : `left:${$playButtonRect.left}px;top:${
           $playButtonRect.top + window.scrollY
-        }px;width:${$playButtonRect.width}px;height:${
-          $playButtonRect.height
         }px;`;
 
   $: moveDistance = Math.sqrt(
@@ -32,17 +30,19 @@
       Math.pow($playButtonRect.top - wrapperRect.top, 2)
   );
 
-  $: moveMillis = moveDistance / moveAvgSpeed;
+  $: durationMillis = moveDistance / moveAvgSpeed;
+
+  $: animationVars = `--start-size:${30}px;--middle-size:${
+    3 * $playButtonRect.width
+  }px;--end-size:${$playButtonRect.width}px;--duration:${durationMillis}ms;`;
 
   function handleClick(e) {
     wrapperRect = wrapper.getBoundingClientRect();
     animationStatus = "entering";
-    // console.log(getWrapperPositionCss());
-    // console.log(window.scrollY);
     window.requestAnimationFrame(() => {
       setTimeout(() => {
         animationStatus = "notRunning";
-      }, moveMillis);
+      }, durationMillis);
       window.requestAnimationFrame(() => {
         animationStatus = "running";
       });
@@ -103,7 +103,8 @@
     position: absolute;
     display: inline-block;
     z-index: 10;
-    transition: all ease;
+    transition: all ease var(--duration);
+    animation: size forwards var(--duration);
   }
 
   .playAnimation :global(svg) {
@@ -111,6 +112,21 @@
     height: 100%;
     stroke-width: 1;
     stroke: white;
+  }
+
+  @keyframes size {
+    0% {
+      width: var(--start-size);
+      height: var(--start-size);
+    }
+    30% {
+      width: var(--middle-size);
+      height: var(--middle-size);
+    }
+    100% {
+      width: var(--end-size);
+      height: var(--end-size);
+    }
   }
 </style>
 
@@ -132,9 +148,7 @@
 </button>
 
 {#if animationVisible}
-  <div
-    class="playAnimation"
-    style={`${animationPositionCss}transition-duration:${moveMillis}ms`}>
-    <PlayAnimation durationMillis={moveMillis} />
+  <div class="playAnimation" style={`${animationVars}${animationPositionCss}`}>
+    <AnimatedPlayToPauseIcon {durationMillis} />
   </div>
 {/if}

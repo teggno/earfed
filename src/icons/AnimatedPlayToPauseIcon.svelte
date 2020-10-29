@@ -2,7 +2,7 @@
   export let durationMillis = 0;
   let logoBegin = 0;
   let logoStatic = durationMillis / 3;
-  let logoDuration = (durationMillis - logoBegin - logoStatic) / 2;
+  let logoDuration = (durationMillis - logoBegin - logoStatic) / 3;
   let pauseBegin = logoBegin + logoStatic + logoDuration;
   let pauseDuration = durationMillis - pauseBegin;
 </script>
