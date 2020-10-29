@@ -12,6 +12,7 @@
     display: flex;
     justify-content: space-evenly;
     background-color: var(--color-background);
+    z-index: 5;
   }
 </style>
 
