@@ -1,6 +1,11 @@
 {
-  "name": "svelte-app",
-  "version": "1.0.0",
+  "name": "earfed",
+  "version": "0.0.1",
+  "description": "A Single Page Podcast App made with Svelte",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
