@@ -9,6 +9,7 @@
   --color-background: #f5f5f5;
   --color-text: #333;
   --color-text-muted: #888;
+  --color-disabled: #aaa;
   --input-border: 1px solid #aaa;
   --spacing-1: 0.125rem;
   --spacing-2: 0.25rem;
@@ -89,19 +90,11 @@ button:not(:disabled) {
   cursor: pointer;
 }
 
-input:disabled {
-  color: #ccc;
-}
-
 button {
   color: #333;
   background-color: #f4f4f4;
   outline: none;
   -webkit-tap-highlight-color: transparent;
-}
-
-button:disabled {
-  color: #999;
 }
 
 button:focus {

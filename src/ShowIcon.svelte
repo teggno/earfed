@@ -1,4 +1,6 @@
 <script>
+  import { createEventDispatcher } from "svelte";
+
   import { getAnimationTargetRect } from "./animationTargetRect";
 
   import AnimatedPlayToPauseIcon from "./icons/AnimatedPlayToPauseIcon.svelte";
@@ -7,7 +9,10 @@
 
   export let showIconUrl = "";
   export let showName = "";
+  export let disabled = false;
+
   const playButtonRect = getAnimationTargetRect();
+  const dispatch = createEventDispatcher();
 
   const moveAvgSpeed = 0.3;
   const playIconStartSize = 30;
@@ -41,6 +46,7 @@
   --duration:${durationMillis}ms;`;
 
   function handleClick() {
+    dispatch("click");
     if (animationStatus !== "notRunning") return;
     playIconWrapperRect = playIconWrapper.getBoundingClientRect();
     animationStatus = "entering";
@@ -147,6 +153,7 @@
 </style>
 
 <button
+  {disabled}
   class={`${showIconUrl ? '' : 'noIcon'}`}
   style={`--show-name-first-letter:'${showName.substr(0, 1)}';--start-size:${playIconStartSize}px;width:${height}px;${showIconUrl ? `background-image:url('${showIconUrl}')` : ''}`}
   bind:offsetHeight={height}

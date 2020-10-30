@@ -3,12 +3,24 @@
 
   import ArrowRightIcon from "./icons/ArrowRightIcon.svelte";
   import DeleteIcon from "./icons/DeleteIcon.svelte";
+  import {
+    play,
+    pause,
+    playerInfo,
+    playing,
+    paused,
+    noEpisode,
+  } from "./playerService";
   import PlayPauseButton from "./PlayPauseButton.svelte";
 
-  let playing = true;
-
   function togglePlayPause() {
-    playing = !playing;
+    if ($playerInfo.status === playing) {
+      console.log("must pause");
+      pause();
+    } else if ($playerInfo.status === paused) {
+      console.log("must play");
+      play();
+    }
   }
 
   function handleBack20s() {}
@@ -73,6 +85,10 @@
     flex-shrink: 0;
   }
 
+  button:disabled {
+    color: var(--color-disabled);
+    fill: var(--color-disabled);
+  }
   .navButtons {
     padding-left: var(--spacing-3);
     display: flex;
@@ -95,34 +111,44 @@
     transition: transform 120ms ease-in-out;
   }
 
-  .navButton:active {
+  .navButton:not(:disabled):active {
     transform: scale(0.85);
   }
 </style>
 
 <div class="container">
   <div class="text">
-    <div class="showName">
-      A Show with a rather long name. I mean, really long
-    </div>
-    <h2 class="episodeTitle">
-      Episode that also has quite a long name. Totally verbose.
-    </h2>
+    <div class="showName">{$playerInfo.episode?.showName || ''}</div>
+    <h2 class="episodeTitle">{$playerInfo.episode?.episodeTitle || ''}</h2>
   </div>
   <div class="buttons">
-    <PlayPauseButton on:toggle={togglePlayPause} {playing} />
+    <PlayPauseButton
+      on:toggle={togglePlayPause}
+      status={$playerInfo.status === noEpisode ? 'disabled' : $playerInfo.status} />
     <div class="navButtons">
       <!--NOTE about ontouchstart="" below: This is a hack because otherwise Safari on
 iOS won't make nice with the :active pseudoclass.-->
-      <button class="navButton" on:click={handleBack20s} ontouchstart="">
+      <button
+        class="navButton"
+        on:click={handleBack20s}
+        ontouchstart=""
+        disabled={$playerInfo.status === noEpisode}>
         <span>-20s</span>
         <ArrowLeftIcon />
       </button>
-      <button class="navButton" on:click={handleForward20s} ontouchstart="">
+      <button
+        class="navButton"
+        on:click={handleForward20s}
+        ontouchstart=""
+        disabled={$playerInfo.status === noEpisode}>
         <span>+20s</span>
         <ArrowRightIcon />
       </button>
-      <button class="navButton" on:click={handleNotInterested} ontouchstart="">
+      <button
+        class="navButton"
+        on:click={handleNotInterested}
+        ontouchstart=""
+        disabled={$playerInfo.status === noEpisode}>
         <DeleteIcon />
       </button>
     </div>

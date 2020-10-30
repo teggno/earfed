@@ -7,7 +7,12 @@
   import { hitTest } from "./dom";
   import { animationTargetRectSetterFactory } from "./animationTargetRect";
 
-  export var playing = false;
+  export var status = disabled;
+
+  export const disabled = "disabled";
+  const playing = "playing";
+  const paused = "paused";
+
   const setAnimationTargetRect = animationTargetRectSetterFactory();
   onMount(() => {
     updateRectInStore();
@@ -106,6 +111,11 @@
     font-size: 0;
   }
 
+  button:disabled {
+    color: var(--color-disabled);
+    fill: var(--color-disabled);
+  }
+
   button.buttonDown {
     transform: scale(0.85);
     outline: 0;
@@ -151,8 +161,9 @@
   on:contextmenu={handleContextMenu}
   bind:this={button}
   class:buttonDown
+  disabled={status === disabled}
   title={playing ? 'Pause' : 'Play'}>
-  {#if playing}
+  {#if status === playing}
     <span
       class="icon"
       in:fade={{ duration: 240, delay: 60, easing: easing.expoOut }}>

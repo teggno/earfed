@@ -10,7 +10,7 @@ export function initAnimationTargetRect() {
 
 export function animationTargetRectSetterFactory() {
   const store = getContext(contextKey);
-  return (rect) => store.update((_) => rect);
+  return (rect) => store.set(rect);
 }
 
 export function getAnimationTargetRect() {
