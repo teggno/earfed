@@ -60,6 +60,7 @@
   }
 
   function handleMouseDown(e) {
+    if (e.button !== 0) return;
     console.log("mousedown");
     buttonDown = true;
   }
