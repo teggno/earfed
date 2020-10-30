@@ -5,10 +5,10 @@
   import * as easing from "svelte/easing";
   import { createEventDispatcher, onMount } from "svelte";
   import { hitTest } from "./dom";
+  import { animationTargetRectSetterFactory } from "./animationTargetRect";
 
   export var playing = false;
-  export var rect = undefined;
-
+  const setAnimationTargetRect = animationTargetRectSetterFactory();
   onMount(() => {
     updateRectInStore();
     window.addEventListener("resize", handleWindowResize);
@@ -31,7 +31,7 @@
       width: r.width - 16,
       height: r.height - 16,
     };
-    rect.update((_) => v);
+    setAnimationTargetRect(v);
   }
 
   // We could just have used :active in CSS. But this can get inconsistent with the

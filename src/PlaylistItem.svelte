@@ -2,7 +2,6 @@
   import ShowIcon from "./ShowIcon.svelte";
 
   export let episode;
-  export let playButtonRect;
 
   $: ({ showIconUrl, showName, episodeTitle } = episode);
 </script>
@@ -36,7 +35,7 @@
 </style>
 
 <li>
-  <ShowIcon {showIconUrl} {showName} {playButtonRect} />
+  <ShowIcon {showIconUrl} {showName} />
   <div class="text">
     <div class="showName">{showName}</div>
     <h2 class="episodeTitle">{episodeTitle}</h2>

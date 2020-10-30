@@ -6,7 +6,6 @@
   import PlayPauseButton from "./PlayPauseButton.svelte";
 
   let playing = true;
-  export let playButtonRect;
 
   function togglePlayPause() {
     playing = !playing;
@@ -111,10 +110,7 @@
     </h2>
   </div>
   <div class="buttons">
-    <PlayPauseButton
-      on:toggle={togglePlayPause}
-      {playing}
-      rect={playButtonRect} />
+    <PlayPauseButton on:toggle={togglePlayPause} {playing} />
     <div class="navButtons">
       <!--NOTE about ontouchstart="" below: This is a hack because otherwise Safari on
 iOS won't make nice with the :active pseudoclass.-->

@@ -2,7 +2,7 @@
   import BottomBar from "./BottomBar.svelte";
   import NowPlaying from "./NowPlaying.svelte";
   import Playlist from "./Playlist.svelte";
-  import { rect } from "./animationTargetRect";
+  import { initAnimationTargetRect } from "./animationTargetRect";
 
   const episodes = getEpisodes();
 
@@ -12,11 +12,13 @@
       episodes.push({
         showName: `Show ${i + 1}`,
         episodeTitle: "Episode foobar",
-        showIconUrl: "http://www.pwop.com/itunes_dnr2.jpg",
+        // showIconUrl: "https://www.pwop.com/itunes_dnr2.jpg",
       });
     }
     return episodes;
   }
+
+  initAnimationTargetRect();
 </script>
 
 <style>
@@ -24,8 +26,8 @@
 
 <div class="container">
   <main>
-    <Playlist {episodes} playButtonRect={rect} />
-    <NowPlaying playButtonRect={rect} />
+    <Playlist {episodes} />
+    <NowPlaying />
   </main>
   <BottomBar />
 </div>

@@ -1,11 +1,13 @@
 <script>
+  import { getAnimationTargetRect } from "./animationTargetRect";
+
   import AnimatedPlayToPauseIcon from "./icons/AnimatedPlayToPauseIcon.svelte";
 
   import PlayIcon from "./icons/PlayIcon.svelte";
 
   export let showIconUrl = "";
   export let showName = "";
-  export let playButtonRect;
+  const playButtonRect = getAnimationTargetRect();
 
   const moveAvgSpeed = 0.3;
   const playIconStartSize = 30;
@@ -39,6 +41,7 @@
   --duration:${durationMillis}ms;`;
 
   function handleClick() {
+    if (animationStatus !== "notRunning") return;
     playIconWrapperRect = playIconWrapper.getBoundingClientRect();
     animationStatus = "entering";
     scrolled = false;

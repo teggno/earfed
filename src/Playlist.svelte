@@ -3,7 +3,6 @@
   import PlaylistItem from "./PlaylistItem.svelte";
 
   export let episodes = [];
-  export let playButtonRect;
 </script>
 
 <style>
@@ -18,7 +17,7 @@
   <PageTitle>Playlist</PageTitle>
   <ul>
     {#each episodes as episode}
-      <PlaylistItem {episode} {playButtonRect} />
+      <PlaylistItem {episode} />
     {/each}
   </ul>
 </div>
