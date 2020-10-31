@@ -161,6 +161,7 @@
   on:contextmenu={handleContextMenu}
   bind:this={button}
   class:buttonDown
+  on:click|stopPropagation
   disabled={status === disabled}
   title={playing ? 'Pause' : 'Play'}>
   {#if status === playing}

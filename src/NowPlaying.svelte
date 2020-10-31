@@ -1,8 +1,8 @@
 <script>
   import ArrowLeftIcon from "./icons/ArrowLeftIcon.svelte";
-
   import ArrowRightIcon from "./icons/ArrowRightIcon.svelte";
   import DeleteIcon from "./icons/DeleteIcon.svelte";
+  import PlayPauseButton from "./PlayPauseButton.svelte";
   import {
     play,
     pause,
@@ -10,8 +10,12 @@
     playing,
     paused,
     noEpisode,
+    removeEpisode,
   } from "./playerService";
-  import PlayPauseButton from "./PlayPauseButton.svelte";
+
+  $: disabled = $playerInfo.status === noEpisode;
+
+  let maximized = false;
 
   function togglePlayPause() {
     if ($playerInfo.status === playing) {
@@ -28,7 +32,13 @@
   function handleForward20s() {}
 
   function handleNotInterested() {
-    // stop playing, remove from playlist
+    removeEpisode();
+  }
+
+  function handleClickComponent() {
+    if (maximized) return;
+
+    maximized = true;
   }
 </script>
 
@@ -36,7 +46,7 @@
   .container {
     width: calc(var(--app-max-width) / 2);
     min-width: 300px;
-    min-height: 160px;
+    height: 160px;
     position: fixed;
     bottom: 150px;
     right: calc(50% - var(--app-max-width) / 2);
@@ -49,6 +59,18 @@
     box-shadow: 0px 11px 15px -7px rgba(0, 0, 0, 0.2),
       0px 24px 38px 3px rgba(0, 0, 0, 0.14),
       0px 9px 46px 8px rgba(0, 0, 0, 0.12);
+    z-index: 6;
+    transition: all 400ms ease 50ms;
+  }
+
+  .container.maximized {
+    bottom: 0;
+    width: var(--app-max-width);
+    box-shadow: 0px 11px 15px -7px rgba(0, 0, 0, 0.5),
+      0px 24px 38px 3px rgba(0, 0, 0, 0.44),
+      0px 9px 46px 8px rgba(0, 0, 0, 0.42);
+    border-radius: 5px 5px 0 0;
+    height: calc(100% - 30px);
   }
 
   .text {
@@ -116,7 +138,9 @@
   }
 </style>
 
-<div class="container">
+<div
+  class={`container${maximized ? ' maximized' : ''}`}
+  on:click={handleClickComponent}>
   <div class="text">
     <div class="showName">{$playerInfo.episode?.showName || ''}</div>
     <h2 class="episodeTitle">{$playerInfo.episode?.episodeTitle || ''}</h2>
@@ -130,25 +154,25 @@
 iOS won't make nice with the :active pseudoclass.-->
       <button
         class="navButton"
-        on:click={handleBack20s}
+        on:click|stopPropagation={handleBack20s}
         ontouchstart=""
-        disabled={$playerInfo.status === noEpisode}>
+        {disabled}>
         <span>-20s</span>
         <ArrowLeftIcon />
       </button>
       <button
         class="navButton"
-        on:click={handleForward20s}
+        on:click|stopPropagation={handleForward20s}
         ontouchstart=""
-        disabled={$playerInfo.status === noEpisode}>
+        {disabled}>
         <span>+20s</span>
         <ArrowRightIcon />
       </button>
       <button
         class="navButton"
-        on:click={handleNotInterested}
+        on:click|stopPropagation={handleNotInterested}
         ontouchstart=""
-        disabled={$playerInfo.status === noEpisode}>
+        {disabled}>
         <DeleteIcon />
       </button>
     </div>
