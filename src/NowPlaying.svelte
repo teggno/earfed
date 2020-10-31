@@ -191,6 +191,8 @@ iOS won't make nice with the :active pseudoclass.-->
     <style>
       body {
         overflow: hidden;
+        /* Prevent "glow" effect below address bar while dragging down */
+        overscroll-behavior-y: none;
       }
     </style>
   {/if}
