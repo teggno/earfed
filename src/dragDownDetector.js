@@ -41,7 +41,9 @@ export default function dragDownDetectorFactory(callback) {
         ].time.valueOf() - contiguousDownwardTouches[0].time.valueOf();
       const totalSpeed = totalDistance / totalTime;
 
-      if (totalDistance > 40 && totalSpeed > 0.4) {
+      console.log(totalDistance);
+      console.log(totalSpeed);
+      if (totalDistance > 20 && totalSpeed > 0.6) {
         callback();
       }
     },
