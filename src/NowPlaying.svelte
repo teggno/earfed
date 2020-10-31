@@ -178,3 +178,13 @@ iOS won't make nice with the :active pseudoclass.-->
     </div>
   </div>
 </div>
+
+<svelte:head>
+  {#if maximized}
+    <style>
+      body {
+        overflow: hidden;
+      }
+    </style>
+  {/if}
+</svelte:head>
