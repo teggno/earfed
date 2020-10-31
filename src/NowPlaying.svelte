@@ -12,10 +12,14 @@
     noEpisode,
     removeEpisode,
   } from "./playerService";
+  import dragDownDetectorFactory from "./dragDownDetector";
 
   $: disabled = $playerInfo.status === noEpisode;
 
   let maximized = false;
+  const dragDownDetector = dragDownDetectorFactory(() => {
+    maximized = false;
+  });
 
   function togglePlayPause() {
     if ($playerInfo.status === playing) {
@@ -140,7 +144,10 @@
 
 <div
   class={`container${maximized ? ' maximized' : ''}`}
-  on:click={handleClickComponent}>
+  on:click={handleClickComponent}
+  on:touchstart|stopPropagation={dragDownDetector.handleTouchStart}
+  on:touchmove|stopPropagation={dragDownDetector.handleTouchMove}
+  on:touchend|stopPropagation={dragDownDetector.handleTouchEnd}>
   <div class="text">
     <div class="showName">{$playerInfo.episode?.showName || ''}</div>
     <h2 class="episodeTitle">{$playerInfo.episode?.episodeTitle || ''}</h2>
