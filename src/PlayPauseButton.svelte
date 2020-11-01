@@ -45,6 +45,7 @@
   let buttonDown = false;
 
   function handleTouchStart(e) {
+    if (status === disabled) return;
     console.log("touchstart");
     buttonDown = true;
   }

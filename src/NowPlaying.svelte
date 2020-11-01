@@ -13,12 +13,14 @@
     removeEpisode,
   } from "./playerService";
   import dragDownDetectorFactory from "./dragDownDetector";
+  import * as bodyScroll from "./toggleBodyScroll";
 
   $: disabled = $playerInfo.status === noEpisode;
 
   let maximized = false;
   const dragDownDetector = dragDownDetectorFactory(() => {
     maximized = false;
+    bodyScroll.enable();
   });
 
   function togglePlayPause() {
@@ -43,6 +45,7 @@
     if (maximized) return;
 
     maximized = true;
+    bodyScroll.disable();
   }
 </script>
 
@@ -108,26 +111,37 @@
   }
 
   .buttons > :global(*) {
-    flex-shrink: 0;
+    display: inline-block;
+    overflow: hidden;
+    width: calc(25% - 16px / 3);
+    text-align: center;
+    transition: all 400ms;
+  }
+
+  .play-pause-wrapper {
+    width: calc(25% + 16px);
+  }
+  .buttons.maximized > :global(*) {
+    width: 33%;
+  }
+
+  .maximized > .delete-wrapper {
+    opacity: 0;
+    width: 0;
   }
 
   button:disabled {
     color: var(--color-disabled);
     fill: var(--color-disabled);
   }
-  .navButtons {
-    padding-left: var(--spacing-3);
-    display: flex;
-    align-items: center;
-  }
 
   .navButton {
     background-color: whitesmoke;
     border-radius: 50%;
-    margin: 0 var(--spacing-3);
     border: 0 none;
     padding: 0;
-    display: flex;
+    margin: 0;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
@@ -152,13 +166,10 @@
     <div class="showName">{$playerInfo.episode?.showName || ''}</div>
     <h2 class="episodeTitle">{$playerInfo.episode?.episodeTitle || ''}</h2>
   </div>
-  <div class="buttons">
-    <PlayPauseButton
-      on:toggle={togglePlayPause}
-      status={$playerInfo.status === noEpisode ? 'disabled' : $playerInfo.status} />
-    <div class="navButtons">
-      <!--NOTE about ontouchstart="" below: This is a hack because otherwise Safari on
+  <!--NOTE about ontouchstart="" below: This is a hack because otherwise Safari on
 iOS won't make nice with the :active pseudoclass.-->
+  <div class={`buttons${maximized ? ' maximized' : ''}`}>
+    <span>
       <button
         class="navButton"
         on:click|stopPropagation={handleBack20s}
@@ -167,6 +178,13 @@ iOS won't make nice with the :active pseudoclass.-->
         <span>-20s</span>
         <ArrowLeftIcon />
       </button>
+    </span>
+    <span class="play-pause-wrapper">
+      <PlayPauseButton
+        on:toggle={togglePlayPause}
+        status={$playerInfo.status === noEpisode ? 'disabled' : $playerInfo.status} />
+    </span>
+    <span>
       <button
         class="navButton"
         on:click|stopPropagation={handleForward20s}
@@ -175,6 +193,8 @@ iOS won't make nice with the :active pseudoclass.-->
         <span>+20s</span>
         <ArrowRightIcon />
       </button>
+    </span>
+    <span class="delete-wrapper">
       <button
         class="navButton"
         on:click|stopPropagation={handleNotInterested}
@@ -182,7 +202,7 @@ iOS won't make nice with the :active pseudoclass.-->
         {disabled}>
         <DeleteIcon />
       </button>
-    </div>
+    </span>
   </div>
 </div>
 
@@ -190,7 +210,6 @@ iOS won't make nice with the :active pseudoclass.-->
   {#if maximized}
     <style>
       body {
-        overflow: hidden;
         /* Prevent "glow" effect below address bar while dragging down */
         overscroll-behavior-y: none;
       }
