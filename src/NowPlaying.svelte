@@ -13,7 +13,6 @@
     removeEpisode,
   } from "./playerService";
   import dragDownDetectorFactory from "./dragDownDetector";
-  import { fade } from "svelte/transition";
   import * as bodyScroll from "./toggleBodyScroll";
   import EpisodeTimeline from "./EpisodeTimeline.svelte";
 
@@ -24,8 +23,6 @@
   let dragDownDistance = 0;
   let containerHeightWhenMaximized = 0;
   $: draggingDown = dragDownDistance !== 0;
-
-  const maximizedFadeOptions = { delay: 300, duration: 200 };
 
   const dragDownDetector = dragDownDetectorFactory(
     (close) => {
@@ -96,13 +93,11 @@
       0px 9px 46px 8px rgba(0, 0, 0, 0.12);
     z-index: 6;
     overflow: hidden;
-    /* transition-delay: 50ms;
-    transition-duration: 400ms;
-    transition-timing-function: ease-out;
-    transition-property: width bottom border-radius box-shadow; */
+    --maximize-duration: 360ms;
   }
+
   .container:not(.draggingDown) {
-    transition-duration: 360ms;
+    transition-duration: var(--maximize-duration);
     transition-timing-function: ease-out;
     transition-property: width height bottom border-radius box-shadow;
   }
@@ -156,12 +151,17 @@
     font-size: var(--font-size-small);
     line-height: var(--lh-copy);
     margin: var(--spacing-3) 0 0 0;
+  }
+
+  .episodeDescription,
+  .timeline {
     opacity: 0;
     transition: opacity 360ms;
   }
 
-  .maximized .episodeDescription {
-    transition: opacity 200ms 360ms;
+  .maximized .episodeDescription,
+  .maximized .timeline {
+    transition: opacity 200ms var(--maximize-duration);
     opacity: 1;
   }
 
@@ -256,8 +256,7 @@
   <div class="text">
     <div class="showName">{$playerInfo.episode?.showName || ''}</div>
     <h2 class="episodeTitle">{$playerInfo.episode?.episodeTitle || ''}</h2>
-    <!-- {#if maximized} -->
-    <p class="episodeDescription" in:fade={maximizedFadeOptions}>
+    <p class="episodeDescription">
       What happens when an open-source experiment becomes software people care
       about? Carl and Richard talk to Jamie Rees about his experiences creating
       Ombi - an open-source project that helps people managing Plex servers to
@@ -283,15 +282,13 @@
       challenges of managing a popular open-source project, both from a
       technical, personal, and professional perspective.
     </p>
-    <!-- {/if} -->
   </div>
-  <!--NOTE about ontouchstart="" below: This is a hack because otherwise Safari on
-iOS won't make nice with the :active pseudoclass.-->
-
-  <div class="timeline" in:fade={maximizedFadeOptions}>
+  <div class="timeline">
     <EpisodeTimeline durationSeconds={48 * 60} currentSecond={0} />
   </div>
   <div class={`buttons${maximized ? ' maximized' : ''}`}>
+    <!--NOTE about ontouchstart="" below: This is a hack because otherwise Safari on
+iOS won't make nice with the :active pseudoclass.-->
     <span>
       <button
         class="navButton"
