@@ -19,14 +19,37 @@
 
   $: disabled = $playerInfo.status === noEpisode;
 
+  let containerElement;
   let maximized = false;
+  let dragDownDistance = 0;
+  let containerHeightWhenMaximized = 0;
+  $: draggingDown = dragDownDistance !== 0;
 
-  const maximizedFadeOptions = { delay: 400, duration: 200 };
+  const maximizedFadeOptions = { delay: 300, duration: 200 };
 
-  const dragDownDetector = dragDownDetectorFactory(() => {
-    maximized = false;
-    bodyScroll.enable();
-  });
+  const dragDownDetector = dragDownDetectorFactory(
+    (close) => {
+      dragDownDistance = 0;
+      containerElement.style.height = null;
+      console.log("end");
+      if (close) {
+        console.log("close");
+        maximized = false;
+        bodyScroll.enable();
+      }
+    },
+    (d) => {
+      dragDownDistance += d;
+      if (containerHeightWhenMaximized === 0) {
+        containerHeightWhenMaximized = containerElement.getBoundingClientRect()
+          .height;
+      }
+
+      containerElement.style.height = `${
+        containerHeightWhenMaximized - dragDownDistance / 3
+      }px`;
+    }
+  );
 
   function togglePlayPause() {
     if ($playerInfo.status === playing) {
@@ -47,6 +70,7 @@
   function handleClickComponent() {
     if (maximized) return;
 
+    dragDownDistance = 0;
     maximized = true;
     bodyScroll.disable();
   }
@@ -54,10 +78,10 @@
 
 <style>
   .container {
-    width: calc(var(--app-max-width) / 2);
-    min-width: 300px;
-    height: 160px;
     position: fixed;
+    width: calc(var(--app-max-width) / 2);
+    height: 160px;
+    min-width: 300px;
     bottom: 150px;
     right: calc(50% - var(--app-max-width) / 2);
     border-radius: 50px 0 0 50px;
@@ -71,23 +95,39 @@
       0px 24px 38px 3px rgba(0, 0, 0, 0.14),
       0px 9px 46px 8px rgba(0, 0, 0, 0.12);
     z-index: 6;
-    transition: all 400ms ease 50ms;
     overflow: hidden;
+    /* transition-delay: 50ms;
+    transition-duration: 400ms;
+    transition-timing-function: ease-out;
+    transition-property: width bottom border-radius box-shadow; */
+  }
+  .container:not(.draggingDown) {
+    transition-duration: 360ms;
+    transition-timing-function: ease-out;
+    transition-property: width height bottom border-radius box-shadow;
+  }
+
+  .draggingDown .text {
+    overflow-y: hidden;
   }
 
   .container.maximized {
-    bottom: 0;
     width: var(--app-max-width);
+    height: calc(100% - 30px);
+    bottom: 0;
+    border-radius: 10px 10px 0 0;
     box-shadow: 0px 11px 15px -7px rgba(0, 0, 0, 0.5),
       0px 24px 38px 3px rgba(0, 0, 0, 0.44),
       0px 9px 46px 8px rgba(0, 0, 0, 0.42);
-    border-radius: 10px 10px 0 0;
-    height: calc(100% - 30px);
   }
 
   .text {
     overflow-y: auto;
     padding: 0 var(--spacing-4);
+  }
+
+  :not(.maximized) .text {
+    overflow-y: hidden;
   }
 
   .showName {
@@ -116,6 +156,13 @@
     font-size: var(--font-size-small);
     line-height: var(--lh-copy);
     margin: var(--spacing-3) 0 0 0;
+    opacity: 0;
+    transition: opacity 360ms;
+  }
+
+  .maximized .episodeDescription {
+    transition: opacity 200ms 360ms;
+    opacity: 1;
   }
 
   .text,
@@ -197,52 +244,53 @@
   }
 </style>
 
+<!-- style={`transform:translateY(${dragDownDistance / 4}px)`} -->
+
 <div
-  class={`container${maximized ? ' maximized' : ''}`}
+  class={`container${maximized ? ' maximized' : ''}${draggingDown ? ' draggingDown' : ''}`}
   on:click={handleClickComponent}
   on:touchstart|stopPropagation={maximized ? dragDownDetector.handleTouchStart : undefined}
   on:touchmove|stopPropagation={maximized ? dragDownDetector.handleTouchMove : undefined}
-  on:touchend|stopPropagation={maximized ? dragDownDetector.handleTouchEnd : undefined}>
+  on:touchend|stopPropagation={maximized ? dragDownDetector.handleTouchEnd : undefined}
+  bind:this={containerElement}>
   <div class="text">
     <div class="showName">{$playerInfo.episode?.showName || ''}</div>
     <h2 class="episodeTitle">{$playerInfo.episode?.episodeTitle || ''}</h2>
-    {#if maximized}
-      <p class="episodeDescription" in:fade={maximizedFadeOptions}>
-        What happens when an open-source experiment becomes software people care
-        about? Carl and Richard talk to Jamie Rees about his experiences
-        creating Ombi - an open-source project that helps people managing Plex
-        servers to handle requests from friends and family for more content.
-        Jamie talks about creating Ombi as an experiment with NancyFX that soon
-        evolved into something lots of folks needed and wanted. The conversation
-        dives into the challenges of managing a popular open-source project,
-        both from a technical, personal, and professional perspective. What
-        happens when an open-source experiment becomes software people care
-        about? Carl and Richard talk to Jamie Rees about his experiences
-        creating Ombi - an open-source project that helps people managing Plex
-        servers to handle requests from friends and family for more content.
-        Jamie talks about creating Ombi as an experiment with NancyFX that soon
-        evolved into something lots of folks needed and wanted. The conversation
-        dives into the challenges of managing a popular open-source project,
-        both from a technical, personal, and professional perspective. What
-        happens when an open-source experiment becomes software people care
-        about? Carl and Richard talk to Jamie Rees about his experiences
-        creating Ombi - an open-source project that helps people managing Plex
-        servers to handle requests from friends and family for more content.
-        Jamie talks about creating Ombi as an experiment with NancyFX that soon
-        evolved into something lots of folks needed and wanted. The conversation
-        dives into the challenges of managing a popular open-source project,
-        both from a technical, personal, and professional perspective.
-      </p>
-    {/if}
+    <!-- {#if maximized} -->
+    <p class="episodeDescription" in:fade={maximizedFadeOptions}>
+      What happens when an open-source experiment becomes software people care
+      about? Carl and Richard talk to Jamie Rees about his experiences creating
+      Ombi - an open-source project that helps people managing Plex servers to
+      handle requests from friends and family for more content. Jamie talks
+      about creating Ombi as an experiment with NancyFX that soon evolved into
+      something lots of folks needed and wanted. The conversation dives into the
+      challenges of managing a popular open-source project, both from a
+      technical, personal, and professional perspective. What happens when an
+      open-source experiment becomes software people care about? Carl and
+      Richard talk to Jamie Rees about his experiences creating Ombi - an
+      open-source project that helps people managing Plex servers to handle
+      requests from friends and family for more content. Jamie talks about
+      creating Ombi as an experiment with NancyFX that soon evolved into
+      something lots of folks needed and wanted. The conversation dives into the
+      challenges of managing a popular open-source project, both from a
+      technical, personal, and professional perspective. What happens when an
+      open-source experiment becomes software people care about? Carl and
+      Richard talk to Jamie Rees about his experiences creating Ombi - an
+      open-source project that helps people managing Plex servers to handle
+      requests from friends and family for more content. Jamie talks about
+      creating Ombi as an experiment with NancyFX that soon evolved into
+      something lots of folks needed and wanted. The conversation dives into the
+      challenges of managing a popular open-source project, both from a
+      technical, personal, and professional perspective.
+    </p>
+    <!-- {/if} -->
   </div>
   <!--NOTE about ontouchstart="" below: This is a hack because otherwise Safari on
 iOS won't make nice with the :active pseudoclass.-->
 
-  {#if maximized}
-    <div class="timeline" in:fade={maximizedFadeOptions}>
-      <EpisodeTimeline durationSeconds={48 * 60} currentSecond={0} />
-    </div>
-  {/if}
+  <div class="timeline" in:fade={maximizedFadeOptions}>
+    <EpisodeTimeline durationSeconds={48 * 60} currentSecond={0} />
+  </div>
   <div class={`buttons${maximized ? ' maximized' : ''}`}>
     <span>
       <button

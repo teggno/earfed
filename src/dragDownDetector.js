@@ -1,4 +1,8 @@
-export default function dragDownDetectorFactory(callback) {
+export default function dragDownDetectorFactory(
+  dragEndCallback,
+  draggingCallback
+) {
+  draggingCallback = draggingCallback || (() => {});
   let previousTouch;
   let contiguousDownwardTouches = [];
   let targetScrollTopsAtFirstTouch = [];
@@ -17,6 +21,13 @@ export default function dragDownDetectorFactory(callback) {
     handleTouchMove(e) {
       if (e.changedTouches.length !== 1) return;
 
+      const mightBeScrollingDown = elementAndAncestorsScrollTops(
+        e.changedTouches[0].target
+      ).some((t) => t > 0);
+      if (mightBeScrollingDown) {
+        return;
+      }
+
       const currentTouch = e.changedTouches[0];
       if (movedUp(previousTouch, currentTouch)) {
         contiguousDownwardTouches = [];
@@ -29,19 +40,29 @@ export default function dragDownDetectorFactory(callback) {
       ];
 
       previousTouch = currentTouch;
+      const dragDownDistance =
+        contiguousDownwardTouches[contiguousDownwardTouches.length - 1].touch
+          .clientY -
+          contiguousDownwardTouches[contiguousDownwardTouches.length - 2]?.touch
+            ?.clientY || 0;
+      console.log(dragDownDistance);
+      if (dragDownDistance !== 0) draggingCallback(dragDownDistance);
     },
 
     handleTouchEnd(e) {
-      if (contiguousDownwardTouches.length === 0) return;
-
+      const firstItem = contiguousDownwardTouches[0];
+      const lastItem =
+        contiguousDownwardTouches[contiguousDownwardTouches.length - 1];
       const totalDistance =
-        contiguousDownwardTouches[contiguousDownwardTouches.length - 1].touch
-          .clientY - contiguousDownwardTouches[0].touch.clientY;
+        firstItem && lastItem
+          ? lastItem.touch.clientY - firstItem.touch.clientY
+          : 0;
       const totalTime =
-        contiguousDownwardTouches[
-          contiguousDownwardTouches.length - 1
-        ].time.valueOf() - contiguousDownwardTouches[0].time.valueOf();
-      const totalSpeed = totalDistance / totalTime;
+        firstItem && lastItem
+          ? lastItem.time.valueOf() - firstItem.time.valueOf()
+          : 0;
+      const totalSpeed =
+        totalTime === 0 ? undefined : totalDistance / totalTime;
 
       const newScrollTops = elementAndAncestorsScrollTops(
         e.changedTouches[0].target
@@ -53,7 +74,9 @@ export default function dragDownDetectorFactory(callback) {
         totalSpeed > 0.5 &&
         areNumberArraysEqual(targetScrollTopsAtFirstTouch, newScrollTops)
       ) {
-        callback();
+        dragEndCallback(true);
+      } else {
+        dragEndCallback(false);
       }
     },
   };
