@@ -21,6 +21,7 @@
   --font-size-large: 1.5rem;
   --label-input-spacing: var(--spacing-2);
   --field-spacing: var(--spacing-3);
+  --lh-copy: 160%;
 }
 
 html,
