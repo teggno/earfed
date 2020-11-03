@@ -26,6 +26,9 @@
   .showName {
     font-size: var(--font-size-small);
     color: var(--color-text-muted);
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
   }
 
   .episodeTitle {
@@ -33,10 +36,18 @@
     padding: 0;
     font-size: var(--font-size-medium);
     font-weight: normal;
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
   }
 
   .text {
     margin-left: var(--spacing-3);
+    min-width: 0;
+  }
+
+  li :global(:first-child) {
+    flex-shrink: 0;
   }
 </style>
 

@@ -136,18 +136,7 @@ function audioWithEpisodeFactory(episode) {
     },
     destroy() {
       removeEventListeners();
-      const updateStore = () => {
-        store.set({ ...initialValue });
-      };
-      const pauseHandler = () => {
-        audio.removeEventListener("pause", pauseHandler);
-        updateStore();
-      };
-      if (audio.paused) {
-        updateStore();
-      } else {
-        audio.addEventListener("pause", pauseHandler);
-      }
+      store.set({ ...initialValue });
       audio.pause();
     },
   };

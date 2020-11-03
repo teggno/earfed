@@ -8,6 +8,7 @@
   import { animationTargetRectSetterFactory } from "./animationTargetRect";
 
   export var status = disabled;
+  export var backgroundImageUrl = "";
 
   export const disabled = "disabled";
   const playing = "playing";
@@ -106,8 +107,9 @@
     position: relative;
     margin: 0;
     padding: 0;
-    /* background: center / contain no-repeat
-      url("http://www.pwop.com/itunes_dnr2.jpg"); */
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
     transition: transform 120ms ease-in-out;
     font-size: 0;
   }
@@ -164,7 +166,8 @@
   class:buttonDown
   on:click|stopPropagation
   disabled={status === disabled}
-  title={playing ? 'Pause' : 'Play'}>
+  title={playing ? 'Pause' : 'Play'}
+  style={`${backgroundImageUrl ? `background-image: url('${backgroundImageUrl}')` : ''}`}>
   {#if status === playing}
     <span
       class="icon"

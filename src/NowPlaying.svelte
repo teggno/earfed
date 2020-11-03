@@ -281,30 +281,7 @@
     <div class="showName">{$playerInfo.episode?.showName || ''}</div>
     <h2 class="episodeTitle">{$playerInfo.episode?.episodeTitle || ''}</h2>
     <p class="episodeDescription">
-      What happens when an open-source experiment becomes software people care
-      about? Carl and Richard talk to Jamie Rees about his experiences creating
-      Ombi - an open-source project that helps people managing Plex servers to
-      handle requests from friends and family for more content. Jamie talks
-      about creating Ombi as an experiment with NancyFX that soon evolved into
-      something lots of folks needed and wanted. The conversation dives into the
-      challenges of managing a popular open-source project, both from a
-      technical, personal, and professional perspective. What happens when an
-      open-source experiment becomes software people care about? Carl and
-      Richard talk to Jamie Rees about his experiences creating Ombi - an
-      open-source project that helps people managing Plex servers to handle
-      requests from friends and family for more content. Jamie talks about
-      creating Ombi as an experiment with NancyFX that soon evolved into
-      something lots of folks needed and wanted. The conversation dives into the
-      challenges of managing a popular open-source project, both from a
-      technical, personal, and professional perspective. What happens when an
-      open-source experiment becomes software people care about? Carl and
-      Richard talk to Jamie Rees about his experiences creating Ombi - an
-      open-source project that helps people managing Plex servers to handle
-      requests from friends and family for more content. Jamie talks about
-      creating Ombi as an experiment with NancyFX that soon evolved into
-      something lots of folks needed and wanted. The conversation dives into the
-      challenges of managing a popular open-source project, both from a
-      technical, personal, and professional perspective.
+      {$playerInfo.episode?.episodeDescription || ''}
     </p>
   </div>
   <div class="timeline">
@@ -329,7 +306,8 @@ iOS won't make nice with the :active pseudoclass.-->
     <span class="play-pause-wrapper">
       <PlayPauseButton
         on:toggle={togglePlayPause}
-        status={$playerInfo.status === noEpisode ? 'disabled' : $playerInfo.status} />
+        status={$playerInfo.status === noEpisode ? 'disabled' : $playerInfo.status}
+        backgroundImageUrl={$playerInfo.episode ? $playerInfo.episode.showIconUrl : ''} />
     </span>
     <span>
       <button
