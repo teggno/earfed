@@ -5,6 +5,7 @@
   import PlayPauseButton from "./PlayPauseButton.svelte";
   import {
     play,
+    seek,
     pause,
     playerInfo,
     playing,
@@ -62,9 +63,22 @@
     }
   }
 
-  function handleBack20s() {}
+  function handleBack20s() {
+    const currentSecond = $playerInfo.currentSecond;
+    seek(currentSecond < 20 ? 0 : currentSecond - 20);
+  }
 
-  function handleForward20s() {}
+  function handleForward20s() {
+    const currentSecond = $playerInfo.currentSecond;
+    const durationSeconds = $playerInfo.durationSeconds;
+    if (typeof durationSeconds !== "number") return;
+
+    if (currentSecond + 20 > durationSeconds) {
+      pause();
+    } else {
+      seek(currentSecond + 20);
+    }
+  }
 
   function handleNotInterested() {
     removeEpisode();
@@ -76,6 +90,11 @@
     dragDownDistance = 0;
     maximized = true;
     bodyScroll.disable();
+  }
+
+  function handleTimeChange({ detail: { second } }) {
+    console.log(second);
+    seek(second);
   }
 </script>
 
@@ -289,7 +308,10 @@
     </p>
   </div>
   <div class="timeline">
-    <EpisodeTimeline durationSeconds={48 * 60} currentSecond={0} />
+    <EpisodeTimeline
+      durationSeconds={$playerInfo.durationSeconds}
+      currentSecond={$playerInfo.currentSecond}
+      on:change={handleTimeChange} />
   </div>
   <div class="buttons">
     <!--NOTE about ontouchstart="" below: This is a hack because otherwise Safari on

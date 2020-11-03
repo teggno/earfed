@@ -12,6 +12,8 @@
       episodes.push({
         showName: `Show ${i + 1}`,
         episodeTitle: "Episode foobar",
+        episodeUrl:
+          "https://stream.redcircle.com/episodes/493397ff-532f-40a0-842c-8b4a5ed1e5ce/stream.mp3",
         // showIconUrl: "https://www.pwop.com/itunes_dnr2.jpg",
       });
     }
