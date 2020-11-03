@@ -9,6 +9,14 @@ export default function dragDownDetectorFactory(
   let contiguousDownwardTouches = [];
   let targetScrollTopsAtFirstTouch = [];
 
+  function hasScrolledSinceTouchStart(element) {
+    // note to the map() below replacing negative values with zeros: This is for the
+    // bouncy scroll behavior on iOS Safari
+    const newScrollTops = elementAndAncestorsScrollTops(element).map((t) =>
+      t < 0 ? 0 : t
+    );
+    return !areNumberArraysEqual(targetScrollTopsAtFirstTouch, newScrollTops);
+  }
   return {
     handleTouchStart(e) {
       if (e.touches.length !== 1) return;
@@ -24,9 +32,8 @@ export default function dragDownDetectorFactory(
       if (e.changedTouches.length !== 1) return;
 
       const currentTouch = e.changedTouches[0];
-      if (isScrolled(currentTouch.target)) {
-        return;
-      }
+
+      if (isScrolled(currentTouch.target)) return;
 
       if (movedUp(lastElement(contiguousDownwardTouches).touch, currentTouch)) {
         contiguousDownwardTouches = [timedTouch(currentTouch)];
@@ -35,13 +42,13 @@ export default function dragDownDetectorFactory(
 
       contiguousDownwardTouches = [
         ...contiguousDownwardTouches,
-        { touch: currentTouch, time: new Date() },
+        timedTouch(currentTouch),
       ];
 
+      const secondButLastTouch =
+        contiguousDownwardTouches[contiguousDownwardTouches.length - 2]?.touch;
       const dragDownDistance =
-        currentTouch.clientY -
-          contiguousDownwardTouches[contiguousDownwardTouches.length - 2]?.touch
-            ?.clientY || 0;
+        currentTouch.clientY - secondButLastTouch?.clientY || 0;
       if (dragDownDistance !== 0) draggingCallback(dragDownDistance);
     },
 
@@ -59,20 +66,11 @@ export default function dragDownDetectorFactory(
       const totalSpeed =
         totalTime === 0 ? undefined : totalDistance / totalTime;
 
-      const newScrollTops = elementAndAncestorsScrollTops(
-        e.changedTouches[0].target
-      ).map((t) => (t < 0 ? 0 : t));
-      // note to the map() above replacing negative values with zeros: This is for the
-      // bouncy scroll behavior on iOS Safari
-      if (
+      const close =
         totalDistance > minDragPixelsToClose &&
         totalSpeed > minDragSpeedToClise &&
-        areNumberArraysEqual(targetScrollTopsAtFirstTouch, newScrollTops)
-      ) {
-        dragEndCallback(true);
-      } else {
-        dragEndCallback(false);
-      }
+        !hasScrolledSinceTouchStart(e.changedTouches[0].target);
+      dragEndCallback(close);
     },
   };
 }
