@@ -1,9 +1,11 @@
+const minDragDownPixelsToClose = 30;
+const minDragSpeedToClose = 0.5;
+
 export default function dragDownDetectorFactory(
   dragEndCallback,
   draggingCallback
 ) {
   draggingCallback = draggingCallback || (() => {});
-  let previousTouch;
   let contiguousDownwardTouches = [];
   let targetScrollTopsAtTouchStart = [];
 
@@ -13,8 +15,9 @@ export default function dragDownDetectorFactory(
 
       const currentTouch = e.touches[0];
 
-      if (isElementOrAncestorsScrolledUp(currentTouch.target)) {
-        // The current touch scrolls the touched element of one of its ancestors down
+      if (isElementOrAncestorsScrolled(currentTouch.target)) {
+        console.log("scrolled");
+        // The current touch scrolls the touched element or one of its ancestors
         // so this touch is of no use.
         // TODO: This might cause a bug if some ancestor element is scrolled down but
         // has overflow: hidden. In that case the move must be used.
@@ -22,7 +25,6 @@ export default function dragDownDetectorFactory(
       }
 
       contiguousDownwardTouches = [touchWithTime(currentTouch)];
-      previousTouch = currentTouch;
       targetScrollTopsAtTouchStart = elementAndAncestorsScrollTops(
         currentTouch.target
       );
@@ -31,8 +33,8 @@ export default function dragDownDetectorFactory(
     handleTouchMove(e) {
       if (e.changedTouches.length !== 1) return;
 
+      const previousTouch = lastElement(contiguousDownwardTouches);
       const currentTouch = e.changedTouches[0];
-
       if (movedUp(previousTouch, currentTouch)) {
         contiguousDownwardTouches = [touchWithTime(currentTouch)];
         return;
@@ -43,38 +45,35 @@ export default function dragDownDetectorFactory(
         touchWithTime(currentTouch),
       ];
 
-      previousTouch = currentTouch;
       const dragDownDistance =
-        contiguousDownwardTouches[contiguousDownwardTouches.length - 1].touch
-          .clientY -
+        currentTouch.clientY -
           contiguousDownwardTouches[contiguousDownwardTouches.length - 2]?.touch
             ?.clientY || 0;
       if (dragDownDistance !== 0) draggingCallback(dragDownDistance);
     },
 
     handleTouchEnd(e) {
-      const firstItem = contiguousDownwardTouches[0];
-      const lastItem =
-        contiguousDownwardTouches[contiguousDownwardTouches.length - 1];
+      const firstTimedTouch = contiguousDownwardTouches[0];
+      const lastTimedTouch = lastElement(contiguousDownwardTouches);
       const totalDistance =
-        firstItem && lastItem
-          ? lastItem.touch.clientY - firstItem.touch.clientY
+        firstTimedTouch && lastTimedTouch
+          ? lastTimedTouch.touch.clientY - firstTimedTouch.touch.clientY
           : 0;
       const totalTime =
-        firstItem && lastItem
-          ? lastItem.time.valueOf() - firstItem.time.valueOf()
+        firstTimedTouch && lastTimedTouch
+          ? lastTimedTouch.time.valueOf() - firstTimedTouch.time.valueOf()
           : 0;
       const totalSpeed =
         totalTime === 0 ? undefined : totalDistance / totalTime;
 
+      // note to the map() below replacing negative values with zeros: This is for the
+      // bouncy scroll behavior on iOS Safari
       const newScrollTops = elementAndAncestorsScrollTops(
         e.changedTouches[0].target
       ).map((t) => (t < 0 ? 0 : t));
-      // note to the map() above replacing negative values with zeros: This is for the
-      // bouncy scroll behavior on iOS Safari
       if (
-        totalDistance > 30 &&
-        totalSpeed > 0.5 &&
+        totalDistance > minDragDownPixelsToClose &&
+        totalSpeed > minDragSpeedToClose &&
         areNumberArraysEqual(targetScrollTopsAtTouchStart, newScrollTops)
       ) {
         dragEndCallback(true);
@@ -114,6 +113,10 @@ function touchWithTime(touch) {
   return { touch, time: new Date() };
 }
 
-function isElementOrAncestorsScrolledUp(element) {
-  elementAndAncestorsScrollTops(element).some((t) => t > 0);
+function isElementOrAncestorsScrolled(element) {
+  return elementAndAncestorsScrollTops(element).some((t) => t > 0);
+}
+
+function lastElement(array) {
+  return array[array.length - 1];
 }

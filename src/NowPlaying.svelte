@@ -26,7 +26,6 @@
 
   function handleDragDown({ detail: { pixels } }) {
     dragDownDistance += pixels;
-    console.log(pixels);
     if (containerHeightWhenMaximized === 0) {
       containerHeightWhenMaximized = containerElement.getBoundingClientRect()
         .height;
