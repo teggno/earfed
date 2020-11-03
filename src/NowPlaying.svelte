@@ -334,8 +334,9 @@ iOS won't make nice with the :active pseudoclass.-->
 <svelte:head>
   {#if maximized}
     <style>
-      body {
-        /* Prevent "glow" effect below address bar while dragging down */
+      body,
+      html {
+        /* Prevent pull-to-refresh and "glow" effect below address bar while dragging down */
         overscroll-behavior-y: none;
       }
     </style>

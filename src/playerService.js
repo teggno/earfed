@@ -73,7 +73,7 @@ function audioWithEpisodeFactory(episode) {
   const audio = new Audio(episode.episodeUrl);
   addEventListeners(audio);
 
-  store.set({ ...initialValue, episode });
+  store.set({ ...initialValue, episode, status: paused });
 
   function addEventListeners() {
     audio.addEventListener("play", handleAudioPlay);
