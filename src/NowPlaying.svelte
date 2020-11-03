@@ -18,36 +18,38 @@
 
   $: disabled = $playerInfo.status === noEpisode;
 
-  let containerElement;
   let maximized = false;
   let dragDownDistance = 0;
   let containerHeightWhenMaximized = 0;
+  let textElement;
+
   $: draggingDown = dragDownDistance !== 0;
 
-  function handleDragDown({ detail: { pixels } }) {
-    dragDownDistance += pixels;
+  function handleDragDown(e) {
+    dragDownDistance += e.detail.pixels;
     if (containerHeightWhenMaximized === 0) {
-      containerHeightWhenMaximized = containerElement.getBoundingClientRect()
-        .height;
+      containerHeightWhenMaximized = e.target.getBoundingClientRect().height;
     }
 
-    containerElement.style.height = `${
+    e.target.style.height = `${
       containerHeightWhenMaximized - dragDownDistance / 3
     }px`;
   }
 
-  function handleDragEnd() {
+  function handleDragEnd(e) {
     dragDownDistance = 0;
-    containerElement.style.height = null;
-
-    console.log("end");
+    e.target.style.height = null;
   }
 
-  function handleCloseThroughDrag() {
+  function handleCloseThroughDrag(e) {
     dragDownDistance = 0;
-    containerElement.style.height = null;
+    e.target.style.height = null;
 
-    console.log("close");
+    setTimeout(() => {
+      // for some reason, doing this without timeout causes some ugly jumping.
+      textElement.scrollTo(0, 0);
+    }, 120);
+
     maximized = false;
     bodyScroll.enable();
   }
@@ -69,7 +71,7 @@
   }
 
   function handleClickComponent() {
-    if (maximized) return;
+    if (maximized || disabled) return;
 
     dragDownDistance = 0;
     maximized = true;
@@ -213,11 +215,12 @@
   .play-pause-wrapper {
     width: calc(25% + 16px);
   }
-  .buttons.maximized > :global(*) {
+
+  .maximized .buttons > :global(*) {
     width: 33%;
   }
 
-  .maximized > .delete-wrapper {
+  .maximized .delete-wrapper {
     opacity: 0;
     width: 0;
   }
@@ -248,17 +251,14 @@
   }
 </style>
 
-<!-- style={`transform:translateY(${dragDownDistance / 4}px)`} -->
-
 <div
   class={`container${maximized ? ' maximized' : ''}${draggingDown ? ' draggingDown' : ''}`}
-  on:click={handleClickComponent}
   use:dragToClose
+  on:click={handleClickComponent}
   on:dragdown|stopPropagation={maximized ? handleDragDown : undefined}
   on:dragend|stopPropagation={maximized ? handleDragEnd : undefined}
-  on:closethroughdrag|stopPropagation={maximized ? handleCloseThroughDrag : undefined}
-  bind:this={containerElement}>
-  <div class="text">
+  on:closethroughdrag|stopPropagation={maximized ? handleCloseThroughDrag : undefined}>
+  <div class="text" bind:this={textElement}>
     <div class="showName">{$playerInfo.episode?.showName || ''}</div>
     <h2 class="episodeTitle">{$playerInfo.episode?.episodeTitle || ''}</h2>
     <p class="episodeDescription">
@@ -291,7 +291,7 @@
   <div class="timeline">
     <EpisodeTimeline durationSeconds={48 * 60} currentSecond={0} />
   </div>
-  <div class={`buttons${maximized ? ' maximized' : ''}`}>
+  <div class="buttons">
     <!--NOTE about ontouchstart="" below: This is a hack because otherwise Safari on
 iOS won't make nice with the :active pseudoclass.-->
     <span>
