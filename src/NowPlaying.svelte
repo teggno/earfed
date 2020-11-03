@@ -12,9 +12,9 @@
     noEpisode,
     removeEpisode,
   } from "./playerService";
-  import dragDownDetectorFactory from "./dragDownDetector";
   import * as bodyScroll from "./toggleBodyScroll";
   import EpisodeTimeline from "./EpisodeTimeline.svelte";
+  import dragToClose from "./dragToCloseAction";
 
   $: disabled = $playerInfo.status === noEpisode;
 
@@ -24,29 +24,34 @@
   let containerHeightWhenMaximized = 0;
   $: draggingDown = dragDownDistance !== 0;
 
-  const dragDownDetector = dragDownDetectorFactory(
-    (close) => {
-      dragDownDistance = 0;
-      containerElement.style.height = null;
-      console.log("end");
-      if (close) {
-        console.log("close");
-        maximized = false;
-        bodyScroll.enable();
-      }
-    },
-    (d) => {
-      dragDownDistance += d;
-      if (containerHeightWhenMaximized === 0) {
-        containerHeightWhenMaximized = containerElement.getBoundingClientRect()
-          .height;
-      }
-
-      containerElement.style.height = `${
-        containerHeightWhenMaximized - dragDownDistance / 3
-      }px`;
+  function handleDragDown({ detail: { pixels } }) {
+    dragDownDistance += pixels;
+    console.log(pixels);
+    if (containerHeightWhenMaximized === 0) {
+      containerHeightWhenMaximized = containerElement.getBoundingClientRect()
+        .height;
     }
-  );
+
+    containerElement.style.height = `${
+      containerHeightWhenMaximized - dragDownDistance / 3
+    }px`;
+  }
+
+  function handleDragEnd() {
+    dragDownDistance = 0;
+    containerElement.style.height = null;
+
+    console.log("end");
+  }
+
+  function handleCloseThroughDrag() {
+    dragDownDistance = 0;
+    containerElement.style.height = null;
+
+    console.log("close");
+    maximized = false;
+    bodyScroll.enable();
+  }
 
   function togglePlayPause() {
     if ($playerInfo.status === playing) {
@@ -249,9 +254,10 @@
 <div
   class={`container${maximized ? ' maximized' : ''}${draggingDown ? ' draggingDown' : ''}`}
   on:click={handleClickComponent}
-  on:touchstart|stopPropagation={maximized ? dragDownDetector.handleTouchStart : undefined}
-  on:touchmove|stopPropagation={maximized ? dragDownDetector.handleTouchMove : undefined}
-  on:touchend|stopPropagation={maximized ? dragDownDetector.handleTouchEnd : undefined}
+  use:dragToClose
+  on:dragdown|stopPropagation={maximized ? handleDragDown : undefined}
+  on:dragend|stopPropagation={maximized ? handleDragEnd : undefined}
+  on:closethroughdrag|stopPropagation={maximized ? handleCloseThroughDrag : undefined}
   bind:this={containerElement}>
   <div class="text">
     <div class="showName">{$playerInfo.episode?.showName || ''}</div>

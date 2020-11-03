@@ -6,6 +6,8 @@
 
   $: current = secondsToTimeString(currentSecond);
   $: remaining = secondsToTimeString(durationSeconds - currentSecond);
+
+  function handleChange() {}
 </script>
 
 <style>
@@ -23,9 +25,14 @@
 </style>
 
 <div>
-  <input type="range" min={0} max={durationSeconds} step="10" />
   <div class="currentRemaining">
     <div>{current}</div>
     <div>{remaining}</div>
   </div>
+  <input
+    type="range"
+    min={0}
+    max={durationSeconds}
+    step="10"
+    on:change|stopPropagation={handleChange} />
 </div>

@@ -5,38 +5,42 @@ export default function dragDownDetectorFactory(
   draggingCallback = draggingCallback || (() => {});
   let previousTouch;
   let contiguousDownwardTouches = [];
-  let targetScrollTopsAtFirstTouch = [];
+  let targetScrollTopsAtTouchStart = [];
 
   return {
     handleTouchStart(e) {
       if (e.touches.length !== 1) return;
 
-      contiguousDownwardTouches = [];
-      previousTouch = e.touches[0];
-      targetScrollTopsAtFirstTouch = elementAndAncestorsScrollTops(
-        e.touches[0].target
+      const currentTouch = e.touches[0];
+
+      if (isElementOrAncestorsScrolledUp(currentTouch.target)) {
+        // The current touch scrolls the touched element of one of its ancestors down
+        // so this touch is of no use.
+        // TODO: This might cause a bug if some ancestor element is scrolled down but
+        // has overflow: hidden. In that case the move must be used.
+        return;
+      }
+
+      contiguousDownwardTouches = [touchWithTime(currentTouch)];
+      previousTouch = currentTouch;
+      targetScrollTopsAtTouchStart = elementAndAncestorsScrollTops(
+        currentTouch.target
       );
     },
 
     handleTouchMove(e) {
       if (e.changedTouches.length !== 1) return;
 
-      const mightBeScrollingDown = elementAndAncestorsScrollTops(
-        e.changedTouches[0].target
-      ).some((t) => t > 0);
-      if (mightBeScrollingDown) {
-        return;
-      }
-
       const currentTouch = e.changedTouches[0];
+
       if (movedUp(previousTouch, currentTouch)) {
-        contiguousDownwardTouches = [];
+        contiguousDownwardTouches = [touchWithTime(currentTouch)];
         return;
       }
 
       contiguousDownwardTouches = [
         ...contiguousDownwardTouches,
-        { touch: currentTouch, time: new Date() },
+        touchWithTime(currentTouch),
       ];
 
       previousTouch = currentTouch;
@@ -45,7 +49,6 @@ export default function dragDownDetectorFactory(
           .clientY -
           contiguousDownwardTouches[contiguousDownwardTouches.length - 2]?.touch
             ?.clientY || 0;
-      console.log(dragDownDistance);
       if (dragDownDistance !== 0) draggingCallback(dragDownDistance);
     },
 
@@ -72,7 +75,7 @@ export default function dragDownDetectorFactory(
       if (
         totalDistance > 30 &&
         totalSpeed > 0.5 &&
-        areNumberArraysEqual(targetScrollTopsAtFirstTouch, newScrollTops)
+        areNumberArraysEqual(targetScrollTopsAtTouchStart, newScrollTops)
       ) {
         dragEndCallback(true);
       } else {
@@ -105,4 +108,12 @@ function areNumberArraysEqual(a, b) {
   }
 
   return true;
+}
+
+function touchWithTime(touch) {
+  return { touch, time: new Date() };
+}
+
+function isElementOrAncestorsScrolledUp(element) {
+  elementAndAncestorsScrollTops(element).some((t) => t > 0);
 }
