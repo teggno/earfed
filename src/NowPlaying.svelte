@@ -176,6 +176,7 @@
     font-size: var(--font-size-small);
     line-height: var(--lh-copy);
     margin: var(--spacing-3) 0 0 0;
+    word-break: break-all;
   }
 
   .episodeDescription,
