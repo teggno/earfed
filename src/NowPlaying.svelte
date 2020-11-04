@@ -122,9 +122,19 @@
   }
 
   .container:not(.draggingDown) {
-    transition-duration: var(--maximize-duration);
-    transition-timing-function: ease-out;
-    transition-property: width height bottom border-radius box-shadow;
+    transition: width var(--maximize-duration) ease-out,
+      height var(--maximize-duration) ease-out,
+      bottom var(--maximize-duration) ease-out,
+      border-radius var(--maximize-duration) ease-out,
+      box-shadow var(--maximize-duration) ease-out;
+  }
+
+  .container:not(.maximized) {
+    transition: width var(--maximize-duration) ease-in,
+      height var(--maximize-duration) ease-out,
+      bottom var(--maximize-duration) ease-out,
+      border-radius var(--maximize-duration) ease-out,
+      box-shadow var(--maximize-duration) ease-out;
   }
 
   .draggingDown .text {
@@ -165,6 +175,11 @@
     text-align: center;
   }
 
+  .maximized .episodeTitle {
+    font-size: var(--font-size-large);
+    white-space: normal;
+  }
+
   .showName,
   .episodeTitle {
     overflow-x: hidden;
@@ -176,7 +191,7 @@
     font-size: var(--font-size-small);
     line-height: var(--lh-copy);
     margin: var(--spacing-3) 0 0 0;
-    word-break: break-all;
+    overflow-x: hidden;
   }
 
   .episodeDescription,

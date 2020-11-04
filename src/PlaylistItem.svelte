@@ -62,7 +62,6 @@
     );
     width: var(--size);
     padding-bottom: var(--size);
-    font-size: 0;
     height: 0;
     position: relative;
   }

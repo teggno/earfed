@@ -15,8 +15,8 @@
   --spacing-2: 0.25rem;
   --spacing-3: 0.5rem;
   --spacing-4: 1rem;
-  --font-size-tiny: 0.5rem;
-  --font-size-small: 0.75rem;
+  --font-size-tiny: 0.75rem;
+  --font-size-small: 0.875rem;
   --font-size-medium: 1rem;
   --font-size-large: 1.5rem;
   --label-input-spacing: var(--spacing-2);
@@ -31,7 +31,7 @@ body {
 
 html {
   background-color: #eee;
-  font-size: 20px;
+  font-size: 16px;
 }
 
 body {
