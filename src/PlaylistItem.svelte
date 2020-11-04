@@ -17,6 +17,7 @@
     display: flex;
     padding: var(--spacing-3);
     cursor: pointer;
+    align-items: center;
   }
 
   li:hover {
@@ -49,10 +50,36 @@
   li :global(:first-child) {
     flex-shrink: 0;
   }
+
+  .square {
+    --assumed-normal-lh: 1.2;
+    --size: max(
+      calc(
+        var(--assumed-normal-lh) * var(--font-size-medium) +
+          var(--assumed-normal-lh) * var(--font-size-small) + var(--spacing-1)
+      ),
+      9%
+    );
+    width: var(--size);
+    padding-bottom: var(--size);
+    font-size: 0;
+    height: 0;
+    position: relative;
+  }
+
+  .square > :global(*) {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    position: absolute;
+  }
 </style>
 
 <li>
-  <ShowIcon {showIconUrl} {showName} on:click={handlePlayClick} />
+  <div class="square">
+    <ShowIcon {showIconUrl} {showName} on:click={handlePlayClick} />
+  </div>
   <div class="text">
     <div class="showName">{showName}</div>
     <h2 class="episodeTitle">{episodeTitle}</h2>

@@ -17,7 +17,6 @@
   const moveAvgSpeed = 0.3;
   const playIconStartSize = 30;
 
-  let height = 0;
   let playIconWrapper;
   let playIconWrapperRect = {};
   let animationStatus = "notRunning";
@@ -70,7 +69,6 @@
   button {
     background-color: bisque;
     font-size: 0;
-    position: relative;
     margin: 0;
     padding: 0;
     border: 0 none;
@@ -155,8 +153,7 @@
 <button
   {disabled}
   class={`${showIconUrl ? '' : 'noIcon'}`}
-  style={`--show-name-first-letter:'${showName.substr(0, 1)}';--start-size:${playIconStartSize}px;width:${height}px;${showIconUrl ? `background-image:url('${showIconUrl}')` : ''}`}
-  bind:offsetHeight={height}
+  style={`--show-name-first-letter:'${showName.substr(0, 1)}';--start-size:${playIconStartSize}px;${showIconUrl ? `background-image:url('${showIconUrl}')` : ''}`}
   on:click={handleClick}>
   <span class="playIconWrapper" bind:this={playIconWrapper}>
     <PlayIcon />
