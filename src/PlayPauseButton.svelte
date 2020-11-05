@@ -116,7 +116,11 @@
 
   button:disabled {
     color: var(--color-disabled);
+  }
+
+  button:disabled :global(svg) {
     fill: var(--color-disabled);
+    stroke: var(--color-disabled);
   }
 
   button.buttonDown {
@@ -150,8 +154,9 @@
   }
 
   .icon :global(svg) {
-    stroke: white;
-    stroke-width: 1;
+    stroke: gray;
+    fill: #eee;
+    stroke-width: 0.75;
     width: 48px;
     height: 48px;
   }
