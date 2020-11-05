@@ -1,5 +1,5 @@
 export function connectNotificationBar(playerService) {
-  if (!"mediaSession" in navigator) noOp;
+  if (!("mediaSession" in navigator)) return noOp;
 
   // adapted from https://developers.google.com/web/updates/2017/02/media-session
 
@@ -13,7 +13,6 @@ export function connectNotificationBar(playerService) {
   );
   // navigator.mediaSession.setActionHandler('previoustrack', function() {});
   // navigator.mediaSession.setActionHandler('nexttrack', function() {});
-
   return (episode) => {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: episode.episodeTitle,
