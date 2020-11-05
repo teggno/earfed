@@ -1,15 +1,10 @@
 <script>
-  import { play } from "./playerService";
-
   import ShowIcon from "./ShowIcon.svelte";
 
   export let episode;
+  export let playing = false;
 
   const { showIconUrl, showName, episodeTitle } = episode;
-
-  function handlePlayClick() {
-    play(episode);
-  }
 </script>
 
 <style>
@@ -83,7 +78,7 @@
 
 <li>
   <div class="square">
-    <ShowIcon {showIconUrl} {showName} on:click={handlePlayClick} />
+    <ShowIcon {episode} {playing} />
   </div>
   <div class="text">
     <div class="showName">{showName}</div>

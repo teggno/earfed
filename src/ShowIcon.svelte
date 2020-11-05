@@ -1,18 +1,16 @@
 <script>
-  import { createEventDispatcher } from "svelte";
-
   import { getAnimationTargetRect } from "./animationTargetRect";
 
   import AnimatedPlayToPauseIcon from "./icons/AnimatedPlayToPauseIcon.svelte";
+  import PauseIcon from "./icons/PauseIcon.svelte";
 
   import PlayIcon from "./icons/PlayIcon.svelte";
+  import { pause, play } from "./playerService";
 
-  export let showIconUrl = "";
-  export let showName = "";
-  export let disabled = false;
+  export let episode;
+  export let playing = false;
 
   const playButtonRect = getAnimationTargetRect();
-  const dispatch = createEventDispatcher();
 
   const moveAvgSpeed = 0.3;
   const playIconStartSize = 36;
@@ -45,8 +43,17 @@
   --duration:${durationMillis}ms;`;
 
   function handleClick() {
-    dispatch("click");
-    if (animationStatus !== "notRunning") return;
+    if (!playing) {
+      play(episode);
+      if (animationStatus === "notRunning") {
+        animatePlay();
+      }
+    } else {
+      pause();
+    }
+  }
+
+  function animatePlay() {
     playIconWrapperRect = playIconWrapper.getBoundingClientRect();
     animationStatus = "entering";
     scrolled = false;
@@ -200,12 +207,15 @@
 
 <button
   ontouchstart=""
-  {disabled}
-  class={`${showIconUrl ? '' : 'noIcon'}`}
-  style={`--show-name-first-letter:'${showName.substr(0, 1)}';--start-size:${playIconStartSize}px;${showIconUrl ? `background-image:url('${showIconUrl}')` : ''}`}
+  class={`${episode.showIconUrl ? '' : 'noIcon'}`}
+  style={`--show-name-first-letter:'${episode.showName.substr(0, 1)}';--start-size:${playIconStartSize}px;${episode.showIconUrl ? `background-image:url('${episode.showIconUrl}')` : ''}`}
   on:click={handleClick}>
   <span class="playIconWrapper" bind:this={playIconWrapper}>
-    <PlayIcon />
+    {#if playing}
+      <PauseIcon />
+    {:else}
+      <PlayIcon />
+    {/if}
   </span>
 </button>
 

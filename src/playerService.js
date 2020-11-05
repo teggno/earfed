@@ -11,6 +11,7 @@ const initialValue = {
 };
 
 const store = writable({ ...initialValue });
+const playerInfo = { subscribe: store.subscribe };
 
 let audioWithEpisode;
 
@@ -55,8 +56,6 @@ function removeEpisode() {
   audioWithEpisode.destroy();
   audioWithEpisode = null;
 }
-
-const playerInfo = { subscribe: store.subscribe };
 
 export {
   play,
