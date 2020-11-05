@@ -5,13 +5,16 @@
   import PlayPauseButton from "./PlayPauseButton.svelte";
   import {
     play,
-    seek,
+    seekBackward,
+    seekForward,
     pause,
     playerInfo,
+    removeEpisode,
     playing,
     paused,
     noEpisode,
-    removeEpisode,
+    seekBackwardSeconds,
+    seekForwardSeconds,
   } from "./playerService";
   import * as bodyScroll from "./toggleBodyScroll";
   import EpisodeTimeline from "./EpisodeTimeline.svelte";
@@ -63,21 +66,12 @@
     }
   }
 
-  function handleBack20s() {
-    const currentSecond = $playerInfo.currentSecond;
-    seek(currentSecond < 20 ? 0 : currentSecond - 20);
+  function handleSeekBackward() {
+    seekBackward();
   }
 
-  function handleForward20s() {
-    const currentSecond = $playerInfo.currentSecond;
-    const durationSeconds = $playerInfo.durationSeconds;
-    if (typeof durationSeconds !== "number") return;
-
-    if (currentSecond + 20 > durationSeconds) {
-      pause();
-    } else {
-      seek(currentSecond + 20);
-    }
+  function handleSeekForward() {
+    seekForward();
   }
 
   function handleNotInterested() {
@@ -312,10 +306,10 @@ iOS won't make nice with the :active pseudoclass.-->
     <span>
       <button
         class="navButton"
-        on:click|stopPropagation={handleBack20s}
+        on:click|stopPropagation={handleSeekBackward}
         ontouchstart=""
         {disabled}>
-        <span>-20s</span>
+        <span>-{seekBackwardSeconds}s</span>
         <ArrowLeftIcon />
       </button>
     </span>
@@ -328,10 +322,10 @@ iOS won't make nice with the :active pseudoclass.-->
     <span>
       <button
         class="navButton"
-        on:click|stopPropagation={handleForward20s}
+        on:click|stopPropagation={handleSeekForward}
         ontouchstart=""
         {disabled}>
-        <span>+20s</span>
+        <span>+{seekForwardSeconds}s</span>
         <ArrowRightIcon />
       </button>
     </span>

@@ -1,8 +1,8 @@
 :root {
   --app-max-width: 100%;
   --color-link: rgb(0, 100, 200);
-  --color-accent: #ff3e00;
-  --color-selected: #ff3e00;
+  --color-accent: #bd4b00;
+  --color-selected: #bd4b00;
   --color-accent-pressed: #ff400046;
   --color-success: rgb(0, 190, 0);
   --color-danger: rgb(190, 0, 0);

@@ -79,7 +79,7 @@
     --button-down-duration: 120ms;
     --button-release-duration: 400ms;
 
-    background-color: orange;
+    background-color: var(--color-accent);
     font-size: 0;
     margin: 0;
     padding: 0;

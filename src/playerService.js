@@ -1,5 +1,7 @@
 import { writable } from "svelte/store";
 
+const seekBackwardSeconds = 20;
+const seekForwardSeconds = 20;
 const playing = "playing";
 const paused = "paused";
 const noEpisode = "noEpisode";
@@ -39,6 +41,24 @@ function seek(second) {
   audioWithEpisode.seek(second);
 }
 
+function seekBackward() {
+  if (!audioWithEpisode) {
+    console.warn("No episode to seek");
+    return;
+  }
+
+  audioWithEpisode.seekBackward();
+}
+
+function seekForward() {
+  if (!audioWithEpisode) {
+    console.warn("No episode to seek");
+    return;
+  }
+
+  audioWithEpisode.seekForward();
+}
+
 function pause() {
   if (!audioWithEpisode) {
     console.warn("No episode to pause");
@@ -59,19 +79,22 @@ function removeEpisode() {
 
 export {
   play,
-  seek,
+  seekBackward,
+  seekForward,
   pause,
   removeEpisode,
   playerInfo,
   playing,
   paused,
   noEpisode,
+  seekBackwardSeconds,
+  seekForwardSeconds,
 };
 
 let audio;
 
 function audioWithEpisodeFactory(episode) {
-  if (!audio) audio = new Audio();
+  if (!audio) audio = document.querySelector("audio");
 
   audio.src = episode.episodeUrl;
 
@@ -131,6 +154,15 @@ function audioWithEpisodeFactory(episode) {
     },
     seek(second) {
       audio.currentTime = second;
+    },
+    seekBackward() {
+      audio.currentTime = Math.max(0, audio.currentTime - seekBackwardSeconds);
+    },
+    seekForward() {
+      audio.currentTime = Math.min(
+        audio.duration,
+        audio.currentTime + seekForwardSeconds
+      );
     },
     pause() {
       audio.pause();
