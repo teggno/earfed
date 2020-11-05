@@ -18,6 +18,9 @@
     padding: var(--spacing-3);
     cursor: pointer;
     align-items: center;
+    /* chrome on android makes stuff that has `cursor: pointer` 
+       blue when tapped which is not wanted here */
+    -webkit-tap-highlight-color: transparent;
   }
 
   li:hover {
@@ -54,11 +57,14 @@
   .square {
     --assumed-normal-lh: 1.2;
     --size: max(
-      calc(
-        var(--assumed-normal-lh) * var(--font-size-medium) +
-          var(--assumed-normal-lh) * var(--font-size-small) + var(--spacing-1)
+      max(
+        calc(
+          var(--assumed-normal-lh) * var(--font-size-medium) +
+            var(--assumed-normal-lh) * var(--font-size-small) + var(--spacing-1)
+        ),
+        9%
       ),
-      9%
+      44px
     );
     width: var(--size);
     padding-bottom: var(--size);
