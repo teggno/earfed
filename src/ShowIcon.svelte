@@ -15,7 +15,7 @@
   const dispatch = createEventDispatcher();
 
   const moveAvgSpeed = 0.3;
-  const playIconStartSize = 30;
+  const playIconStartSize = 36;
 
   let playIconWrapper;
   let playIconWrapperRect = {};
@@ -67,7 +67,12 @@
 
 <style>
   button {
-    background-color: bisque;
+    --button-animation-property: transform;
+    --button-animation-timing: ease-in-out;
+    --button-down-duration: 120ms;
+    --button-release-duration: 400ms;
+
+    background-color: orange;
     font-size: 0;
     margin: 0;
     padding: 0;
@@ -76,34 +81,18 @@
     background-size: contain;
   }
 
+  button:active {
+    transform: scale(0.95);
+    outline: 0;
+  }
+
   button > * {
     z-index: 2;
     position: relative;
   }
 
-  /* 
-   This displays the placeholder (background and first letter of show name) 
-   in case there is no show icon
-   */
-  button.noIcon::before {
-    content: var(--show-name-first-letter);
-    background-color: yellowgreen;
-    color: white;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
-    font-size: var(--font-size-large);
-    z-index: 1;
-  }
-
   button,
-  button.noIcon::before {
+  button::after {
     border-radius: var(--spacing-2);
   }
 
@@ -112,9 +101,9 @@
   }
 
   .playIconWrapper :global(svg) {
-    stroke: whitesmoke;
-    fill: #666;
-    stroke-width: 1;
+    stroke: gray;
+    fill: #eee;
+    stroke-width: 0.75;
     width: var(--start-size);
     height: var(--start-size);
   }
@@ -130,8 +119,38 @@
   .playAnimation :global(svg) {
     width: 100%;
     height: 100%;
-    stroke-width: 1;
-    stroke: white;
+    stroke-width: 0.75;
+    animation: color forwards var(--duration);
+  }
+
+  /* semitransparent overlay when button is pressed */
+  button::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    z-index: 2;
+  }
+
+  button:active:after {
+    opacity: 1;
+  }
+
+  /* button press/release transition */
+  button,
+  button::after {
+    transition-property: var(--button-animation-property);
+    transition-timing-function: var(--button-animation-timing);
+    transition-duration: var(--button-release-duration);
+  }
+
+  button:active,
+  button:active:after {
+    transition-duration: var(--button-down-duration);
   }
 
   @keyframes size {
@@ -148,9 +167,39 @@
       height: var(--end-size);
     }
   }
+
+  @keyframes color {
+    0% {
+      fill: #eee;
+      stroke: gray;
+      stroke-width: 0.75;
+    }
+    10% {
+      fill: #eee;
+      stroke: gray;
+      stroke-width: 0.25;
+    }
+    40% {
+      stroke-width: 0;
+    }
+    50% {
+      stroke-width: 0;
+      fill: black;
+      stroke: black;
+    }
+    80% {
+      stroke-width: 0;
+    }
+    100% {
+      stroke-width: 0.75;
+      fill: #eee;
+      stroke: gray;
+    }
+  }
 </style>
 
 <button
+  ontouchstart=""
   {disabled}
   class={`${showIconUrl ? '' : 'noIcon'}`}
   style={`--show-name-first-letter:'${showName.substr(0, 1)}';--start-size:${playIconStartSize}px;${showIconUrl ? `background-image:url('${showIconUrl}')` : ''}`}
