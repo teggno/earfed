@@ -69,8 +69,13 @@ export {
   noEpisode,
 };
 
+let audio;
+
 function audioWithEpisodeFactory(episode) {
-  const audio = new Audio(episode.episodeUrl);
+  if (!audio) audio = new Audio();
+
+  audio.src = episode.episodeUrl;
+
   addEventListeners(audio);
 
   store.set({ ...initialValue, episode, status: paused });
@@ -138,6 +143,8 @@ function audioWithEpisodeFactory(episode) {
       removeEventListeners();
       store.set({ ...initialValue });
       audio.pause();
+      audio.src = ""; // seems to work as oposed to undefined
+      audio.load();
     },
   };
 }
