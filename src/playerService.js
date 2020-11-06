@@ -32,15 +32,6 @@ function play(episode) {
   audioWithEpisode.play();
 }
 
-function seek(second) {
-  if (!audioWithEpisode) {
-    console.warn("No episode to seek");
-    return;
-  }
-
-  audioWithEpisode.seek(second);
-}
-
 function seekBackward() {
   if (!audioWithEpisode) {
     console.warn("No episode to seek");
@@ -94,7 +85,7 @@ export {
 let audio;
 
 function audioWithEpisodeFactory(episode) {
-  if (!audio) audio = document.querySelector("audio");
+  if (!audio) audio = new Audio();
 
   audio.src = episode.episodeUrl;
 

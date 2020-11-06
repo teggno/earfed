@@ -34,7 +34,6 @@
 </style>
 
 <div class="container">
-  <audio />
   <main>
     <Playlist {episodes} />
     <NowPlaying />
