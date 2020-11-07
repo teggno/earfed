@@ -48,7 +48,14 @@
   function handleCloseThroughDrag(e) {
     dragDownDistance = 0;
     e.target.style.height = null;
+    minimize();
+  }
 
+  function handleCloseClick(e) {
+    minimize();
+  }
+
+  function minimize() {
     setTimeout(() => {
       // for some reason, doing this without timeout causes some ugly jumping.
       textElement.scrollTo(0, 0);
@@ -278,15 +285,61 @@
   .navButton:not(:disabled):active {
     transform: scale(0.85);
   }
+
+  .closeBar {
+    --total-bar-height: 44px;
+    --visible-bar-height: 4px;
+    --visible-margin-top: var(--spacing-3);
+
+    box-sizing: content-box;
+    font-size: 0;
+    position: absolute;
+    top: calc(
+      calc(var(--visible-bar-height) - var(--total-bar-height)) / 2 +
+        var(--visible-margin-top)
+    );
+    left: 50%;
+    transform: translateX(-50%);
+    display: inline-block;
+    margin: 0;
+    width: 44px;
+    height: var(--total-bar-height);
+    border: 0 none;
+    background-color: transparent;
+  }
+  .container:not(.maximized) .closeBar {
+    pointer-events: none;
+  }
+
+  .closeBar::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ccc;
+    border-radius: 5px;
+    height: var(--visible-bar-height);
+    width: 32px;
+    opacity: 0;
+    transition: opacity var(--maximize-duration);
+  }
+
+  .container.maximized .closeBar::after {
+    opacity: 1;
+  }
 </style>
 
 <div
-  class={`container${maximized ? ' maximized' : ''}${draggingDown ? ' draggingDown' : ''}`}
+  class="container"
+  class:draggingDown
+  class:maximized
   use:dragToClose
   on:click={handleClickComponent}
   on:dragdown|stopPropagation={maximized ? handleDragDown : undefined}
   on:dragend|stopPropagation={maximized ? handleDragEnd : undefined}
   on:closethroughdrag|stopPropagation={maximized ? handleCloseThroughDrag : undefined}>
+  <button class="closeBar" on:click|stopPropagation={handleCloseClick} />
   <div class="text" bind:this={textElement}>
     <div class="showName">{$playerInfo.episode?.showName || ''}</div>
     <h2 class="episodeTitle">{$playerInfo.episode?.episodeTitle || ''}</h2>
