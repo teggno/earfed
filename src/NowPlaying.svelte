@@ -382,7 +382,7 @@ iOS won't make nice with the :active pseudoclass.-->
         class="navButton"
         on:click|stopPropagation={handleSeekBackward}
         ontouchstart=""
-        title={`Seek backward ${seekBackwardSeconds} Seconds`}
+        title={`Back ${seekBackwardSeconds} Seconds`}
         {disabled}>
         <span>-{seekBackwardSeconds}s</span>
         <ArrowLeftIcon />
@@ -399,7 +399,7 @@ iOS won't make nice with the :active pseudoclass.-->
         class="navButton"
         on:click|stopPropagation={handleSeekForward}
         ontouchstart=""
-        title={`Seek forward ${seekForwardSeconds} Seconds`}
+        title={`Forward ${seekForwardSeconds} Seconds`}
         {disabled}>
         <span>+{seekForwardSeconds}s</span>
         <ArrowRightIcon />
