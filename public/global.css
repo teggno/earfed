@@ -22,11 +22,13 @@
   --label-input-spacing: var(--spacing-2);
   --field-spacing: var(--spacing-3);
   --lh-copy: 160%;
+  --focus-shadow: 0 0 3pt 2pt #ff6600;
 }
 
 html,
 body {
   width: 100%;
+  overflow-x: hidden;
 }
 
 html {
@@ -97,8 +99,21 @@ button {
   -webkit-tap-highlight-color: transparent;
 }
 
-button:focus {
-  border-color: #666;
+button:focus,
+input:focus {
+  outline: none;
+  /* for browsers that don't support :focus-visible */
+  box-shadow: var(--focus-shadow);
+}
+button:focus:not(:focus-visible),
+input:focus:not(:focus-visible) {
+  /* reset style set by :focus for browsers that do supoort :focus-visible */
+  box-shadow: none;
+}
+button:focus-visible,
+input:focus-visible {
+  /* for browsers that do support :focus-visible */
+  box-shadow: var(--focus-shadow);
 }
 
 @media screen and (min-width: 640px) {

@@ -242,7 +242,6 @@
 
   .buttons > :global(*) {
     display: inline-block;
-    overflow: hidden;
     width: calc(25% - 16px / 3);
     text-align: center;
     transition: all 400ms;
@@ -307,6 +306,11 @@
     border: 0 none;
     background-color: transparent;
   }
+  .closeBar:focus,
+  .closeBar:focus-visible {
+    box-shadow: none;
+  }
+
   .container:not(.maximized) .closeBar {
     pointer-events: none;
   }
@@ -323,6 +327,19 @@
     width: 32px;
     opacity: 0;
     transition: opacity var(--maximize-duration);
+  }
+
+  .closeBar:focus::after {
+    /* for browsers that don't support :focus-visible */
+    box-shadow: var(--focus-shadow);
+  }
+  .closeBar:focus:not(:focus-visible)::after {
+    /* reset style set by :focus for browsers that do supoort :focus-visible */
+    box-shadow: none;
+  }
+  .closeBar:focus-visible::after {
+    /* for browsers that do support :focus-visible */
+    box-shadow: var(--focus-shadow);
   }
 
   .container.maximized .closeBar::after {
@@ -342,7 +359,8 @@
   <button
     class="closeBar"
     on:click|stopPropagation={handleMinimizeClick}
-    title="Minimize" />
+    title="Minimize"
+    tabindex={maximized ? '' : '-1'} />
   <div class="text" bind:this={textElement}>
     <div class="showName">{$playerInfo.episode?.showName || ''}</div>
     <h2 class="episodeTitle">{$playerInfo.episode?.episodeTitle || ''}</h2>
