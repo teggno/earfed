@@ -51,7 +51,7 @@
     minimize();
   }
 
-  function handleCloseClick(e) {
+  function handleMinimizeClick(e) {
     minimize();
   }
 
@@ -339,7 +339,10 @@
   on:dragdown|stopPropagation={maximized ? handleDragDown : undefined}
   on:dragend|stopPropagation={maximized ? handleDragEnd : undefined}
   on:closethroughdrag|stopPropagation={maximized ? handleCloseThroughDrag : undefined}>
-  <button class="closeBar" on:click|stopPropagation={handleCloseClick} />
+  <button
+    class="closeBar"
+    on:click|stopPropagation={handleMinimizeClick}
+    title="Minimize" />
   <div class="text" bind:this={textElement}>
     <div class="showName">{$playerInfo.episode?.showName || ''}</div>
     <h2 class="episodeTitle">{$playerInfo.episode?.episodeTitle || ''}</h2>
@@ -361,6 +364,7 @@ iOS won't make nice with the :active pseudoclass.-->
         class="navButton"
         on:click|stopPropagation={handleSeekBackward}
         ontouchstart=""
+        title={`Seek backward ${seekBackwardSeconds} Seconds`}
         {disabled}>
         <span>-{seekBackwardSeconds}s</span>
         <ArrowLeftIcon />
@@ -377,6 +381,7 @@ iOS won't make nice with the :active pseudoclass.-->
         class="navButton"
         on:click|stopPropagation={handleSeekForward}
         ontouchstart=""
+        title={`Seek forward ${seekForwardSeconds} Seconds`}
         {disabled}>
         <span>+{seekForwardSeconds}s</span>
         <ArrowRightIcon />
@@ -387,6 +392,7 @@ iOS won't make nice with the :active pseudoclass.-->
         class="navButton"
         on:click|stopPropagation={handleNotInterested}
         ontouchstart=""
+        title="Discard Episode"
         {disabled}>
         <DeleteIcon />
       </button>

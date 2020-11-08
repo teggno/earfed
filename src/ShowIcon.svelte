@@ -208,8 +208,9 @@
 <button
   ontouchstart=""
   class={`${episode.showIconUrl ? '' : 'noIcon'}`}
-  style={`--show-name-first-letter:'${episode.showName.substr(0, 1)}';--start-size:${playIconStartSize}px;${episode.showIconUrl ? `background-image:url('${episode.showIconUrl}')` : ''}`}
-  on:click={handleClick}>
+  style={`--start-size:${playIconStartSize}px;${episode.showIconUrl ? `background-image:url('${episode.showIconUrl}')` : ''}`}
+  on:click={handleClick}
+  title={`${playing ? 'Pause' : 'Play'}`}>
   <span class="playIconWrapper" bind:this={playIconWrapper}>
     {#if playing}
       <PauseIcon />
