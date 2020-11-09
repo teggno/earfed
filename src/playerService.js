@@ -1,4 +1,5 @@
 import { writable } from "svelte/store";
+import { areEpisodesEqual } from "./episode";
 
 const seekBackwardSeconds = 20;
 const seekForwardSeconds = 20;
@@ -159,7 +160,7 @@ function audioWithEpisodeFactory(episode) {
       audio.pause();
     },
     isEpisode(otherEpisode) {
-      return otherEpisode && otherEpisode.episodeUrl === episode.episodeUrl;
+      return otherEpisode && areEpisodesEqual(otherEpisode, episode);
     },
     destroy() {
       removeEventListeners();

@@ -98,9 +98,9 @@
   .container {
     position: fixed;
     width: calc(var(--app-max-width) / 2);
-    height: 160px;
+    height: var(--mini-player-height);
+    bottom: var(--mini-player-bottom);
     min-width: 300px;
-    bottom: 150px;
     right: calc(50% - var(--app-max-width) / 2);
     border-radius: 50px 0 0 50px;
     padding: var(--spacing-4) 0;

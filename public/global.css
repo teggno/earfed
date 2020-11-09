@@ -23,6 +23,10 @@
   --field-spacing: var(--spacing-3);
   --lh-copy: 160%;
   --focus-shadow: 0 0 3pt 2pt #ff6600;
+
+  /* vertical positioning of the minimized "NowPlaying"*/
+  --mini-player-height: 160px;
+  --mini-player-bottom: 150px;
 }
 
 html,

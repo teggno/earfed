@@ -7,6 +7,8 @@
   import * as playerService from "./playerService";
   import { connectNotificationBar } from "./notificationBarService";
   import { onMount } from "svelte";
+  import { areEpisodesEqual } from "./episode";
+
   const episodes = getEpisodes();
 
   initAnimationTargetRect();
@@ -19,10 +21,7 @@
     const updater = connectNotificationBar(playerService);
     let currentEpisode;
     return playerService.playerInfo.subscribe((info) => {
-      if (
-        info.episode &&
-        info.episode.episodeUrl !== (currentEpisode || {}).episodeUrl
-      ) {
+      if (info.episode && !areEpisodesEqual(info.episode, currentEpisode)) {
         updater(info.episode);
       }
       currentEpisode = info.episode;
