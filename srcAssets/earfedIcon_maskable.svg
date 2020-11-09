@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   width="24"
+   height="24"
+   viewbox="0 0 24 24"
+   id="svg60"
+   sodipodi:docname="earfedIcon_maskable.svg"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
+   inkscape:export-filename="/Users/christian/dev/earfed/public/favicon.png"
+   inkscape:export-xdpi="512"
+   inkscape:export-ydpi="512">
+  <metadata
+     id="metadata66">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs64" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1718"
+     inkscape:window-height="1053"
+     id="namedview62"
+     showgrid="false"
+     inkscape:zoom="30.625"
+     inkscape:cx="8.9632653"
+     inkscape:cy="12"
+     inkscape:window-x="0"
+     inkscape:window-y="23"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg60" />
+  <path
+     id="arrow"
+     d="m 3.6,9.1200001 v 6.2160009 c 0,0.473998 0.5220001,0.761998 0.9240001,0.504 0,0 0,0 0,0 L 9.408,12.732001 c 0.3720001,-0.234001 0.3720001,-0.774001 0,-1.014 L 4.5240001,8.6160001 C 4.1220001,8.358 3.6,8.6460001 3.6,9.1200001 Z"
+     style="fill:#808080;stroke-width:1.2" />
+  <path
+     id="path58"
+     d="m 12,18.72 c 0.2436,0 0.4704,-0.0504 0.6384,-0.126 0.5964,-0.3108 1.0164,-0.7392 1.4364,-1.9992 0.428399,-1.310401 1.2348,-1.9236 2.0076,-2.52 0.6636,-0.5124 1.3524,-1.0416 1.9488,-2.1252 C 18.4764,11.1432 18.72,10.2612 18.72,9.48 18.72,7.128 16.872,5.28 14.519999,5.28 12.168,5.28 10.32,7.128 10.32,9.48 v 0 H 8.64 v 0 C 8.64,6.1788 11.2188,3.6 14.519999,3.6 17.8212,3.6 20.4,6.1788 20.4,9.48 c 0,1.0584 -0.3192,2.226 -0.8988,3.276 -0.7644,1.386 -1.6632,2.0832 -2.394,2.645999 C 16.4268,15.9228 15.9396,16.3008 15.6708,17.124 15.1668,18.6528 14.519999,19.5096 13.3776,20.106 12.9492,20.2992 12.4788,20.4 12,20.4 10.1436,20.4 8.64,18.8964 8.64,17.04 v 0 h 1.68 v 0 c 0,0.924 0.756,1.68 1.68,1.68 z"
+     style="fill:#ff6600;fill-opacity:1;stroke-width:1.2" />
+</svg>
