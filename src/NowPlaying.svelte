@@ -19,6 +19,7 @@
   import * as bodyScroll from "./toggleBodyScroll";
   import EpisodeTimeline from "./EpisodeTimeline.svelte";
   import dragToClose from "./dragToCloseAction";
+  import { tick } from "svelte";
 
   $: disabled = $playerInfo.status === noEpisode;
 
@@ -29,40 +30,42 @@
 
   $: draggingDown = dragDownDistance !== 0;
 
+  function handleClickComponent() {
+    if (maximized || disabled) return;
+
+    dragDownDistance = 0;
+    maximized = true;
+    tick().then(() => {
+      bodyScroll.disable();
+    });
+  }
+
   function handleDragDown(e) {
     dragDownDistance += e.detail.pixels;
     if (containerHeightWhenMaximized === 0) {
       containerHeightWhenMaximized = e.target.getBoundingClientRect().height;
     }
-
-    e.target.style.height = `${
-      containerHeightWhenMaximized - dragDownDistance / 3
-    }px`;
   }
 
-  function handleDragEnd(e) {
+  function handleDragEnd() {
     dragDownDistance = 0;
-    e.target.style.height = null;
   }
 
-  function handleCloseThroughDrag(e) {
+  function handleCloseThroughDrag() {
     dragDownDistance = 0;
-    e.target.style.height = null;
     minimize();
   }
 
-  function handleMinimizeClick(e) {
+  function handleMinimizeClick() {
     minimize();
   }
 
   function minimize() {
-    setTimeout(() => {
-      // for some reason, doing this without timeout causes some ugly jumping.
-      textElement.scrollTo(0, 0);
-    }, 120);
-
     maximized = false;
-    bodyScroll.enable();
+    tick().then(() => {
+      bodyScroll.enable();
+      textElement.scrollTo(0, 0);
+    });
   }
 
   function togglePlayPause() {
@@ -83,14 +86,6 @@
 
   function handleNotInterested() {
     removeEpisode();
-  }
-
-  function handleClickComponent() {
-    if (maximized || disabled) return;
-
-    dragDownDistance = 0;
-    maximized = true;
-    bodyScroll.disable();
   }
 
   function handleTimeChange({ detail: { second } }) {
@@ -355,7 +350,8 @@
   on:click={handleClickComponent}
   on:dragdown|stopPropagation={maximized ? handleDragDown : undefined}
   on:dragend|stopPropagation={maximized ? handleDragEnd : undefined}
-  on:closethroughdrag|stopPropagation={maximized ? handleCloseThroughDrag : undefined}>
+  on:closethroughdrag|stopPropagation={maximized ? handleCloseThroughDrag : undefined}
+  style={`${maximized && draggingDown ? `height:${containerHeightWhenMaximized - dragDownDistance / 3}px` : ''}`}>
   <button
     class="closeBar"
     on:click|stopPropagation={handleMinimizeClick}
