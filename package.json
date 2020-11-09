@@ -18,7 +18,7 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "start": "sirv public --host teggno.dev --http2 --key https/test.key --cert https/test2.crt"
+    "start": "sirv public --host teggno.dev --http2 --key https/teggno.dev.key --cert https/teggno.dev.crt"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^14.0.0",
