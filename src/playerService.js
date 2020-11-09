@@ -33,6 +33,15 @@ function play(episode) {
   audioWithEpisode.play();
 }
 
+function seek(second) {
+  if (!audioWithEpisode) {
+    console.warn("No episode to seek");
+    return;
+  }
+
+  audioWithEpisode.seek(second);
+}
+
 function seekBackward() {
   if (!audioWithEpisode) {
     console.warn("No episode to seek");
@@ -71,6 +80,7 @@ function removeEpisode() {
 
 export {
   play,
+  seek,
   seekBackward,
   seekForward,
   pause,

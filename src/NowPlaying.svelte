@@ -5,6 +5,7 @@
   import PlayPauseButton from "./PlayPauseButton.svelte";
   import {
     play,
+    seek,
     seekBackward,
     seekForward,
     pause,
