@@ -94,6 +94,8 @@ export {
 };
 
 let audio;
+let pendingPause = false;
+let pendingPlay = false;
 
 function audioWithEpisodeFactory(episode) {
   if (!audio) audio = new Audio();
@@ -152,7 +154,21 @@ function audioWithEpisodeFactory(episode) {
 
   return {
     play() {
-      audio.play();
+      pendingPlay = true;
+      pendingPause = false;
+      const promise = audio.play();
+      if (promise) {
+        promise.then(playSuccess);
+      } else {
+        playSuccess();
+      }
+      function playSuccess() {
+        pendingPlay = false;
+        if (pendingPause) {
+          pendingPause = false;
+          audio.pause();
+        }
+      }
     },
     seek(second) {
       audio.currentTime = second;
@@ -167,7 +183,11 @@ function audioWithEpisodeFactory(episode) {
       );
     },
     pause() {
-      audio.pause();
+      if (pendingPlay) {
+        pendingPause = true;
+      } else {
+        audio.pause();
+      }
     },
     isEpisode(otherEpisode) {
       return otherEpisode && areEpisodesEqual(otherEpisode, episode);
@@ -175,7 +195,6 @@ function audioWithEpisodeFactory(episode) {
     destroy() {
       removeEventListeners();
       store.set({ ...initialValue });
-      audio.pause();
       audio.src = ""; // seems to work as oposed to undefined
       audio.load();
     },
