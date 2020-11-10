@@ -107,9 +107,12 @@ button {
   -webkit-tap-highlight-color: transparent;
 }
 
+*:focus {
+  outline: none;
+}
+
 button:focus,
 input:focus {
-  outline: none;
   /* for browsers that don't support :focus-visible */
   box-shadow: var(--focus-shadow);
 }
