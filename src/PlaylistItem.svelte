@@ -22,7 +22,7 @@
 <style>
   li {
     cursor: pointer;
-    /* fixes the slide animation on iOS safari */
+    /* fixes the slide animation on Safari */
     overflow: hidden;
     /* chrome on android makes stuff that has `cursor: pointer` 
        blue when tapped which is not wanted here */
@@ -38,7 +38,6 @@
   .alwaysVisible {
     display: flex;
     align-items: center;
-    padding: var(--spacing-3);
   }
 
   .alwaysVisible :global(:first-child) {
@@ -69,6 +68,7 @@
     padding-bottom: var(--size);
     height: 0;
     position: relative;
+    margin: var(--spacing-3);
   }
 
   .square > :global(*) {
@@ -80,8 +80,48 @@
   }
 
   .text {
-    margin-left: var(--spacing-3);
+    margin: 0;
+    padding: var(--spacing-3);
+    padding-left: 0;
     min-width: 0;
+    border: 0 none;
+    display: block;
+    text-align: left;
+    align-self: stretch;
+    flex-grow: 1;
+    background-color: transparent;
+    position: relative;
+  }
+
+  /* The overflow:hidden on the li prevents the focus box-shadow from 
+     being displayed properly, so we have to indicate focus differently here */
+  .text:focus {
+    box-shadow: none;
+  }
+  .text:focus-visible {
+    box-shadow: none;
+  }
+
+  .text::after {
+    content: "";
+    position: absolute;
+    left: 0px;
+    top: 5px;
+    right: 5px;
+    bottom: 5px;
+  }
+  .text:focus::after {
+    outline: none;
+    /* for browsers that don't support :focus-visible */
+    box-shadow: var(--focus-shadow);
+  }
+  .text:focus:not(:focus-visible)::after {
+    /* reset style set by :focus for browsers that do supoort :focus-visible */
+    box-shadow: none;
+  }
+  .text:focus-visible::after {
+    /* for browsers that do support :focus-visible */
+    box-shadow: var(--focus-shadow);
   }
 
   .episodeTitle {
@@ -125,14 +165,14 @@
 </style>
 
 <li class:expanded>
-  <div class="alwaysVisible" on:click={handleClick}>
+  <div class="alwaysVisible">
     <div class="square">
       <ShowIcon {episode} {playing} />
     </div>
-    <div class="text">
+    <button class="text" aria-expanded={expanded} on:click={handleClick}>
       <h2 class="episodeTitle">{episodeTitle}</h2>
       <div class="showName">{showName}</div>
-    </div>
+    </button>
   </div>
   {#if expanded}
     <!--durations and delays below must be coordinated with the transition of
