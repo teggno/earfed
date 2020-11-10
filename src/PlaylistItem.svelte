@@ -4,6 +4,7 @@
   import { cubicOut, quadIn } from "svelte/easing";
 
   import ShowIcon from "./ShowIcon.svelte";
+  import DivButton from "./DivButton.svelte";
 
   export let episode;
   export let playing = false;
@@ -79,30 +80,29 @@
     position: absolute;
   }
 
-  .text {
-    margin: 0;
+  .alwaysVisible > :global(:nth-child(2)) {
     padding: var(--spacing-3);
     padding-left: 0;
     min-width: 0;
-    border: 0 none;
-    display: block;
-    text-align: left;
     align-self: stretch;
     flex-grow: 1;
     background-color: transparent;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   /* The overflow:hidden on the li prevents the focus box-shadow from 
      being displayed properly, so we have to indicate focus differently here */
-  .text:focus {
+  .alwaysVisible > :global(:nth-child(2)):focus {
     box-shadow: none;
   }
-  .text:focus-visible {
+  .alwaysVisible > :global(:nth-child(2)):focus-visible {
     box-shadow: none;
   }
 
-  .text::after {
+  .alwaysVisible > :global(:nth-child(2))::after {
     content: "";
     position: absolute;
     left: 0px;
@@ -110,16 +110,16 @@
     right: 5px;
     bottom: 5px;
   }
-  .text:focus::after {
+  .alwaysVisible > :global(:nth-child(0)):focus::after {
     outline: none;
     /* for browsers that don't support :focus-visible */
     box-shadow: var(--focus-shadow);
   }
-  .text:focus:not(:focus-visible)::after {
+  .alwaysVisible > :global(:nth-child(2)):focus:not(:focus-visible)::after {
     /* reset style set by :focus for browsers that do supoort :focus-visible */
     box-shadow: none;
   }
-  .text:focus-visible::after {
+  .alwaysVisible > :global(:nth-child(2)):focus-visible::after {
     /* for browsers that do support :focus-visible */
     box-shadow: var(--focus-shadow);
   }
@@ -169,10 +169,10 @@
     <div class="square">
       <ShowIcon {episode} {playing} />
     </div>
-    <button class="text" aria-expanded={expanded} on:click={handleClick}>
+    <DivButton on:click={handleClick} ariaExpanded={expanded}>
       <h2 class="episodeTitle">{episodeTitle}</h2>
       <div class="showName">{showName}</div>
-    </button>
+    </DivButton>
   </div>
   {#if expanded}
     <!--durations and delays below must be coordinated with the transition of
