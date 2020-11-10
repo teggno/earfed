@@ -30,6 +30,10 @@
   --mini-player-bottom: 150px;
 }
 
+html {
+  overflow-y: scroll;
+}
+
 html,
 body {
   width: 100%;
