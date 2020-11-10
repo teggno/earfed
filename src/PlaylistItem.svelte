@@ -1,24 +1,26 @@
 <script>
   import { createEventDispatcher } from "svelte";
   import { slide } from "svelte/transition";
+  import { cubicOut, quadIn } from "svelte/easing";
+
   import ShowIcon from "./ShowIcon.svelte";
 
   export let episode;
   export let playing = false;
   export let expanded = false;
+  export let delayInTransition = false;
 
   const { showName, episodeTitle, episodeDescription } = episode;
 
   const dispatch = createEventDispatcher();
 
-  function handleClickText() {
+  function handleClick() {
     dispatch("toggleExpanded");
   }
 </script>
 
 <style>
   li {
-    padding: var(--spacing-3);
     cursor: pointer;
     /* fixes the slide animation on iOS safari */
     overflow: hidden;
@@ -36,10 +38,19 @@
   .alwaysVisible {
     display: flex;
     align-items: center;
+    padding: var(--spacing-3);
   }
 
   .alwaysVisible :global(:first-child) {
     flex-shrink: 0;
+  }
+
+  li.expanded .alwaysVisible {
+    animation: expanding 500ms;
+  }
+
+  .details {
+    padding: var(--spacing-3);
   }
 
   .square {
@@ -96,7 +107,7 @@
   }
 
   .detailsTop {
-    padding: var(--spacing-3) 0;
+    padding-bottom: var(--spacing-3);
   }
 
   @media (hover: hover) {
@@ -104,21 +115,36 @@
       background-color: var(--background-hover-list);
     }
   }
+
+  @keyframes expanding {
+    20%,
+    30% {
+      background-color: var(--color-hover);
+    }
+  }
 </style>
 
 <li class:expanded>
-  <div class="alwaysVisible">
+  <div class="alwaysVisible" on:click={handleClick}>
     <div class="square">
       <ShowIcon {episode} {playing} />
     </div>
-    <div class="text" on:click={handleClickText}>
+    <div class="text">
       <h2 class="episodeTitle">{episodeTitle}</h2>
       <div class="showName">{showName}</div>
     </div>
   </div>
   {#if expanded}
-    <!--duration: 400 below must be coordinated with the transition on li -->
-    <div transition:slide={{ duration: 400 }}>
+    <!--durations and delays below must be coordinated with the transition of
+    the background-color on li -->
+    <!--the reason easing.quadIn is used for in:slide is that this should make
+    the user focus on the item that was just expanded because it's movement
+    looks like ending a bit later this way. This is especially important when
+    expanding an item that comes after the currently expanded item.-->
+    <div
+      class="details"
+      in:slide={{ delay: 0, duration: 400, easing: delayInTransition ? quadIn : cubicOut }}
+      out:slide={{ delay: 0, duration: 400 }}>
       <div class="detailsTop">
         <div>32 min left</div>
       </div>

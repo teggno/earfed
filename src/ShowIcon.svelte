@@ -209,7 +209,7 @@
   ontouchstart=""
   class={`${episode.showIconUrl ? '' : 'noIcon'}`}
   style={`--start-size:${playIconStartSize}px;${episode.showIconUrl ? `background-image:url('${episode.showIconUrl}')` : ''}`}
-  on:click={handleClick}
+  on:click|stopPropagation={handleClick}
   title={`${playing ? 'Pause' : 'Play'}`}>
   <span class="playIconWrapper" bind:this={playIconWrapper}>
     {#if playing}

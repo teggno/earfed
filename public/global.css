@@ -23,6 +23,7 @@
   --field-spacing: var(--spacing-3);
   --lh-copy: 160%;
   --focus-shadow: 0 0 3pt 2pt #ff6600;
+  --color-hover: #eee;
 
   /* vertical positioning of the minimized "NowPlaying"*/
   --mini-player-height: 160px;
@@ -132,6 +133,6 @@ input:focus-visible {
 @media (pointer: fine) {
   :root {
     /* only highlight hovering not on phone*/
-    --background-hover-list: #eee;
+    --background-hover-list: var(--color-hover);
   }
 }
