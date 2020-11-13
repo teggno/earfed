@@ -37,7 +37,7 @@
   }
 </style>
 
-<button type="button" class:selected disabled={selected}>
+<button type="button" class:selected disabled={selected} on:click>
   <slot />
   <span class="text">{text}</span>
 </button>

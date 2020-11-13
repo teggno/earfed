@@ -1,7 +1,20 @@
 <script>
+  import { createEventDispatcher } from "svelte";
+
   import BottomBarButton from "./BottomBarButton.svelte";
   import LibraryIcon from "./icons/LibraryIcon.svelte";
   import PlaylistIcon from "./icons/PlaylistIcon.svelte";
+
+  export let selectedItemName = "";
+
+  const shows = "shows";
+  const playlist = "playlist";
+
+  const dispatch = createEventDispatcher();
+
+  function handleClick(name) {
+    dispatch("change", { selectedItemName: name });
+  }
 </script>
 
 <style>
@@ -17,10 +30,16 @@
 </style>
 
 <div>
-  <BottomBarButton text={'Shows'}>
+  <BottomBarButton
+    text={'Shows'}
+    on:click={() => handleClick(shows)}
+    selected={selectedItemName === shows}>
     <LibraryIcon />
   </BottomBarButton>
-  <BottomBarButton text={'Playlist'} selected>
+  <BottomBarButton
+    text={'Playlist'}
+    on:click={() => handleClick(playlist)}
+    selected={selectedItemName === playlist}>
     <PlaylistIcon />
   </BottomBarButton>
 </div>

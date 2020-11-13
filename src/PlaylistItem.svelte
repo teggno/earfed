@@ -188,7 +188,7 @@
       <div class="detailsTop">
         <div>32 min left</div>
       </div>
-      <div class="episodeDescription">{episodeDescription}</div>
+      <div class="episodeDescription">{episodeDescription || ''}</div>
     </div>
   {/if}
 </li>

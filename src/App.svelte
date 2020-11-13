@@ -3,17 +3,18 @@
   import NowPlaying from "./NowPlaying.svelte";
   import Playlist from "./Playlist.svelte";
   import { initAnimationTargetRect } from "./animationTargetRect";
-  import { getEpisodes } from "./dummyData";
   import * as playerService from "./playerService";
   import { connectNotificationBar } from "./notificationBarService";
   import { onMount } from "svelte";
   import { areEpisodesEqual } from "./episode";
+  import Shows from "./Shows.svelte";
 
-  const episodes = getEpisodes();
+  let currentComponentName = "shows";
 
   initAnimationTargetRect();
 
   onMount(() => {
+    registerServiceWorker();
     return connectNotificationBarToPlayerService();
   });
 
@@ -27,6 +28,31 @@
       currentEpisode = info.episode;
     });
   }
+
+  function registerServiceWorker() {
+    if (!("serviceWorker" in navigator)) return Promise.resolve();
+
+    return navigator.serviceWorker.register("/service-worker.js").then(
+      function (registration) {
+        // Registration was successful
+        console.log(
+          "ServiceWorker registration successful with scope: ",
+          registration.scope
+        );
+      },
+      function (err) {
+        // registration failed :(
+        console.log("ServiceWorker registration failed: ", err);
+      }
+    );
+  }
+
+  const components = { playlist: Playlist, shows: Shows };
+
+  function handleComponentChange({ detail: { selectedItemName } }) {
+    console.log(selectedItemName);
+    currentComponentName = selectedItemName;
+  }
 </script>
 
 <style>
@@ -34,8 +60,10 @@
 
 <div class="container">
   <main>
-    <Playlist {episodes} />
+    <svelte:component this={components[currentComponentName]} />
     <NowPlaying />
   </main>
-  <BottomBar />
+  <BottomBar
+    selectedItemName={currentComponentName}
+    on:change={handleComponentChange} />
 </div>
