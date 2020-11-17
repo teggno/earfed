@@ -18,7 +18,7 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "start": "sirv public --host teggno.dev --http2 --key https/teggno.dev.key --cert https/teggno.dev.crt"
+    "start": "sirv public --host teggno.dev --http2 --key https/teggno.dev.key --cert https/teggno.dev.crt --single"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^14.0.0",
@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "idb": "^5.0.7",
+    "page": "^1.11.6",
     "sirv-cli": "^1.0.0",
     "uuid": "^8.3.1"
   },
