@@ -1,4 +1,3 @@
-import { fetchShowRssFeed } from "../showRssFeed";
 import newUuid from "./newUuid";
 import openUserDataDb, { showSubscriptionsMetadata } from "./userDataDb";
 
@@ -9,45 +8,18 @@ const status = {
 
 export async function allShowSubscriptions() {
   const db = await openUserDataDb();
-  const showsRaw = await db.getAllFromIndex(
+  return db.getAllFromIndex(
     showSubscriptionsMetadata.storeName,
     showSubscriptionsMetadata.indexNames.status,
     status.subscribed
   );
-  return showsRaw.map(({ apple, rss, ...rest }) => {
-    if (apple) {
-      return { ...rest, fetchShow: () => fetchShowApple(apple.collectionId) };
-    } else if (rss) {
-      return { ...rest, fetchShow: () => fetchShowRssFeed(rss.showRssFeedUrl) };
-    } else {
-      throw new Error("Unexpected show that has neither rss nor apple info");
-    }
-  });
 }
 
-export async function subscribeToShowApple(collectionId) {
-  const show = { ...newShow(), apple: { collectionId } };
-  await subscribeToShow(show);
-  return show;
-}
-
-export async function subscribeToShowRss(showRssFeedUrl) {
-  const show = { ...newShow(), rss: { showRssFeedUrl } };
-  await subscribeToShow(show);
-  return show;
-}
-
-async function subscribeToShow(show) {
+export async function subscribeToShow(providerMapping) {
+  const show = { ...newShow(), providerMapping };
   const db = await openUserDataDb();
   await db.add(showSubscriptionsMetadata.storeName, show);
-}
-
-function newShow() {
-  return {
-    showId: newUuid(),
-    status: status.subscribed,
-    updated: new Date(),
-  };
+  return show;
 }
 
 export async function unsubscribeFromShow(showId) {
@@ -63,4 +35,10 @@ export async function unsubscribeFromShow(showId) {
   await tran.done;
 }
 
-function fetchShowApple(collectionId) {}
+function newShow() {
+  return {
+    showId: newUuid(),
+    status: status.subscribed,
+    updated: new Date(),
+  };
+}

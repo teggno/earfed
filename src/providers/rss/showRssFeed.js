@@ -1,9 +1,9 @@
-import { corsProxyUrl } from "./config";
-import parseXmlString from "./xml";
+import { corsProxyUrl } from "../../config";
+import parseXmlString from "../../xml";
 
-export async function fetchShowRssFeed(showRssFeedUrl) {
+export async function fetchShowRssFeed(rssFeedUrl) {
   const feedXmlString = await fetch(
-    `${corsProxyUrl}/${showRssFeedUrl}`
+    `${corsProxyUrl}/${rssFeedUrl}`
   ).then((res) => res.text());
   const feedXmlDocument = parseXmlString(feedXmlString);
   return parseShowFeed(feedXmlDocument);
@@ -54,6 +54,8 @@ function parseItem(itemElement) {
       episode.durationSeconds = parseInt(node.textContent);
     } else if (node.nodeName === "enclosure") {
       episode.episodeUrl = node.getAttribute("url");
+    } else if (node.nodeName === "guid") {
+      episode.guid = node.textContent;
     }
   }
   return episode;

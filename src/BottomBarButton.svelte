@@ -1,6 +1,12 @@
 <script>
+  import { writable } from "svelte/store";
+
+  import link from "./routing/linkAction";
   export let text = "";
-  export let selected = false;
+  export let path = "";
+  export let isActive = undefined; // optional
+
+  const active = writable(false);
 </script>
 
 <style>
@@ -17,16 +23,10 @@
     justify-content: space-between;
   }
 
-  /* button:not(:disabled):active {
-    background-color: rgba(255, 255, 255);
-    opacity: 0.6;
-    transform: translateY(1px);
-  } */
-
-  .selected {
+  .active {
     color: var(--color-selected);
   }
-  .selected :global(svg) {
+  .active :global(svg) {
     fill: var(--color-selected);
   }
 
@@ -37,7 +37,12 @@
   }
 </style>
 
-<button type="button" class:selected disabled={selected} on:click>
+<button
+  type="button"
+  class={$active ? 'active' : ''}
+  disabled={$active}
+  on:click
+  use:link={{ path, active, isActive }}>
   <slot />
   <span class="text">{text}</span>
 </button>

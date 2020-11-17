@@ -22,12 +22,7 @@
 
 <style>
   li {
-    cursor: pointer;
-    /* fixes the slide animation on Safari */
     overflow: hidden;
-    /* chrome on android makes stuff that has `cursor: pointer` 
-       blue when tapped which is not wanted here */
-    -webkit-tap-highlight-color: transparent;
     /* 400ms must be coordinated with the slide animation below */
     transition: background-color ease-out 400ms;
   }
@@ -164,7 +159,7 @@
   }
 </style>
 
-<li class:expanded>
+<li class:expanded class="pointer">
   <div class="alwaysVisible">
     <div class="square">
       <ShowIcon {episode} {playing} />

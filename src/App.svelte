@@ -1,15 +1,17 @@
 <script>
-  import BottomBar from "./BottomBar.svelte";
-  import NowPlaying from "./NowPlaying.svelte";
-  import Playlist from "./Playlist.svelte";
-  import { initAnimationTargetRect } from "./animationTargetRect";
-  import * as playerService from "./playerService";
-  import { connectNotificationBar } from "./notificationBarService";
   import { onMount } from "svelte";
+  import AddShowRss from "./AddShowRss.svelte";
+  import { initAnimationTargetRect } from "./animationTargetRect";
+  import BottomBar from "./BottomBar.svelte";
   import { areEpisodesEqual } from "./episode";
+  import { connectNotificationBar } from "./notificationBarService";
+  import NowPlaying from "./NowPlaying.svelte";
+  import * as playerService from "./playerService";
+  import Playlist from "./Playlist.svelte";
+  import Route from "./routing/Route.svelte";
+  import Router from "./routing/Router.svelte";
   import Shows from "./Shows.svelte";
-
-  let currentComponentName = "shows";
+  import ShowSubscription from "./ShowSubscription.svelte";
 
   initAnimationTargetRect();
 
@@ -46,13 +48,6 @@
       }
     );
   }
-
-  const components = { playlist: Playlist, shows: Shows };
-
-  function handleComponentChange({ detail: { selectedItemName } }) {
-    console.log(selectedItemName);
-    currentComponentName = selectedItemName;
-  }
 </script>
 
 <style>
@@ -60,10 +55,13 @@
 
 <div class="container">
   <main>
-    <svelte:component this={components[currentComponentName]} />
+    <Router>
+      <Route component={Playlist} path="" />
+      <Route component={Shows} path="shows" />
+      <Route component={AddShowRss} path="shows/addrss" />
+      <Route component={ShowSubscription} path="shows/subscribe" />
+    </Router>
     <NowPlaying />
   </main>
-  <BottomBar
-    selectedItemName={currentComponentName}
-    on:change={handleComponentChange} />
+  <BottomBar />
 </div>

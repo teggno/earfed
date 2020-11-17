@@ -1,30 +1,20 @@
 <script>
   import { onMount } from "svelte";
 
-  import RssShowSearch from "./RssShowSearch.svelte";
   import ShowList from "./ShowList.svelte";
-  import {
-    allShowSubscriptions,
-    subscribeToShowRss,
-  } from "./userData/showSubscriptions";
+  import { showSubscriptionToShow } from "./showService";
+  import { allShowSubscriptions } from "./userData/showSubscriptions";
+  import link from "./routing/linkAction";
 
   onMount(() => {
     refreshShows();
   });
   let shows = [];
 
-  function handleChange({ detail: { showRssFeedUrl } }) {
-    subscribeToShowRss(showRssFeedUrl).then(refreshShows);
-  }
-
   function refreshShows() {
     allShowSubscriptions()
       .then((showSubscriptions) =>
-        Promise.all(
-          showSubscriptions.map((showSubscription) =>
-            showSubscription.fetchShow()
-          )
-        )
+        Promise.all(showSubscriptions.map(showSubscriptionToShow))
       )
       .then((allShows) => {
         shows = allShows;
@@ -33,6 +23,6 @@
 </script>
 
 <div>
-  <RssShowSearch on:change={handleChange} />
+  <button use:link={{ path: '/shows/addrss' }}>Add Show</button>
   <ShowList {shows} />
 </div>

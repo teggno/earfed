@@ -90,7 +90,6 @@ textarea {
   font-size: inherit;
   -webkit-padding: 0.4em 0;
   padding: 0.4em;
-  margin: 0 0 0.5em 0;
   box-sizing: border-box;
   border: 1px solid #ccc;
   border-radius: 2px;
@@ -125,6 +124,13 @@ button:focus-visible,
 input:focus-visible {
   /* for browsers that do support :focus-visible */
   box-shadow: var(--focus-shadow);
+}
+
+.pointer {
+  cursor: pointer;
+  /* chrome on android makes stuff that has `cursor: pointer` 
+     blue when tapped which is not wanted here */
+  -webkit-tap-highlight-color: transparent; /* fixes the slide animation on Safari */
 }
 
 @media screen and (min-width: 640px) {
