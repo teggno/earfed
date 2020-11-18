@@ -35,16 +35,33 @@
     if (!("serviceWorker" in navigator)) return Promise.resolve();
 
     return navigator.serviceWorker.register("/service-worker.js").then(
-      function (registration) {
-        // Registration was successful
+      (registration) => {
         console.log(
           "ServiceWorker registration successful with scope: ",
           registration.scope
         );
+        if (!registration.installing) {
+          console.log("updating app files");
+          const appV1 = "app-v1";
+          const indexHtmlFiles = [
+            "/" /* index.html itself */,
+            "manifest.webmanifest",
+            "global.css",
+            "favicon.png",
+            "/build/bundle.js",
+            "/build/bundle.css",
+            "/icons/earfedicon-apple-touch.png",
+          ];
+          window.caches
+            .open(appV1)
+            .then((cache) => cache.addAll(indexHtmlFiles));
+        }
+        // console.log("installing", registration.installing);
+        // console.log("waiting", registration.waiting);
+        // console.log("active", registration.active);
       },
-      function (err) {
-        // registration failed :(
-        console.log("ServiceWorker registration failed: ", err);
+      (err) => {
+        console.error("ServiceWorker registration failed: ", err);
       }
     );
   }
