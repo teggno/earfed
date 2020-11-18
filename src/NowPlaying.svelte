@@ -157,7 +157,7 @@
     overflow-y: hidden;
   }
 
-  .showName {
+  .showTitle {
     font-size: var(--font-size-small);
     padding-left: var(--spacing-3);
     color: var(--color-text-muted);
@@ -177,7 +177,7 @@
     white-space: normal;
   }
 
-  .showName,
+  .showTitle,
   .episodeTitle {
     overflow-x: hidden;
     white-space: nowrap;
@@ -359,7 +359,7 @@
     title="Minimize"
     tabindex={maximized ? '' : '-1'} />
   <div class="text" bind:this={textElement}>
-    <div class="showName">{$playerInfo.episode?.showName || ''}</div>
+    <div class="showTitle">{$playerInfo.episode?.showTitle || ''}</div>
     <h2 class="episodeTitle">{$playerInfo.episode?.episodeTitle || ''}</h2>
     <p class="episodeDescription">
       {$playerInfo.episode?.episodeDescription || ''}
@@ -389,7 +389,7 @@ iOS won't make nice with the :active pseudoclass.-->
       <PlayPauseButton
         on:toggle={togglePlayPause}
         status={$playerInfo.status === noEpisode ? 'disabled' : $playerInfo.status}
-        backgroundImageUrl={$playerInfo.episode ? $playerInfo.episode.showIconUrl : ''} />
+        backgroundImageUrl={$playerInfo.episode ? $playerInfo.episode.showImageUrl : ''} />
     </span>
     <span>
       <button

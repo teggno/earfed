@@ -20,8 +20,8 @@ export default async function getPlaylist() {
       }
       const episode = show.episodeFor(e.providerMapping);
       return {
-        showIconUrl: show.showIconUrl,
-        showName: show.showName,
+        showImageUrl: show.showImageUrl,
+        showTitle: show.showTitle,
         ...episode,
       };
     })

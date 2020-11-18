@@ -25,9 +25,16 @@
   --focus-shadow: 0 0 3pt 2pt #ff6600;
   --color-hover: #eee;
 
+  /* browser's "normal" line height if not set otherwise */
+  --assumed-normal-lh: 1.2;
+
   /* vertical positioning of the minimized "NowPlaying"*/
   --mini-player-height: 160px;
   --mini-player-bottom: 150px;
+
+  --min-touchable-size: 44px;
+
+  --image-fallback-color: var(--color-accent);
 }
 
 html {

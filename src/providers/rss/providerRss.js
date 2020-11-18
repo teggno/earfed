@@ -1,6 +1,9 @@
-import { fetchShowRssFeed } from "./showRssFeed";
+import { parseShowFeed } from "./rssFeedParser";
 import { subscribeToShow as subscribe } from "../../userData/showSubscriptions";
 import { addEpisodeRss } from "../../userData/episdes";
+import { corsProxyUrl } from "../../config";
+import parseXmlString from "../../xml";
+
 export function showProviderMapping(rssFeedUrl) {
   return { rssFeedUrl };
 }
@@ -9,8 +12,12 @@ export function providerFor(showProviderMapping) {
   return typeof showProviderMapping.rssFeedUrl !== "undefined";
 }
 
-export function fetchShow(showProviderMapping) {
-  return fetchShowRssFeed(showProviderMapping.rssFeedUrl);
+export async function fetchShow(showProviderMapping) {
+  const feedXmlString = await fetch(
+    `${corsProxyUrl}/${showProviderMapping.rssFeedUrl}`
+  ).then((res) => res.text());
+  const feedXmlDocument = parseXmlString(feedXmlString);
+  return parseShowFeed(feedXmlDocument);
 }
 
 export function episodeFor(episodeProviderMapping, allShowEpisodes) {

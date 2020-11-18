@@ -1,5 +1,4 @@
 <script>
-  import { createEventDispatcher, onMount } from "svelte";
   import { providerByMapping } from "./providers/providers";
   import { parseQuery } from "./urls";
   import { arrayOfLength } from "./utils";
@@ -8,8 +7,6 @@
   let episodes = [];
   let selectedIndices = [];
   let provider;
-
-  const dispatch = createEventDispatcher();
 
   onMount(() => {
     const providerMapping = providerMappingFromQuery();
@@ -109,8 +106,8 @@
 
 {#if show}
   <div>
-    <img src={show.showIconUrl} alt="" />
-    <h2>{show.showName}</h2>
+    <img src={show.showImageUrl} alt="" />
+    <h2>{show.showTitle}</h2>
     <!-- <div>{show.showDescription}</div> -->
   </div>
   <button on:click={handleClick}>Subscribe</button>

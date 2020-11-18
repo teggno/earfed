@@ -25,9 +25,9 @@ const appV1 = "app-v1";
 
 self.addEventListener("install", (event) => {
   console.log("V1 installing…");
-  event.waitUntil(
-    caches.open(appV1).then((cache) => cache.addAll(indexHtmlFiles))
-  );
+  // event.waitUntil(
+  //   caches.open(appV1).then((cache) => cache.addAll(indexHtmlFiles))
+  // );
 });
 
 self.addEventListener("fetch", (event) => {
@@ -48,7 +48,7 @@ self.addEventListener("fetch", (event) => {
               ? `in cache: ${event.request.url}`
               : `not in cache ${event.request.url}`
           );
-          return response;
+          return response || fetch(event.request);
         })
       )
     );

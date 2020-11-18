@@ -5,13 +5,14 @@
 
   import ShowIcon from "./ShowIcon.svelte";
   import DivButton from "./DivButton.svelte";
+  import Square from "./Square.svelte";
 
   export let episode;
   export let playing = false;
   export let expanded = false;
   export let delayInTransition = false;
 
-  const { showName, episodeTitle, episodeDescription } = episode;
+  const { showTitle, episodeTitle, episodeDescription } = episode;
 
   const dispatch = createEventDispatcher();
 
@@ -48,9 +49,8 @@
     padding: var(--spacing-3);
   }
 
-  .square {
-    --assumed-normal-lh: 1.2;
-    --size: max(
+  .alwaysVisible {
+    --square-size: max(
       max(
         calc(
           var(--assumed-normal-lh) * var(--font-size-medium) +
@@ -60,19 +60,10 @@
       ),
       44px
     );
-    width: var(--size);
-    padding-bottom: var(--size);
-    height: 0;
-    position: relative;
-    margin: var(--spacing-3);
   }
 
-  .square > :global(*) {
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    position: absolute;
+  .alwaysVisible > :global(*):first-child {
+    margin: var(--spacing-3);
   }
 
   .alwaysVisible > :global(:nth-child(2)) {
@@ -129,7 +120,7 @@
     text-overflow: ellipsis;
   }
 
-  .showName {
+  .showTitle {
     font-size: var(--font-size-small);
     color: var(--color-text-muted);
     white-space: nowrap;
@@ -161,12 +152,12 @@
 
 <li class:expanded class="pointer">
   <div class="alwaysVisible">
-    <div class="square">
+    <Square>
       <ShowIcon {episode} {playing} />
-    </div>
+    </Square>
     <DivButton on:click={handleClick} ariaExpanded={expanded}>
       <h2 class="episodeTitle">{episodeTitle}</h2>
-      <div class="showName">{showName}</div>
+      <div class="showTitle">{showTitle}</div>
     </DivButton>
   </div>
   {#if expanded}

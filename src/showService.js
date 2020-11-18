@@ -16,8 +16,8 @@ export async function showSubscriptionToShow(showSubscription) {
     provider.episodeFor(episodeProviderMapping, fetchedShowData.episodes);
   return {
     showId: showSubscription.showId,
-    showName: fetchedShowData.showName,
-    showIconUrl: fetchedShowData.showIconUrl,
+    showTitle: fetchedShowData.showTitle,
+    showImageUrl: fetchedShowData.showImageUrl,
     episodeFor,
   };
 }

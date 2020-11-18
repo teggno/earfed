@@ -79,7 +79,7 @@
     --button-down-duration: 120ms;
     --button-release-duration: 400ms;
 
-    background-color: var(--color-accent);
+    background-color: var(--image-fallback-color);
     font-size: 0;
     margin: 0;
     padding: 0;
@@ -207,8 +207,7 @@
 
 <button
   ontouchstart=""
-  class={`${episode.showIconUrl ? '' : 'noIcon'}`}
-  style={`--start-size:${playIconStartSize}px;${episode.showIconUrl ? `background-image:url('${episode.showIconUrl}')` : ''}`}
+  style={`--start-size:${playIconStartSize}px;${episode.showImageUrl ? `background-image:url('${episode.showImageUrl}')` : ''}`}
   on:click|stopPropagation={handleClick}
   title={`${playing ? 'Pause' : 'Play'}`}>
   <span class="playIconWrapper" bind:this={playIconWrapper}>

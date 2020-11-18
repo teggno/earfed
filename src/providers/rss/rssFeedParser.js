@@ -1,14 +1,3 @@
-import { corsProxyUrl } from "../../config";
-import parseXmlString from "../../xml";
-
-export async function fetchShowRssFeed(rssFeedUrl) {
-  const feedXmlString = await fetch(
-    `${corsProxyUrl}/${rssFeedUrl}`
-  ).then((res) => res.text());
-  const feedXmlDocument = parseXmlString(feedXmlString);
-  return parseShowFeed(feedXmlDocument);
-}
-
 export function parseShowFeed(feedXmlDocument) {
   if (feedXmlDocument.documentElement.nodeName === "parsererror") {
     throw new Error("error parsing feed XML");
@@ -22,17 +11,17 @@ export function parseShowFeed(feedXmlDocument) {
   for (var i = 0; i < channelElement.childNodes.length; i++) {
     const node = channelElement.childNodes[i];
     if (node.nodeName === "title") {
-      show.showName = node.textContent;
+      show.showTitle = node.textContent;
     } else if (node.nodeName === "language") {
       show.language = node.textContent;
     } else if (node.nodeName === "itunes:image") {
       // TODO: as seen these images can get quite big. So maybe pass them
       // through some image resize (and then caching) service.
-      show.showIconUrl = node.getAttribute("href");
+      show.showImageUrl = node.getAttribute("href");
     } else if (node.nodeName === "item") {
-      const episode = parseItem(node);
+      const episode = parseEpisode(node);
       if (episode) {
-        show.episodes.push(parseItem(node));
+        show.episodes.push(parseEpisode(node));
       }
     }
   }
@@ -40,7 +29,7 @@ export function parseShowFeed(feedXmlDocument) {
   return show;
 }
 
-function parseItem(itemElement) {
+function parseEpisode(itemElement) {
   const episode = {};
   for (var i = 0; i < itemElement.childNodes.length; i++) {
     const node = itemElement.childNodes[i];

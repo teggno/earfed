@@ -16,11 +16,11 @@ export function connectNotificationBar(playerService) {
   return (episode) => {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: episode.episodeTitle,
-      artist: episode.showName,
+      artist: episode.showTitle,
       album: "",
       artwork: [
         {
-          src: episode.showIconUrl,
+          src: episode.showImageUrl,
           sizes: "512x512",
           type: "image/png",
         },
