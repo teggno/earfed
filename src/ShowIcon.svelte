@@ -85,8 +85,6 @@
     margin: 0;
     padding: 0;
     border: 0 none;
-    background-repeat: no-repeat;
-    background-size: contain;
     position: relative;
     overflow: hidden;
   }

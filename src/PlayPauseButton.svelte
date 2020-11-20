@@ -107,11 +107,6 @@
     position: relative;
     margin: 0;
     padding: 0;
-    background-position: center;
-    /* cover is right here because the image is guaranteed to be square as 
-       it comes transformed from cloudinary and the button is a circle. */
-    background-size: cover;
-    background-repeat: no-repeat;
     transition: transform 120ms ease-in-out;
     font-size: 0;
     overflow: hidden;
