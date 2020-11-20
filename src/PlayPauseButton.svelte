@@ -114,6 +114,7 @@
     background-repeat: no-repeat;
     transition: transform 120ms ease-in-out;
     font-size: 0;
+    overflow: hidden;
   }
 
   button:disabled {
@@ -148,6 +149,14 @@
     transition: opacity 120ms ease-in-out;
   }
 
+  .showImage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
   .icon {
     position: absolute;
     top: 50%;
@@ -173,8 +182,10 @@
   class:buttonDown
   on:click|stopPropagation
   disabled={status === disabled}
-  title={playing ? 'Pause' : 'Play'}
-  style={`${backgroundImageUrl ? `background-image: url('${backgroundImageUrl}')` : ''}`}>
+  title={playing ? 'Pause' : 'Play'}>
+  {#if backgroundImageUrl}
+    <img src={backgroundImageUrl} alt="" class="showImage" />
+  {/if}
   {#if status === playing}
     <span
       class="icon"
