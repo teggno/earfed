@@ -44,14 +44,14 @@
   --duration:${durationMillis}ms;`;
 
   function handleClick() {
-    // if (!playing) {
-    //   play(episode);
-    //   if (animationStatus === "notRunning") {
-    //     animatePlay();
-    //   }
-    // } else {
-    //   pause();
-    // }
+    if (!playing) {
+      play(episode);
+      if (animationStatus === "notRunning") {
+        animatePlay();
+      }
+    } else {
+      pause();
+    }
   }
 
   function animatePlay() {
@@ -88,6 +88,7 @@
     background-repeat: no-repeat;
     background-size: contain;
     position: relative;
+    overflow: hidden;
   }
 
   button:active {
@@ -96,7 +97,6 @@
   }
 
   button > * {
-    z-index: 2;
     position: relative;
   }
 
@@ -105,7 +105,16 @@
     border-radius: var(--spacing-2);
   }
 
+  .showImage {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+  }
+
   .playIconWrapper {
+    z-index: 3;
     display: inline-block;
   }
 
@@ -142,7 +151,7 @@
     bottom: 0;
     background-color: rgba(255, 255, 255, 0.5);
     opacity: 0;
-    z-index: 2;
+    z-index: 3;
   }
 
   button:active:after {
@@ -209,9 +218,15 @@
 
 <button
   ontouchstart=""
-  style={`--start-size:${playIconStartSize}px;${episode.showImageUrl ? `background-image:url('${showImageThumbUrl(episode.showImageUrl)}')` : ''}`}
+  style={`--start-size:${playIconStartSize}px;`}
   on:click|stopPropagation={handleClick}
   title={`${playing ? 'Pause' : 'Play'}`}>
+  {#if episode.showImageUrl}
+    <img
+      class="showImage"
+      src={showImageThumbUrl(episode.showImageUrl)}
+      alt="" />
+  {/if}
   <span class="playIconWrapper" bind:this={playIconWrapper}>
     {#if playing}
       <PauseIcon />
