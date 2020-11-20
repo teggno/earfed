@@ -12,3 +12,7 @@ export function arrayOfLength(length, itemFactory) {
   }
   return arr;
 }
+
+export function isPromise(maybePromise) {
+  return maybePromise && typeof maybePromise.then === "function";
+}

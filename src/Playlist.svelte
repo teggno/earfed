@@ -4,25 +4,25 @@
   import { playerInfo, playing } from "./playerService";
   import { areEpisodesEqual } from "./episode";
   import { afterUpdate, onMount } from "svelte";
-  import getPlaylist from "./playlistService";
+  import { playlist } from "./playlistService";
 
-  let episodes = [];
+  // let episodes = [];
   let expandedEpisode;
   let indexOfPreviouslyExpandedEpisode = -1;
 
   $: currentEpisode = $playerInfo.episode;
   $: playerPlaying = $playerInfo.status === playing;
 
-  onMount(() => {
-    getPlaylist()
-      .then((ep) => {
-        episodes = ep;
-      })
-      .then(() => {});
-  });
+  // onMount(() => {
+  //   getPlaylist()
+  //     .then((ep) => {
+  //       episodes = ep;
+  //     })
+  //     .then(() => {});
+  // });
 
   afterUpdate(() => {
-    indexOfPreviouslyExpandedEpisode = episodes.findIndex((e) =>
+    indexOfPreviouslyExpandedEpisode = $playlist.findIndex((e) =>
       areEpisodesEqual(e, expandedEpisode)
     );
   });
@@ -48,7 +48,7 @@
 <div>
   <PageTitle>Playlist</PageTitle>
   <ul>
-    {#each episodes as episode, index}
+    {#each $playlist as episode, index}
       <PlaylistItem
         {episode}
         playing={playerPlaying && currentEpisode && areEpisodesEqual(currentEpisode, episode)}

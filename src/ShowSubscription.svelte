@@ -2,6 +2,10 @@
   import { providerByMapping } from "./providers/providers";
   import { parseQuery } from "./urls";
   import { arrayOfLength } from "./utils";
+  import { onMount } from "svelte";
+  import { refreshPlaylist } from "./playlistService";
+  import { refreshShows } from "./showService";
+  import { showImageThumbUrl } from "./config";
 
   let show;
   let episodes = [];
@@ -30,7 +34,9 @@
 
     const episodesToAdd = selectedIndices.map((i) => episodes[i]);
     await provider.addEpisodes(show.showId, episodesToAdd);
-    // dispatch("subscribe");
+
+    refreshShows();
+    refreshPlaylist();
   }
 
   function providerMappingFromQuery() {
@@ -106,7 +112,7 @@
 
 {#if show}
   <div>
-    <img src={show.showImageUrl} alt="" />
+    <img src={showImageThumbUrl(show.showImageUrl)} alt="" />
     <h2>{show.showTitle}</h2>
     <!-- <div>{show.showDescription}</div> -->
   </div>

@@ -21,6 +21,7 @@
   import EpisodeTimeline from "./EpisodeTimeline.svelte";
   import dragToClose from "./dragToCloseAction";
   import { tick } from "svelte";
+  import { showImageThumbUrl } from "./config";
 
   $: disabled = $playerInfo.status === noEpisode;
 
@@ -389,7 +390,7 @@ iOS won't make nice with the :active pseudoclass.-->
       <PlayPauseButton
         on:toggle={togglePlayPause}
         status={$playerInfo.status === noEpisode ? 'disabled' : $playerInfo.status}
-        backgroundImageUrl={$playerInfo.episode ? $playerInfo.episode.showImageUrl : ''} />
+        backgroundImageUrl={$playerInfo.episode ? showImageThumbUrl($playerInfo.episode.showImageUrl) : ''} />
     </span>
     <span>
       <button

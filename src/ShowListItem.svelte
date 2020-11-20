@@ -1,7 +1,6 @@
 <script>
+  import { showImageThumbUrl } from "./config";
   import ImgWithFallback from "./ImgWithFallback.svelte";
-
-  import Square from "./Square.svelte";
 
   export let show;
 </script>
@@ -9,12 +8,9 @@
 <style>
   li {
     --square-size: max(
-      max(
-        calc(
-          var(--assumed-normal-lh) * var(--font-size-medium) +
-            var(--assumed-normal-lh) * var(--font-size-small) + var(--spacing-1)
-        ),
-        9%
+      calc(
+        var(--assumed-normal-lh) * var(--font-size-medium) +
+          var(--assumed-normal-lh) * var(--font-size-small) + var(--spacing-1)
       ),
       44px
     );
@@ -23,19 +19,19 @@
     padding: var(--spacing-3) 0;
   }
 
-  .rightOfImage {
-    margin-left: var(--spacing-3);
+  /* targets ImgWithFallback */
+  li > :global(:first-child) {
+    border-radius: 4px;
+    width: var(--square-size);
+    height: var(--square-size);
   }
 
-  /* targets the image or the fallback */
-  li > :global(*) > :global(*):first-child {
-    border-radius: 4px;
+  .rightOfImage {
+    margin-left: var(--spacing-3);
   }
 </style>
 
 <li>
-  <Square>
-    <ImgWithFallback src={show.showImageUrl} />
-  </Square>
+  <ImgWithFallback src={showImageThumbUrl(show.showImageUrl)} />
   <div class="rightOfImage">{show.showTitle}</div>
 </li>

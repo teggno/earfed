@@ -1,29 +1,37 @@
-import { allShowSubscriptions } from "./userData/showSubscriptions";
-import { showSubscriptionToShow } from "./showService";
+import { allShowsStore } from "./showService";
 import { allEpisodesNotDeleted } from "./userData/episdes";
 import { arrayToMap } from "./utils";
+import { derived, writable } from "svelte/store";
+import { oncer } from "./oncer";
 
-export default async function getPlaylist() {
-  const userDataShows = await allShowSubscriptions();
-  const showPromises = userDataShows.map((ss) => showSubscriptionToShow(ss));
-  const shows = await Promise.all(showPromises);
+const once = oncer();
+const userDataEpisodes = writable([], (set) => {
+  once(() => allEpisodesNotDeleted().then(set));
+  return () => {};
+});
 
-  const showsById = arrayToMap(shows, (s) => s.showId);
+export const playlist = derived(
+  [allShowsStore, userDataEpisodes],
+  ([shows, episodeSubscriptions]) => {
+    const showsById = arrayToMap(shows, (s) => s.showId);
 
-  const userDataEpisodes = await allEpisodesNotDeleted();
-  return userDataEpisodes
-    .map((e) => {
+    return episodeSubscriptions.reduce((result, e) => {
       const show = showsById[e.showId];
-      if (!show) {
+      if (show) {
+        const episode = show.episodeFor(e.providerMapping);
+        result.push({
+          showImageUrl: show.showImageUrl,
+          showTitle: show.showTitle,
+          ...episode,
+        });
+      } else {
         console.warn("no show", e.showId);
-        return;
       }
-      const episode = show.episodeFor(e.providerMapping);
-      return {
-        showImageUrl: show.showImageUrl,
-        showTitle: show.showTitle,
-        ...episode,
-      };
-    })
-    .filter((e) => e);
+      return result;
+    }, []);
+  }
+);
+
+export function refreshPlaylist() {
+  allEpisodesNotDeleted().then(userDataEpisodes.set);
 }

@@ -5,7 +5,6 @@
 
   import ShowIcon from "./ShowIcon.svelte";
   import DivButton from "./DivButton.svelte";
-  import Square from "./Square.svelte";
 
   export let episode;
   export let playing = false;
@@ -51,19 +50,18 @@
 
   .alwaysVisible {
     --square-size: max(
-      max(
-        calc(
-          var(--assumed-normal-lh) * var(--font-size-medium) +
-            var(--assumed-normal-lh) * var(--font-size-small) + var(--spacing-1)
-        ),
-        9%
+      calc(
+        var(--assumed-normal-lh) * var(--font-size-medium) +
+          var(--assumed-normal-lh) * var(--font-size-small) + var(--spacing-1)
       ),
       44px
     );
   }
 
-  .alwaysVisible > :global(*):first-child {
+  .alwaysVisible > :global(:first-child) {
     margin: var(--spacing-3);
+    width: var(--square-size);
+    height: var(--square-size);
   }
 
   .alwaysVisible > :global(:nth-child(2)) {
@@ -152,9 +150,7 @@
 
 <li class:expanded class="pointer">
   <div class="alwaysVisible">
-    <Square>
-      <ShowIcon {episode} {playing} />
-    </Square>
+    <ShowIcon {episode} {playing} />
     <DivButton on:click={handleClick} ariaExpanded={expanded}>
       <h2 class="episodeTitle">{episodeTitle}</h2>
       <div class="showTitle">{showTitle}</div>

@@ -1,5 +1,6 @@
 <script>
   import { getAnimationTargetRect } from "./animationTargetRect";
+  import { showImageThumbUrl } from "./config";
 
   import AnimatedPlayToPauseIcon from "./icons/AnimatedPlayToPauseIcon.svelte";
   import PauseIcon from "./icons/PauseIcon.svelte";
@@ -43,14 +44,14 @@
   --duration:${durationMillis}ms;`;
 
   function handleClick() {
-    if (!playing) {
-      play(episode);
-      if (animationStatus === "notRunning") {
-        animatePlay();
-      }
-    } else {
-      pause();
-    }
+    // if (!playing) {
+    //   play(episode);
+    //   if (animationStatus === "notRunning") {
+    //     animatePlay();
+    //   }
+    // } else {
+    //   pause();
+    // }
   }
 
   function animatePlay() {
@@ -86,6 +87,7 @@
     border: 0 none;
     background-repeat: no-repeat;
     background-size: contain;
+    position: relative;
   }
 
   button:active {
@@ -207,7 +209,7 @@
 
 <button
   ontouchstart=""
-  style={`--start-size:${playIconStartSize}px;${episode.showImageUrl ? `background-image:url('${episode.showImageUrl}')` : ''}`}
+  style={`--start-size:${playIconStartSize}px;${episode.showImageUrl ? `background-image:url('${showImageThumbUrl(episode.showImageUrl)}')` : ''}`}
   on:click|stopPropagation={handleClick}
   title={`${playing ? 'Pause' : 'Play'}`}>
   <span class="playIconWrapper" bind:this={playIconWrapper}>

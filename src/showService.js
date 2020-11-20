@@ -1,6 +1,15 @@
+import { writable } from "svelte/store";
+import { oncer } from "./oncer";
 import { providerByMapping } from "./providers/providers";
+import { allShowSubscriptions } from "./userData/showSubscriptions";
 
-export async function showSubscriptionToShow(showSubscription) {
+async function allShows() {
+  const userDataShows = await allShowSubscriptions();
+  const showPromises = userDataShows.map((ss) => showSubscriptionToShow(ss));
+  return await Promise.all(showPromises);
+}
+
+async function showSubscriptionToShow(showSubscription) {
   const provider = providerByMapping(showSubscription.providerMapping);
   if (!provider) {
     throw new Error(
@@ -20,4 +29,14 @@ export async function showSubscriptionToShow(showSubscription) {
     showImageUrl: fetchedShowData.showImageUrl,
     episodeFor,
   };
+}
+
+const once = oncer();
+export const allShowsStore = writable([], (set) => {
+  once(() => allShows().then(set));
+  return () => {};
+});
+
+export function refreshShows() {
+  allShows().then(allShowsStore.set);
 }

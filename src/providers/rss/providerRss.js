@@ -14,7 +14,7 @@ export function providerFor(showProviderMapping) {
 
 export async function fetchShow(showProviderMapping) {
   const feedXmlString = await fetch(
-    `${corsProxyUrl}/${showProviderMapping.rssFeedUrl}`
+    `${corsProxyUrl ? corsProxyUrl + "/" : ""}${showProviderMapping.rssFeedUrl}`
   ).then((res) => res.text());
   const feedXmlDocument = parseXmlString(feedXmlString);
   return parseShowFeed(feedXmlDocument);

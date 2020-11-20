@@ -1,3 +1,5 @@
+import { showImageThumbUrl } from "./config";
+
 export function connectNotificationBar(playerService) {
   if (!("mediaSession" in navigator)) return noOp;
 
@@ -20,7 +22,7 @@ export function connectNotificationBar(playerService) {
       album: "",
       artwork: [
         {
-          src: episode.showImageUrl,
+          src: showImageThumbUrl(episode.showImageUrl),
           sizes: "512x512",
           type: "image/png",
         },
