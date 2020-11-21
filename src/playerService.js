@@ -98,7 +98,10 @@ let pendingPause = false;
 let pendingPlay = false;
 
 function audioWithEpisodeFactory(episode) {
-  if (!audio) audio = new Audio();
+  if (!audio) {
+    audio = new Audio();
+    audio.crossOrigin = "anonymous";
+  }
 
   audio.src = episode.episodeUrl;
 
