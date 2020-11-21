@@ -223,7 +223,8 @@
     <img
       class="showImage"
       src={showImageThumbUrl(episode.showImageUrl)}
-      alt="" />
+      alt=""
+      crossorigin="anonymous" />
   {/if}
   <span class="playIconWrapper" bind:this={playIconWrapper}>
     {#if playing}

@@ -179,7 +179,11 @@
   disabled={status === disabled}
   title={playing ? 'Pause' : 'Play'}>
   {#if backgroundImageUrl}
-    <img src={backgroundImageUrl} alt="" class="showImage" />
+    <img
+      src={backgroundImageUrl}
+      alt=""
+      class="showImage"
+      crossorigin="anonymous" />
   {/if}
   {#if status === playing}
     <span

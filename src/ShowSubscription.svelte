@@ -112,7 +112,10 @@
 
 {#if show}
   <div>
-    <img src={showImageThumbUrl(show.showImageUrl)} alt="" />
+    <img
+      src={showImageThumbUrl(show.showImageUrl)}
+      alt=""
+      crossorigin="anonymous" />
     <h2>{show.showTitle}</h2>
     <!-- <div>{show.showDescription}</div> -->
   </div>

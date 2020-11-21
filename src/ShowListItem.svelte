@@ -32,6 +32,8 @@
 </style>
 
 <li>
-  <ImgWithFallback src={showImageThumbUrl(show.showImageUrl)} />
+  <ImgWithFallback
+    src={showImageThumbUrl(show.showImageUrl)}
+    crossorigin="anonymous" />
   <div class="rightOfImage">{show.showTitle}</div>
 </li>

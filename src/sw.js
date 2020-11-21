@@ -23,6 +23,12 @@ registerRoute(
 // Get rid of workbox logging warnings concerning livereload.js
 registerRoute(/.*\/livereload.js(\?.+)[0, 1]/, new NetworkOnly());
 
+// Get audio data from network only for the time being
+registerRoute(
+  ({ request }) => request.destination === "audio",
+  new NetworkOnly()
+);
+
 registerRoute(
   ({ request }) => request.destination === "image",
   new CacheFirst({
@@ -31,12 +37,6 @@ registerRoute(
       new ExpirationPlugin({
         maxEntries: 60,
         maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
-      }),
-      // For requesting images that don't have the CORS headers. This is to be removed
-      // when images are fetched from Earfed's own image processing endpoint because
-      // that endpoint will either not be CORS or it will but then have the headers.
-      new CacheableResponsePlugin({
-        statuses: [0, 200],
       }),
     ],
   })

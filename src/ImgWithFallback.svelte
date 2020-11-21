@@ -1,6 +1,7 @@
 <script>
   export let src;
   export let alt = "";
+  export let crossorigin = undefined;
 
   let error = false;
 
@@ -19,4 +20,4 @@
   <slot>
     <div class="fallback" />
   </slot>
-{:else}<img {src} {alt} on:error={handleImageError} />{/if}
+{:else}<img {src} {alt} on:error={handleImageError} {crossorigin} />{/if}
