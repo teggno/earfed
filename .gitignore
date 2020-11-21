@@ -1,6 +1,7 @@
 /node_modules/
 /public/build/
 /public/sw.js
+/public/sw.js.map
 
 .DS_Store
 https
