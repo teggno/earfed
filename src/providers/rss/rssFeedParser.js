@@ -29,6 +29,10 @@ export function parseShowFeed(feedXmlDocument) {
   return show;
 }
 
+/**
+ *
+ * @param {Element} itemElement
+ */
 function parseEpisode(itemElement) {
   const episode = {};
   for (var i = 0; i < itemElement.childNodes.length; i++) {
@@ -36,7 +40,14 @@ function parseEpisode(itemElement) {
     if (node.nodeName === "itunes:title" || node.nodeName === "title") {
       episode.episodeTitle = node.textContent;
     } else if (node.nodeName === "description") {
-      episode.episodeDescription = node.nodeValue;
+      if (node.firstChild.nodeType === Node.TEXT_NODE) {
+        episode.episodeDescription = { type: "text", value: node.nodeValue };
+      } else if (node.firstChild.nodeType === Node.CDATA_SECTION_NODE) {
+        episode.episodeDescription = {
+          type: "html",
+          value: node.textContent,
+        };
+      }
     } else if (node.nodeName === "pubDate") {
       episode.pubDate = new Date(node.textContent);
     } else if (node.nodeName === "itunes:duration") {

@@ -5,6 +5,7 @@
 
   import ShowIcon from "./ShowIcon.svelte";
   import DivButton from "./DivButton.svelte";
+  import EpisodeDescription from "./EpisodeDescription.svelte";
 
   export let episode;
   export let playing = false;
@@ -125,11 +126,6 @@
     overflow-x: hidden;
     text-overflow: ellipsis;
   }
-
-  .episodeDescription {
-    line-height: var(--lh-copy);
-  }
-
   .detailsTop {
     padding-bottom: var(--spacing-3);
   }
@@ -148,29 +144,33 @@
   }
 </style>
 
-<li class:expanded class="pointer">
-  <div class="alwaysVisible">
-    <ShowIcon {episode} {playing} />
-    <DivButton on:click={handleClick} ariaExpanded={expanded}>
-      <h2 class="episodeTitle">{episodeTitle}</h2>
-      <div class="showTitle">{showTitle}</div>
-    </DivButton>
-  </div>
-  {#if expanded}
-    <!--durations and delays below must be coordinated with the transition of
+<li class:expanded>
+  <article>
+    <div class="alwaysVisible pointer">
+      <ShowIcon {episode} {playing} />
+      <DivButton on:click={handleClick} ariaExpanded={expanded}>
+        <h2 class="episodeTitle">{episodeTitle}</h2>
+        <div class="showTitle">{showTitle}</div>
+      </DivButton>
+    </div>
+    {#if expanded}
+      <!--durations and delays below must be coordinated with the transition of
     the background-color on li -->
-    <!--the reason easing.quadIn is used for in:slide is that this should make
+      <!--the reason easing.quadIn is used for in:slide is that this should make
     the user focus on the item that was just expanded because it's movement
     looks like ending a bit later this way. This is especially important when
     expanding an item that comes after the currently expanded item.-->
-    <div
-      class="details"
-      in:slide={{ delay: 0, duration: 400, easing: delayInTransition ? quadIn : cubicOut }}
-      out:slide={{ delay: 0, duration: 400 }}>
-      <div class="detailsTop">
-        <div>32 min left</div>
+      <div
+        class="details"
+        in:slide={{ delay: 0, duration: 400, easing: delayInTransition ? quadIn : cubicOut }}
+        out:slide={{ delay: 0, duration: 400 }}>
+        <div class="detailsTop">
+          <div>32 min left</div>
+        </div>
+        <section>
+          <EpisodeDescription {episodeDescription} />
+        </section>
       </div>
-      <div class="episodeDescription">{episodeDescription || ''}</div>
-    </div>
-  {/if}
+    {/if}
+  </article>
 </li>
