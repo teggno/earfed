@@ -104,11 +104,12 @@ export default [
           production ? "production" : "not_production"
         ),
       }),
-      workbox({
-        globDirectory: "public",
-        globPatterns: ["**/*.css", "**/*.js", "**/*.png", "index.html"],
-        // ...any other options here...
-      }),
+      production &&
+        workbox({
+          globDirectory: "public",
+          globPatterns: ["**/*.css", "**/*.js", "**/*.png", "index.html"],
+          // ...any other options here...
+        }),
       production && terser(),
     ],
     output: {

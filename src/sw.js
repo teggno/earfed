@@ -7,18 +7,19 @@ import {
   NetworkOnly,
   StaleWhileRevalidate,
 } from "workbox-strategies";
-import { CacheableResponsePlugin } from "workbox-cacheable-response";
 
-// This is where rollup-plugin-workbox-inject will inject the list of static app
-// files.
-//precacheAndRoute(self.__WB_MANIFEST);
-
-// For development serve app assets from network always. Only works if precacheAndRoute
-// (above) is commented out
-registerRoute(
-  ({ request }) => new URL(request.url).origin === self.origin,
-  new NetworkOnly()
-);
+if (process.env.NODE_ENV === "production") {
+  // This is where rollup-plugin-workbox-inject will inject the list of static app
+  // files.
+  precacheAndRoute(self.__WB_MANIFEST);
+} else {
+  // For development serve app assets from network always. Only works if precacheAndRoute
+  // (above) is commented out
+  registerRoute(
+    ({ request }) => new URL(request.url).origin === self.origin,
+    new NetworkOnly()
+  );
+}
 
 // Get rid of workbox logging warnings concerning livereload.js
 registerRoute(/.*\/livereload.js(\?.+)[0, 1]/, new NetworkOnly());
@@ -45,9 +46,16 @@ registerRoute(
 // Everything that is not one of the static web files or audio is expected to be
 // some show/episode metadata like titles, descriptions, images.
 
-// TODO: Change to StaleWhileRevalidate in production
-setDefaultHandler(
-  new CacheFirst({
-    cacheName: "metadata",
-  })
-);
+if (process.env.NODE_ENV === "production") {
+  setDefaultHandler(
+    new StaleWhileRevalidate({
+      cacheName: "metadata",
+    })
+  );
+} else {
+  setDefaultHandler(
+    new CacheFirst({
+      cacheName: "metadata",
+    })
+  );
+}
