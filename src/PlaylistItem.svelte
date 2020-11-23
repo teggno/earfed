@@ -1,16 +1,7 @@
 <script>
   import { createEventDispatcher } from "svelte";
   import { slide } from "svelte/transition";
-  import {
-    circIn,
-    cubicIn,
-    cubicOut,
-    quadIn,
-    quartIn,
-    quartInOut,
-    quartOut,
-    sineIn,
-  } from "svelte/easing";
+  import { circIn, cubicOut, quadIn } from "svelte/easing";
 
   import ShowIcon from "./ShowIcon.svelte";
   import DivButton from "./DivButton.svelte";
@@ -70,7 +61,7 @@
     height: var(--square-size);
   }
 
-  .alwaysVisible > :global(:nth-child(2)) {
+  .alwaysVisible > :global(.divButton) {
     padding: var(--spacing-3);
     padding-left: 0;
     min-width: 0;
@@ -85,14 +76,14 @@
 
   /* The overflow:hidden on the li prevents the focus box-shadow from 
      being displayed properly, so we have to indicate focus differently here */
-  .alwaysVisible > :global(:nth-child(2)):focus {
+  .alwaysVisible > :global(.divButton):focus {
     box-shadow: none;
   }
-  .alwaysVisible > :global(:nth-child(2)):focus-visible {
+  .alwaysVisible > :global(.divButton):focus-visible {
     box-shadow: none;
   }
 
-  .alwaysVisible > :global(:nth-child(2))::after {
+  .alwaysVisible > :global(.divButton)::after {
     content: "";
     position: absolute;
     left: 0px;
@@ -100,16 +91,16 @@
     right: 5px;
     bottom: 5px;
   }
-  .alwaysVisible > :global(:nth-child(0)):focus::after {
+  .alwaysVisible > :global(.divButton):focus::after {
     outline: none;
     /* for browsers that don't support :focus-visible */
     box-shadow: var(--focus-shadow);
   }
-  .alwaysVisible > :global(:nth-child(2)):focus:not(:focus-visible)::after {
+  .alwaysVisible > :global(.divButton):focus:not(:focus-visible)::after {
     /* reset style set by :focus for browsers that do supoort :focus-visible */
     box-shadow: none;
   }
-  .alwaysVisible > :global(:nth-child(2)):focus-visible::after {
+  .alwaysVisible > :global(.divButton):focus-visible::after {
     /* for browsers that do support :focus-visible */
     box-shadow: var(--focus-shadow);
   }
@@ -158,7 +149,10 @@
   <article>
     <div class="alwaysVisible pointer">
       <ShowIcon {episode} {playing} />
-      <DivButton on:click={handleClick} ariaExpanded={expanded}>
+      <DivButton
+        on:click={handleClick}
+        ariaExpanded={expanded}
+        className="divButton">
         <h2 class="episodeTitle">{episodeTitle}</h2>
         <div class="showTitle">{showTitle}</div>
       </DivButton>
