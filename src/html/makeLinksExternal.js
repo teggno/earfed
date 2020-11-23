@@ -4,9 +4,7 @@
  * @param {Element} element
  */
 export default function makeLinksExternal(element) {
-  console.log("makeLinksExternal");
   element.querySelectorAll("a").forEach((anchor) => {
-    console.log("anchor");
     anchor.setAttribute("target", "_blank");
   });
 }
