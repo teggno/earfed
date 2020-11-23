@@ -43,8 +43,8 @@ registerRoute(
   })
 );
 
-// Everything that is not one of the static web files or audio is expected to be
-// some show/episode metadata like titles, descriptions, images.
+// Everything that is not one of the static web files, image or audio is expected to be
+// some show/episode metadata like titles, descriptions, images in xml or json format.
 
 if (process.env.NODE_ENV === "production") {
   setDefaultHandler(
