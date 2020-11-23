@@ -1,7 +1,16 @@
 <script>
   import { createEventDispatcher } from "svelte";
   import { slide } from "svelte/transition";
-  import { cubicOut, quadIn } from "svelte/easing";
+  import {
+    circIn,
+    cubicIn,
+    cubicOut,
+    quadIn,
+    quartIn,
+    quartInOut,
+    quartOut,
+    sineIn,
+  } from "svelte/easing";
 
   import ShowIcon from "./ShowIcon.svelte";
   import DivButton from "./DivButton.svelte";
@@ -43,10 +52,6 @@
 
   li.expanded .alwaysVisible {
     animation: expanding 500ms;
-  }
-
-  .details {
-    padding: var(--spacing-3);
   }
 
   .alwaysVisible {
@@ -126,8 +131,13 @@
     overflow-x: hidden;
     text-overflow: ellipsis;
   }
+
+  .episodeDescription {
+    padding: var(--spacing-3);
+  }
+
   .detailsTop {
-    padding-bottom: var(--spacing-3);
+    padding: var(--spacing-3);
   }
 
   @media (hover: hover) {
@@ -159,15 +169,15 @@
       <!--the reason easing.quadIn is used for in:slide is that this should make
     the user focus on the item that was just expanded because it's movement
     looks like ending a bit later this way. This is especially important when
-    expanding an item that comes after the currently expanded item.-->
+    expanding an item that is below the currently expanded item.-->
       <div
         class="details"
-        in:slide={{ delay: 0, duration: 400, easing: delayInTransition ? quadIn : cubicOut }}
-        out:slide={{ delay: 0, duration: 400 }}>
+        in:slide={{ delay: 0, duration: Math.max(episodeDescription.value.length / 13, 400), easing: delayInTransition ? quadIn : circIn }}
+        out:slide={{ delay: 0, duration: 400, easing: cubicOut }}>
         <div class="detailsTop">
           <div>32 min left</div>
         </div>
-        <section>
+        <section class="episodeDescription">
           <EpisodeDescription {episodeDescription} />
         </section>
       </div>
