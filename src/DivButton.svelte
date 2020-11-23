@@ -2,6 +2,7 @@
   import { createEventDispatcher } from "svelte";
 
   export let ariaExpanded = undefined;
+  export let className = undefined;
 
   const dispatch = createEventDispatcher();
   function handleKeyDown(e) {
@@ -12,6 +13,7 @@
 </script>
 
 <div
+  class={className}
   aria-expanded={ariaExpanded}
   on:click
   on:keydown={handleKeyDown}
