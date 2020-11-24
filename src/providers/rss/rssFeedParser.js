@@ -40,13 +40,19 @@ function parseEpisode(itemElement) {
     if (node.nodeName === "itunes:title" || node.nodeName === "title") {
       episode.episodeTitle = node.textContent;
     } else if (node.nodeName === "description") {
-      if (node.firstChild.nodeType === Node.TEXT_NODE) {
-        episode.episodeDescription = { type: "text", value: node.nodeValue };
-      } else if (node.firstChild.nodeType === Node.CDATA_SECTION_NODE) {
+      const nonEmptyChild = firstNonEmptyChild(node);
+      if (nonEmptyChild && nonEmptyChild.nodeType === Node.TEXT_NODE) {
+        episode.episodeDescription = { type: "text", value: node.textContent };
+      } else if (
+        nonEmptyChild &&
+        nonEmptyChild.nodeType === Node.CDATA_SECTION_NODE
+      ) {
         episode.episodeDescription = {
           type: "html",
           value: node.textContent,
         };
+      } else {
+        episode.episodeDescription = { type: "text", value: "" };
       }
     } else if (node.nodeName === "pubDate") {
       episode.pubDate = new Date(node.textContent);
@@ -59,4 +65,21 @@ function parseEpisode(itemElement) {
     }
   }
   return episode;
+}
+
+const whitespace = /\s+/;
+/**
+ *
+ * @param {Element} parentElement
+ */
+function firstNonEmptyChild(parentElement) {
+  let child = parentElement.firstChild;
+  while (
+    child &&
+    child.nodeType === Node.TEXT_NODE &&
+    child.textContent.match(whitespace)
+  ) {
+    child = child.nextSibling;
+  }
+  return child;
 }
