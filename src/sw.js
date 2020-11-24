@@ -27,7 +27,17 @@ registerRoute(/.*\/livereload.js(\?.+)[0, 1]/, new NetworkOnly());
 // Get audio data from network only for the time being
 registerRoute(
   ({ request }) => request.destination === "audio",
-  bypassServiceWorker
+  ({ request }) => {
+    if (request.headers.has("range")) {
+      request = new Request(request, {
+        headers: {
+          "access-control-request-headers": "range",
+        },
+      });
+    }
+    // return event.respondWith(fetch(request));
+    return new NetworkOnly().handle({ request });
+  }
 );
 
 registerRoute(
@@ -58,12 +68,4 @@ if (process.env.NODE_ENV === "production") {
       cacheName: "metadata",
     })
   );
-}
-
-function bypassServiceWorker() {
-  // the "handler" function passed to `registerRoute()` is normally expected to
-  // return a promise. We deliberately return something false-y here to bypass
-  // the service worker. This works better than registering a NetworkOnly()
-  // route because with that, we end up with CORS issues when there are
-  // redirects.
 }
