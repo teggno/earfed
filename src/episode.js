@@ -1,3 +1,3 @@
 export function areEpisodesEqual(a, b) {
-  return a && b && a.episodeUrl === b.episodeUrl;
+  return a && b && a.episodeId === b.episodeId;
 }
