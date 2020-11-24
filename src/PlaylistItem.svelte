@@ -166,7 +166,7 @@
     expanding an item that is below the currently expanded item.-->
       <div
         class="details"
-        in:slide={{ delay: 0, duration: Math.max(episodeDescription.value.length / 13, 400), easing: delayInTransition ? quadIn : circIn }}
+        in:slide={{ delay: 0, duration: episodeDescription.value ? Math.max(episodeDescription.value.length / 13, 400) : 400, easing: delayInTransition ? quadIn : circIn }}
         out:slide={{ delay: 0, duration: 400, easing: cubicOut }}>
         <div class="detailsTop">
           <div>32 min left</div>

@@ -390,7 +390,7 @@ iOS won't make nice with the :active pseudoclass.-->
       <PlayPauseButton
         on:toggle={togglePlayPause}
         status={$playerInfo.status === noEpisode ? 'disabled' : $playerInfo.status}
-        backgroundImageUrl={$playerInfo.episode ? showImageThumbUrl($playerInfo.episode.showImageUrl) : ''} />
+        backgroundImageUrl={$playerInfo.episode && $playerInfo.episode.showImageUrl ? showImageThumbUrl($playerInfo.episode.showImageUrl) : ''} />
     </span>
     <span>
       <button
