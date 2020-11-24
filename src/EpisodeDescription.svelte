@@ -23,7 +23,7 @@
 
 <div class="root">
   {#if episodeDescription.type === 'text'}
-    {episodeDescription.value}
+    {episodeDescription.value || ''}
   {:else}
     <!--TODO: Align h1 - h6 inside episodeDescription.value to make styling
     inside container reliable-->

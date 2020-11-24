@@ -3,23 +3,14 @@
   import PlaylistItem from "./PlaylistItem.svelte";
   import { playerInfo, playing } from "./playerService";
   import { areEpisodesEqual } from "./episode";
-  import { afterUpdate, onMount } from "svelte";
+  import { afterUpdate } from "svelte";
   import { playlist } from "./playlistService";
 
-  // let episodes = [];
   let expandedEpisode;
   let indexOfPreviouslyExpandedEpisode = -1;
 
   $: currentEpisode = $playerInfo.episode;
   $: playerPlaying = $playerInfo.status === playing;
-
-  // onMount(() => {
-  //   getPlaylist()
-  //     .then((ep) => {
-  //       episodes = ep;
-  //     })
-  //     .then(() => {});
-  // });
 
   afterUpdate(() => {
     indexOfPreviouslyExpandedEpisode = $playlist.findIndex((e) =>

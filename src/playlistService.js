@@ -22,6 +22,7 @@ export const playlist = derived(
         result.push({
           showImageUrl: show.showImageUrl,
           showTitle: show.showTitle,
+          episodeId: e.episodeId,
           ...episode,
         });
       } else {
