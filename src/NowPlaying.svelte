@@ -22,6 +22,7 @@
   import dragToClose from "./dragToCloseAction";
   import { tick } from "svelte";
   import { showImageThumbUrl } from "./config";
+  import EpisodeDescription from "./EpisodeDescription.svelte";
 
   $: disabled = $playerInfo.status === noEpisode;
 
@@ -362,9 +363,12 @@
   <div class="text" bind:this={textElement}>
     <div class="showTitle">{$playerInfo.episode?.showTitle || ''}</div>
     <h2 class="episodeTitle">{$playerInfo.episode?.episodeTitle || ''}</h2>
-    <p class="episodeDescription">
-      {$playerInfo.episode?.episodeDescription || ''}
-    </p>
+    <section class="episodeDescription">
+      {#if $playerInfo.episode}
+        <EpisodeDescription
+          episodeDescription={$playerInfo.episode.episodeDescription} />
+      {/if}
+    </section>
   </div>
   <div class="timeline">
     <EpisodeTimeline
