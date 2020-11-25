@@ -1,10 +1,9 @@
-import newUuid from "./newUuid";
 import openUserDataDb, { episodesMetadata } from "./userDataDb";
 
 const status = {
+  listed: "l",
+  ended: "e",
   deleted: "d",
-  playing: "py",
-  paused: "ps",
 };
 
 export async function allEpisodesNotDeleted() {
@@ -16,25 +15,23 @@ export async function allEpisodesNotDeleted() {
   );
 }
 
-export async function addEpisodeRss(showId, { guid, episodeUrl }) {
+export async function addEpisode(providerEpisodeId, showId, providerMapping) {
   const episode = {
     ...newEpisode(),
+    episodeId: {
+      provider: showId.provider,
+      providerEpisodeId,
+    },
     showId,
-    providerMapping: { guid, episodeUrl },
+    providerMapping,
   };
-  await addEpisode(episode);
-  return episode;
-}
-
-async function addEpisode(episode) {
   const db = await openUserDataDb();
-  db.add(episodesMetadata.storeName, episode);
+  await db.add(episodesMetadata.storeName, episode);
+  return episode;
 }
 
 function newEpisode() {
   return {
-    episodeId: newUuid(),
-    status: status.paused,
-    updated: new Date(),
+    status: { value: status.listed, updated: new Date() },
   };
 }

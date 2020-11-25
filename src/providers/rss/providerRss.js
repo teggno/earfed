@@ -1,8 +1,8 @@
 import { parseShowFeed } from "./rssFeedParser";
 import { subscribeToShow as subscribe } from "../../userData/showSubscriptions";
-import { addEpisodeRss } from "../../userData/episdes";
 import { corsProxyUrl } from "../../config";
 import parseXmlString from "../../xml";
+import { addEpisode } from "../../userData/episdes";
 
 export function showProviderMapping(rssFeedUrl) {
   return { rssFeedUrl };
@@ -33,12 +33,12 @@ export function subscriptionQuery(rssFeedUrlEncoded) {
 }
 
 export function subscribeToShow(showProviderMapping) {
-  return subscribe(showProviderMapping);
+  return subscribe("rss", showProviderMapping.rssFeedUrl, showProviderMapping);
 }
 
 export function addEpisodes(showId, episodes) {
   const promises = episodes.map((episode) => {
-    addEpisodeRss(showId, episode);
+    addEpisode(episode.guid, showId, { guid: episode.guid });
   });
   return Promise.all(promises);
 }

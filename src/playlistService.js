@@ -13,10 +13,10 @@ const userDataEpisodes = writable([], (set) => {
 export const playlist = derived(
   [allShowsStore, userDataEpisodes],
   ([shows, episodeSubscriptions]) => {
-    const showsById = arrayToMap(shows, (s) => s.showId);
+    const showsById = arrayToMap(shows, (s) => showIdToString(s.showId));
 
     return episodeSubscriptions.reduce((result, e) => {
-      const show = showsById[e.showId];
+      const show = showsById[showIdToString(e.showId)];
       if (show) {
         const episode = show.episodeFor(e.providerMapping);
         result.push({
@@ -35,4 +35,8 @@ export const playlist = derived(
 
 export function refreshPlaylist() {
   allEpisodesNotDeleted().then(userDataEpisodes.set);
+}
+
+function showIdToString(showId) {
+  return `${showId.provider}_${showId.providerShowId}`;
 }

@@ -6,19 +6,22 @@ export default function openUserDataDb() {
       const showSubscriptions = db.createObjectStore(
         showSubscriptionsMetadata.storeName,
         {
-          keyPath: "showId",
+          keyPath: ["showId.provider", "showId.providerShowId"],
         }
       );
       showSubscriptions.createIndex(
         showSubscriptionsMetadata.indexNames.status,
-        "status"
+        "status.value"
       ); // subscribed, unsubscribed
 
       const episodes = db.createObjectStore(episodesMetadata.storeName, {
-        keyPath: "episodeId",
+        keyPath: ["episodeId.provider", "episodeId.providerEpisodeId"],
       });
-      episodes.createIndex(episodesMetadata.indexNames.status, "status"); // playing, paused, deleted
-      episodes.createIndex(episodesMetadata.indexNames.showId, "showId");
+      episodes.createIndex(episodesMetadata.indexNames.status, "status.value"); // listed, ended, deleted
+      episodes.createIndex(episodesMetadata.indexNames.showId, [
+        "showId.provider",
+        "showId.providerShowId",
+      ]);
     },
   });
 }

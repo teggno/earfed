@@ -1,4 +1,3 @@
-import newUuid from "./newUuid";
 import openUserDataDb, { showSubscriptionsMetadata } from "./userDataDb";
 
 const status = {
@@ -15,8 +14,17 @@ export async function allShowSubscriptions() {
   );
 }
 
-export async function subscribeToShow(providerMapping) {
-  const show = { ...newShow(), providerMapping };
+export async function subscribeToShow(
+  provider,
+  providerShowId,
+  providerMapping
+) {
+  console.log(arguments);
+  const show = {
+    ...newShow(),
+    showId: { provider, providerShowId },
+    providerMapping,
+  };
   const db = await openUserDataDb();
   await db.add(showSubscriptionsMetadata.storeName, show);
   return show;
@@ -30,15 +38,13 @@ export async function unsubscribeFromShow(showId) {
     console.warn("tried to unsubscribe from non existing show", showId);
     return;
   }
-  show.status = status.unsubscribed;
+  show.status = { value: status.unsubscribed, date: new Date() };
   await tran.store.put(show);
   await tran.done;
 }
 
 function newShow() {
   return {
-    showId: newUuid(),
-    status: status.subscribed,
-    updated: new Date(),
+    status: { value: status.subscribed, updated: new Date() },
   };
 }

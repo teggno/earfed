@@ -27,11 +27,16 @@ manage subscriptions -> add: save show url, delete: remove show url
 - get all episodes (not: hidden, completed)
 - change order of an episode
 
-(current) episode status:
+episode:
+tells which episodes are in the playlist and which are explicitly removed.
 fields: episodeid, updated, status
-status: deleted, playing, paused
+status: added, deleted
 
-(current) episode playback position
+positionseconds (if undefined: not played yet), date
+status: listed/ended/deleted, date
+
+episode playback position:
+tells where the playback of each episode is at.
 fields: episodeid, updated, positionseconds
 
 show subscriptions
@@ -60,3 +65,15 @@ showSource:
 - rss: { url } -> xml cached
 - apple: { collectionId } -> json cached
 - spotify: { whateverId } -> json cached
+
+## IDs
+
+Using uuids makes synchronizing between different devices difficult. For example
+if device A puts episode E1 on the playlist while offline and device B does the
+same while offline too, and then they are synchronized to the cloud, the uuids
+generated on each device for the same episode are different. So the data must be
+synchronized using some other key (e.g. the episode's guid if it's an rss episode).
+So we just use this key as the key in earfed even though that has other issues.
+
+But what if a system gives up it's structure entirely. For example apple
+podcasts doesn't have a collectionid any more but something different? So, key = (provider, id_as_of_provider)
