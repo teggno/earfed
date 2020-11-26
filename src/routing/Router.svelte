@@ -1,6 +1,5 @@
 <script context="module">
   import { writable } from "svelte/store";
-  //   const basePath = "/";
 
   export const registerRouteFn = {};
   export const activeRoute = writable({ activePath: "/" });
@@ -13,7 +12,9 @@
   export let basePath = "/";
 
   let routes = [];
-  let currentComponent;
+  let currentRoute;
+
+  $: currentComponentProps = currentRoute ? currentRoute.getProps() : {};
 
   setContext(registerRouteFn, doRegisterRoute);
 
@@ -24,28 +25,36 @@
         activeRoute.update((old) => ({ ...old, activePath: context.path }));
         next();
       });
-      page(route.path, opener(route.component));
+      page(route.path, opener(route));
     });
     page();
   });
 
-  function opener(component) {
+  function opener(route) {
     return (context) => {
-      currentComponent = component;
+      currentRoute = route;
     };
   }
 
-  function doRegisterRoute(path, component) {
-    const newItem = { path, component };
+  function doRegisterRoute(path, component, getProps) {
+    const newItem = {
+      path,
+      component,
+      getProps: typeof getProps === "function" ? getProps : getPropsFallback,
+    };
     routes = [...routes, newItem];
     // return the unregister function
     return () => {
       routes = routes.filter((r) => r !== newItem);
     };
   }
+
+  function getPropsFallback() {
+    return {};
+  }
 </script>
 
 <slot />
-{#if currentComponent}
-  <svelte:component this={currentComponent} />
+{#if currentRoute}
+  <svelte:component this={currentRoute.component} {...currentComponentProps} />
 {/if}
