@@ -1,40 +1,53 @@
 import { allShowsStore } from "./showService";
-import { allEpisodesNotDeleted } from "./userData/episdes";
+import { allEpisodesNotDeleted } from "./userData/episodes";
 import { arrayToMap } from "./utils";
 import { derived, writable } from "svelte/store";
 import { oncer } from "./oncer";
 
 const once = oncer();
-const userDataEpisodes = writable([], (set) => {
-  once(() => allEpisodesNotDeleted().then(set));
+const userDataEpisodes = writable({ state: "initial", data: [] }, (set) => {
+  once(() =>
+    allEpisodesNotDeleted().then((e) => {
+      set({ state: "loaded", data: e });
+    })
+  );
   return () => {};
 });
 
 export const playlist = derived(
   [allShowsStore, userDataEpisodes],
   ([shows, episodeSubscriptions]) => {
-    const showsById = arrayToMap(shows, (s) => showIdToString(s.showId));
+    if (shows.state === "loaded" && episodeSubscriptions.state === "loaded") {
+      const showsById = arrayToMap(shows.data, (s) => showIdToString(s.showId));
 
-    return episodeSubscriptions.reduce((result, e) => {
-      const show = showsById[showIdToString(e.showId)];
-      if (show) {
-        const episode = show.episodeFor(e.providerMapping);
-        result.push({
-          showImageUrl: show.showImageUrl,
-          showTitle: show.showTitle,
-          episodeId: e.episodeId,
-          ...episode,
-        });
-      } else {
-        console.warn("no show", e.showId);
-      }
-      return result;
-    }, []);
+      const data = episodeSubscriptions.data.reduce((result, e) => {
+        const show = showsById[showIdToString(e.showId)];
+        if (show) {
+          const providerEpisode = show.episodeFor(e.providerMapping);
+          result.push({
+            showImageUrl: show.showImageUrl,
+            showTitle: show.showTitle,
+            episodeId: e.episodeId,
+            positionSeconds: e.positionSeconds,
+            status: e.status,
+            ...providerEpisode,
+          });
+        } else {
+          console.warn("no show", e.showId);
+        }
+        return result;
+      }, []);
+      return { state: "loaded", data };
+    } else {
+      return { state: "initial", data: [] };
+    }
   }
 );
 
 export function refreshPlaylist() {
-  allEpisodesNotDeleted().then(userDataEpisodes.set);
+  allEpisodesNotDeleted().then((data) =>
+    userDataEpisodes.set({ state: "loaded", data })
+  );
 }
 
 function showIdToString(showId) {

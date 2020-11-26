@@ -169,7 +169,9 @@
         in:slide={{ delay: 0, duration: episodeDescription.value ? Math.max(episodeDescription.value.length / 13, 400) : 400, easing: delayInTransition ? quadIn : circIn }}
         out:slide={{ delay: 0, duration: 400, easing: cubicOut }}>
         <div class="detailsTop">
-          <div>32 min left</div>
+          <div>
+            {episode.positionSeconds && episode.positionSeconds.value ? `${Math.round((episode.durationSeconds - episode.positionSeconds.value) / 60)} min left` : `${Math.round(episode.durationSeconds / 60)} min`}
+          </div>
         </div>
         <section class="episodeDescription">
           <EpisodeDescription {episodeDescription} />

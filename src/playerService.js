@@ -18,7 +18,7 @@ const playerInfo = { subscribe: store.subscribe };
 
 let audioWithEpisode;
 
-function play(episode) {
+function play(episode, setOnly) {
   if (episode && !audioWithEpisode) {
     audioWithEpisode = audioWithEpisodeFactory(episode);
   } else if (episode && audioWithEpisode) {
@@ -30,7 +30,7 @@ function play(episode) {
     console.warn("No episode to play");
     return;
   }
-  audioWithEpisode.play();
+  if (!setOnly) audioWithEpisode.play();
 }
 
 function seek(second) {
@@ -102,12 +102,17 @@ function audioWithEpisodeFactory(episode) {
     audio = new Audio();
     audio.crossOrigin = "anonymous";
   }
+  const currentSecond =
+    episode.positionSeconds && episode.positionSeconds.value
+      ? episode.positionSeconds.value
+      : 0;
 
   audio.src = episode.episodeUrl;
+  audio.currentTime = currentSecond;
 
   addEventListeners(audio);
 
-  store.set({ ...initialValue, episode, status: paused });
+  store.set({ ...initialValue, currentSecond, episode, status: paused });
 
   function addEventListeners() {
     audio.addEventListener("play", handleAudioPlay);

@@ -4,8 +4,8 @@
   import { playerInfo, playing } from "./playerService";
   import { areEpisodesEqual } from "./episode";
   import { afterUpdate } from "svelte";
-  import { playlist } from "./playlistService";
 
+  export let playlist;
   let expandedEpisode;
   let indexOfPreviouslyExpandedEpisode = -1;
 
@@ -13,9 +13,11 @@
   $: playerPlaying = $playerInfo.status === playing;
 
   afterUpdate(() => {
-    indexOfPreviouslyExpandedEpisode = $playlist.findIndex((e) =>
-      areEpisodesEqual(e, expandedEpisode)
-    );
+    const { state, data } = $playlist;
+    indexOfPreviouslyExpandedEpisode =
+      state === "loaded"
+        ? data.findIndex((e) => areEpisodesEqual(e, expandedEpisode))
+        : -1;
   });
 
   function toggleExpanded(episode) {
@@ -38,14 +40,16 @@
 
 <div>
   <PageTitle>Playlist</PageTitle>
-  <ul>
-    {#each $playlist as episode, index}
-      <PlaylistItem
-        {episode}
-        playing={playerPlaying && currentEpisode && areEpisodesEqual(currentEpisode, episode)}
-        expanded={areEpisodesEqual(expandedEpisode, episode)}
-        delayInTransition={indexOfPreviouslyExpandedEpisode !== -1 && indexOfPreviouslyExpandedEpisode < index}
-        on:toggleExpanded={() => toggleExpanded(episode)} />
-    {/each}
-  </ul>
+  {#if $playlist.state === 'loaded'}
+    <ul>
+      {#each $playlist.data as episode, index}
+        <PlaylistItem
+          {episode}
+          playing={playerPlaying && currentEpisode && areEpisodesEqual(currentEpisode, episode)}
+          expanded={areEpisodesEqual(expandedEpisode, episode)}
+          delayInTransition={indexOfPreviouslyExpandedEpisode !== -1 && indexOfPreviouslyExpandedEpisode < index}
+          on:toggleExpanded={() => toggleExpanded(episode)} />
+      {/each}
+    </ul>
+  {/if}
 </div>

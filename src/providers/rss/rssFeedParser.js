@@ -1,3 +1,5 @@
+import { timeStringToSeconds } from "../../time";
+
 export function parseShowFeed(feedXmlDocument) {
   if (feedXmlDocument.documentElement.nodeName === "parsererror") {
     throw new Error("error parsing feed XML");
@@ -57,7 +59,7 @@ function parseEpisode(itemElement) {
     } else if (node.nodeName === "pubDate") {
       episode.pubDate = new Date(node.textContent);
     } else if (node.nodeName === "itunes:duration") {
-      episode.durationSeconds = parseInt(node.textContent);
+      episode.durationSeconds = timeStringToSeconds(node.textContent);
     } else if (node.nodeName === "enclosure") {
       episode.episodeUrl = node.getAttribute("url");
     } else if (node.nodeName === "guid") {

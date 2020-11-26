@@ -32,11 +32,17 @@ async function showSubscriptionToShow(showSubscription) {
 }
 
 const once = oncer();
-export const allShowsStore = writable([], (set) => {
-  once(() => allShows().then(set));
+export const allShowsStore = writable({ state: "initial", data: [] }, (set) => {
+  once(() =>
+    allShows().then((shows) => {
+      set({ state: "loaded", data: shows });
+    })
+  );
   return () => {};
 });
 
 export function refreshShows() {
-  allShows().then(allShowsStore.set);
+  allShows().then((shows) => {
+    set({ state: "loaded", data: shows });
+  });
 }

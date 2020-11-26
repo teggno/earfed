@@ -2,7 +2,7 @@ import { parseShowFeed } from "./rssFeedParser";
 import { subscribeToShow as subscribe } from "../../userData/showSubscriptions";
 import { corsProxyUrl } from "../../config";
 import parseXmlString from "../../xml";
-import { addEpisode } from "../../userData/episdes";
+import { addEpisode } from "../../userData/episodes";
 
 export function showProviderMapping(rssFeedUrl) {
   return { rssFeedUrl };
