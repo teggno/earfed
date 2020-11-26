@@ -26,7 +26,8 @@ registerRoute(/.*\/livereload.js(\?.+)[0, 1]/, new NetworkOnly());
 
 // Get audio data from network only for the time being
 registerRoute(
-  ({ request }) => request.destination === "audio",
+  ({ request }) =>
+    request.destination === "audio" || request.destination === "video", // NOTE: due to a bug in chromium, we also check for video
   ({ request }) => {
     if (request.headers.has("range")) {
       request = new Request(request, {
