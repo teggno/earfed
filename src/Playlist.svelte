@@ -48,7 +48,7 @@
           playing={playerPlaying && currentEpisode && areEpisodesEqual(currentEpisode, episode)}
           expanded={areEpisodesEqual(expandedEpisode, episode)}
           delayInTransition={indexOfPreviouslyExpandedEpisode !== -1 && indexOfPreviouslyExpandedEpisode < index}
-          on:toggleExpanded={() => toggleExpanded(episode)} />
+          on:click={() => toggleExpanded(episode)} />
       {/each}
     </ul>
   {/if}
