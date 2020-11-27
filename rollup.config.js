@@ -6,6 +6,7 @@ import { terser } from "rollup-plugin-terser";
 import replace from "@rollup/plugin-replace";
 import workbox from "rollup-plugin-workbox-inject";
 import { readFileSync } from "fs";
+import css from "rollup-plugin-css-only";
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -45,14 +46,14 @@ export default [
     },
     plugins: [
       svelte({
-        // enable run-time checks when not in production
-        dev: !production,
-        // we'll extract any component CSS out into
-        // a separate file - better for performance
-        css: (css) => {
-          css.write("bundle.css");
+        compilerOptions: {
+          // enable run-time checks when not in production
+          dev: !production,
         },
       }),
+      // we'll extract any component CSS out into
+      // a separate file - better for performance
+      css({ output: "bundle.css" }),
 
       // If you have external dependencies installed from
       // npm, you'll most likely need these plugins. In
