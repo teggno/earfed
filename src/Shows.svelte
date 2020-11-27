@@ -6,5 +6,5 @@
 
 <div>
   <button use:link={{ path: '/shows/addrss' }}>Add Show</button>
-  <ShowList shows={$allShowsStore} />
+  <ShowList shows={$allShowsStore.data} />
 </div>
