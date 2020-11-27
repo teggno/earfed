@@ -1,6 +1,6 @@
 <script>
   import { getAnimationTargetRect } from "./animationTargetRect";
-  import { showImageThumbUrl } from "./config";
+  import { showImageUrlThumb } from "./config";
 
   import AnimatedPlayToPauseIcon from "./icons/AnimatedPlayToPauseIcon.svelte";
   import PauseIcon from "./icons/PauseIcon.svelte";
@@ -222,7 +222,7 @@
   {#if episode.showImageUrl}
     <img
       class="showImage"
-      src={showImageThumbUrl(episode.showImageUrl)}
+      src={showImageUrlThumb(episode.showImageUrl)}
       alt=""
       crossorigin="anonymous" />
   {/if}

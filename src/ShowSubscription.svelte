@@ -5,7 +5,7 @@
   import { onMount } from "svelte";
   import { refreshPlaylist } from "./playlistService";
   import { refreshShows } from "./showService";
-  import { showImageThumbUrl } from "./config";
+  import { showImageUrlThumb } from "./config";
 
   let show;
   let episodes = [];
@@ -113,7 +113,7 @@
 {#if show}
   <div>
     <img
-      src={showImageThumbUrl(show.showImageUrl)}
+      src={showImageUrlThumb(show.showImageUrl)}
       alt=""
       crossorigin="anonymous" />
     <h2>{show.showTitle}</h2>

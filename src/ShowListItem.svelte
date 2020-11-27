@@ -1,5 +1,5 @@
 <script>
-  import { showImageThumbUrl } from "./config";
+  import { showImageUrlThumb } from "./config";
   import ImgWithFallback from "./ImgWithFallback.svelte";
 
   export let show;
@@ -33,7 +33,7 @@
 
 <li>
   <ImgWithFallback
-    src={showImageThumbUrl(show.showImageUrl)}
+    src={showImageUrlThumb(show.showImageUrl)}
     crossorigin="anonymous" />
   <div class="rightOfImage">{show.showTitle}</div>
 </li>
