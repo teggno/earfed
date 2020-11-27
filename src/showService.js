@@ -43,6 +43,6 @@ export const allShowsStore = writable({ state: "initial", data: [] }, (set) => {
 
 export function refreshShows() {
   allShows().then((shows) => {
-    set({ state: "loaded", data: shows });
+    allShowsStore.set({ state: "loaded", data: shows });
   });
 }
