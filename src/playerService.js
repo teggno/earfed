@@ -5,6 +5,7 @@ const seekBackwardSeconds = 20;
 const seekForwardSeconds = 20;
 const playing = "playing";
 const paused = "paused";
+const ended = "ended";
 const noEpisode = "noEpisode";
 const initialValue = {
   episode: undefined,
@@ -88,6 +89,7 @@ export {
   playerInfo,
   playing,
   paused,
+  ended,
   noEpisode,
   seekBackwardSeconds,
   seekForwardSeconds,
@@ -119,13 +121,14 @@ function audioWithEpisodeFactory(episode) {
     audio.addEventListener("playing", handleAudioPlaying);
     audio.addEventListener("pause", handleAudioPause);
     audio.addEventListener("timeupdate", handleAudioTimeUpdate);
+    audio.addEventListener("ended", handleAudioEnded);
   }
 
   function removeEventListeners() {
     audio.removeEventListener("play", handleAudioPlay);
     audio.removeEventListener("playing", handleAudioPlaying);
     audio.removeEventListener("pause", handleAudioPause);
-    audio.removeEventListener("timeupdate", handleAudioTimeUpdate);
+    audio.removeEventListener("ended", handleAudioEnded);
   }
 
   function handleAudioPlay() {
@@ -149,6 +152,10 @@ function audioWithEpisodeFactory(episode) {
 
   function handleAudioPause() {
     store.update((old) => ({ ...old, status: paused }));
+  }
+
+  function handleAudioEnded() {
+    store.update((old) => ({ ...old, status: ended }));
   }
 
   let lastSecond = 0;
