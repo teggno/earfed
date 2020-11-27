@@ -46,7 +46,7 @@
 
   function findLastPlayedEpisode(episodes) {
     return episodes
-      .filter((e) => e.status.value === status.listed)
+      .filter((e) => e.status.value === status.listed && e.positionSeconds)
       .sort(
         (a, b) =>
           b.positionSeconds.updated.valueOf() -
