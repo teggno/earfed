@@ -19,7 +19,6 @@ export async function subscribeToShow(
   providerShowId,
   providerMapping
 ) {
-  console.log(arguments);
   const show = {
     ...newShow(),
     showId: { provider, providerShowId },

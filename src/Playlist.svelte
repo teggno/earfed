@@ -25,6 +25,10 @@
       ? undefined
       : episode;
   }
+
+  function episodeKey(episodeId) {
+    return `${episodeId.provider}_${episodeId.providerEpisodeId}`;
+  }
 </script>
 
 <style>
@@ -42,7 +46,7 @@
   <PageTitle>Playlist</PageTitle>
   {#if $playlist.state === 'loaded'}
     <ul>
-      {#each $playlist.data as episode, index}
+      {#each $playlist.data as episode, index (episodeKey(episode.episodeId))}
         <PlaylistItem
           {episode}
           playing={playerPlaying && currentEpisode && areEpisodesEqual(currentEpisode, episode)}

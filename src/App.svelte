@@ -8,12 +8,17 @@
   import NowPlaying from "./NowPlaying.svelte";
   import * as playerService from "./playerService";
   import Playlist from "./Playlist.svelte";
-  import { playlist, refreshPlaylist } from "./playlistService";
+  import {
+    episodeAfter,
+    lastPlayedEpisode,
+    playlist,
+    refreshPlaylist,
+  } from "./playlistService";
   import Route from "./routing/Route.svelte";
   import Router from "./routing/Router.svelte";
   import Shows from "./Shows.svelte";
   import ShowSubscription from "./ShowSubscription.svelte";
-  import { status, updatePositionSeconds } from "./userData/episodes";
+  import { setEnded, updatePositionSeconds } from "./userData/episodes";
 
   initAnimationTargetRect();
 
@@ -29,29 +34,10 @@
   });
 
   function setLastPlayedEpisode() {
-    let unsubscribe;
-    new Promise((resolve) => {
-      unsubscribe = playlist.subscribe(({ state, data }) => {
-        if (state === "loaded") {
-          resolve(data);
-        }
-      });
-    }).then((data) => {
-      unsubscribe();
-      const episode = findLastPlayedEpisode(data);
+    lastPlayedEpisode().then((episode) => {
       if (!episode) return;
       playerService.play(episode, true);
     });
-  }
-
-  function findLastPlayedEpisode(episodes) {
-    return episodes
-      .filter((e) => e.status.value === status.listed && e.positionSeconds)
-      .sort(
-        (a, b) =>
-          b.positionSeconds.updated.valueOf() -
-          a.positionSeconds.updated.valueOf()
-      )[0];
   }
 
   function connectNotificationBarToPlayerService() {
@@ -66,16 +52,27 @@
   }
 
   function startUpdatingDbWithPlayerStatus() {
-    return playerService.playerInfo.subscribe(async (info) => {
-      if (!info.episode || info.status !== playerService.playing) return;
+    return playerService.playerInfo.subscribe(
+      async ({ episode, status, currentSecond }) => {
+        if (!episode) return;
 
-      await updatePositionSeconds(
-        info.episode.episodeId,
-        info.currentSecond,
-        new Date()
-      );
-      refreshPlaylist();
-    });
+        if (status == playerService.playing) {
+          await updatePositionSeconds(
+            episode.episodeId,
+            currentSecond,
+            new Date()
+          );
+          refreshPlaylist();
+        } else if (status === playerService.ended) {
+          const episodeToPlayNext = await episodeAfter(episode);
+          if (episodeToPlayNext) {
+            playerService.play(episodeToPlayNext);
+          }
+          await setEnded(episode.episodeId, new Date());
+          refreshPlaylist();
+        }
+      }
+    );
   }
 
   function registerServiceWorker() {

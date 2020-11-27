@@ -6,12 +6,12 @@ export const status = {
   deleted: "d",
 };
 
-export async function allEpisodesNotDeleted() {
+export async function listedEpisodes() {
   const db = await openUserDataDb();
   return db.getAllFromIndex(
     episodesMetadata.storeName,
     episodesMetadata.indexNames.status,
-    status.subscribed
+    status.listed
   );
 }
 
@@ -50,6 +50,22 @@ export async function updatePositionSeconds(episodeId, positionSeconds, date) {
     console.warn(
       "not updating positionSeconds because there's a newer value already"
     );
+  }
+  return episode;
+}
+
+export async function setEnded(episodeId, date) {
+  const db = await openUserDataDb();
+  const tran = db.transaction(episodesMetadata.storeName, "readwrite");
+  const episode = await tran.store.get([
+    episodeId.provider,
+    episodeId.providerEpisodeId,
+  ]);
+  if (!episode.status || episode.status.updated < date) {
+    episode.status = { value: status.ended, updated: date };
+    await tran.store.put(episode);
+  } else {
+    console.warn("not updating status because there's a newer value already");
   }
   return episode;
 }

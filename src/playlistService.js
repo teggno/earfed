@@ -1,13 +1,14 @@
 import { allShowsStore } from "./showService";
-import { allEpisodesNotDeleted } from "./userData/episodes";
+import { listedEpisodes, status } from "./userData/episodes";
 import { arrayToMap } from "./utils";
 import { derived, writable } from "svelte/store";
 import { oncer } from "./oncer";
+import { areEpisodesEqual } from "./episode";
 
 const once = oncer();
 const userDataEpisodes = writable({ state: "initial", data: [] }, (set) => {
   once(() =>
-    allEpisodesNotDeleted().then((e) => {
+    listedEpisodes().then((e) => {
       set({ state: "loaded", data: e });
     })
   );
@@ -25,11 +26,11 @@ export const playlist = derived(
         if (show) {
           const providerEpisode = show.episodeFor(e.providerMapping);
           result.push({
-            showImageUrl: show.showImageUrl,
-            showTitle: show.showTitle,
             episodeId: e.episodeId,
             positionSeconds: e.positionSeconds,
             status: e.status,
+            showImageUrl: show.showImageUrl,
+            showTitle: show.showTitle,
             ...providerEpisode,
           });
         } else {
@@ -45,9 +46,44 @@ export const playlist = derived(
 );
 
 export function refreshPlaylist() {
-  allEpisodesNotDeleted().then((data) =>
+  listedEpisodes().then((data) =>
     userDataEpisodes.set({ state: "loaded", data })
   );
+}
+
+export function lastPlayedEpisode() {
+  return playlistEpisodes().then(findLastPlayedEpisode);
+}
+
+export async function episodeAfter(episode) {
+  const episodes = await playlistEpisodes();
+  const indexOfEpisode = episodes.findIndex((e) =>
+    areEpisodesEqual(e, episode)
+  );
+  return episodes[indexOfEpisode + 1];
+}
+
+function playlistEpisodes() {
+  let unsubscribe;
+  return new Promise((resolve) => {
+    unsubscribe = playlist.subscribe(({ state, data }) => {
+      if (state === "loaded") {
+        resolve(data);
+      }
+    });
+  }).finally(() => {
+    unsubscribe();
+  });
+}
+
+function findLastPlayedEpisode(episodes) {
+  return episodes
+    .filter((e) => e.status.value === status.listed && e.positionSeconds)
+    .sort(
+      (a, b) =>
+        b.positionSeconds.updated.valueOf() -
+        a.positionSeconds.updated.valueOf()
+    )[0];
 }
 
 function showIdToString(showId) {

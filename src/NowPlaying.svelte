@@ -92,7 +92,6 @@
   }
 
   function handleTimeChange({ detail: { second } }) {
-    console.log(second);
     seek(second);
   }
 </script>
