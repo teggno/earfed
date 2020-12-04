@@ -1,4 +1,8 @@
-import openUserDataDb, { episodesMetadata } from "./userDataDb";
+import { addEpisodesToEnd, removeEpisodeOrder } from "./episodeOrder";
+import openUserDataDb, {
+  episodeOrderMetadata,
+  episodesMetadata,
+} from "./userDataDb";
 
 export const status = {
   listed: "l",
@@ -15,25 +19,41 @@ export async function listedEpisodes() {
   );
 }
 
-export async function addEpisode(providerEpisodeId, showId, providerMapping) {
-  const episode = {
-    ...newEpisode(),
-    episodeId: {
-      provider: showId.provider,
-      providerEpisodeId,
-    },
-    showId,
-    providerMapping,
-  };
+/**
+ * @param {Object[]} episodes
+ * @param {string} episodes[].providerEpisodeId
+ * @param {string} episodes[].showId
+ * @param {Object} episodes[].providerMapping
+ */
+export async function addEpisodes(episodes, date) {
   const db = await openUserDataDb();
-  await db.add(episodesMetadata.storeName, episode);
-  return episode;
-}
-
-function newEpisode() {
-  return {
-    status: { value: status.listed, updated: new Date() },
-  };
+  const tran = db.transaction(
+    [episodesMetadata.storeName, episodeOrderMetadata.storeName],
+    "readwrite"
+  );
+  const episodesForStore = episodes.map(
+    ({ providerEpisodeId, showId, providerMapping }) => ({
+      status: { value: status.listed, updated: date },
+      episodeId: {
+        provider: showId.provider,
+        providerEpisodeId,
+      },
+      showId,
+      providerMapping,
+    })
+  );
+  try {
+    const episodeStore = tran.objectStore(episodesMetadata.storeName);
+    const orderStore = tran.objectStore(episodeOrderMetadata.storeName);
+    await Promise.all(episodesForStore.map((e) => episodeStore.add(e)));
+    const episodeIds = episodesForStore.map((e) => e.episodeId);
+    await addEpisodesToEnd(orderStore, episodeIds, date);
+  } catch (e) {
+    console.error(e);
+    tran.abort();
+    // no need to re-throw because tran.abort() kind of does that already.
+  }
+  return tran.done;
 }
 
 export async function updatePositionSeconds(episodeId, positionSeconds, date) {
@@ -56,16 +76,27 @@ export async function updatePositionSeconds(episodeId, positionSeconds, date) {
 
 export async function setEnded(episodeId, date) {
   const db = await openUserDataDb();
-  const tran = db.transaction(episodesMetadata.storeName, "readwrite");
-  const episode = await tran.store.get([
+  const tran = db.transaction(
+    [episodesMetadata.storeName, episodeOrderMetadata.storeName],
+    "readwrite"
+  );
+  const episodeStore = tran.objectStore(episodesMetadata.storeName);
+  const orderStore = tran.objectStore(episodeOrderMetadata.storeName);
+  const episode = await episodeStore.get([
     episodeId.provider,
     episodeId.providerEpisodeId,
   ]);
   if (!episode.status || episode.status.updated < date) {
     episode.status = { value: status.ended, updated: date };
-    await tran.store.put(episode);
+    try {
+      await episodeStore.put(episode);
+      await removeEpisodeOrder(orderStore, episodeId, date);
+    } catch (e) {
+      console.error(e);
+      tran.abort();
+    }
   } else {
     console.warn("not updating status because there's a newer value already");
   }
-  return episode;
+  return tran.done;
 }

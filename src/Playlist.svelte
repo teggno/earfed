@@ -4,10 +4,16 @@
   import { playerInfo, playing } from "./playerService";
   import { areEpisodesEqual } from "./episode";
   import { afterUpdate } from "svelte";
+  import orderable from "./actions/orderableAction";
+  import { putEpisodeOrder } from "./userData/episodeOrder";
+  import { refreshOrder } from "./playlistService";
 
   export let playlist;
   let expandedEpisode;
   let indexOfPreviouslyExpandedEpisode = -1;
+  let dragHandleVisible = false;
+  let ul;
+  let indexOfOrderedItem;
 
   $: currentEpisode = $playerInfo.episode;
   $: playerPlaying = $playerInfo.status === playing;
@@ -29,30 +35,84 @@
   function episodeKey(episodeId) {
     return `${episodeId.provider}_${episodeId.providerEpisodeId}`;
   }
+
+  function handleOrderStart({ detail }) {
+    indexOfOrderedItem = detail.indexOfOrderedItem;
+    dragHandleVisible = true;
+  }
+
+  function handleOrderEnd({ detail }) {
+    dragHandleVisible = false;
+
+    if (typeof detail.orderedNodeIndex === "undefined") return;
+
+    const { orderedNodeIndex, targetNodeIndex, beforeTargetNode } = detail;
+    console.log(detail);
+    const items = $playlist.data;
+    const newOrder = items.flatMap((item, index) => {
+      if (index === orderedNodeIndex) {
+        return [];
+      } else if (index === targetNodeIndex) {
+        return beforeTargetNode
+          ? [items[orderedNodeIndex], item]
+          : [item, items[orderedNodeIndex]];
+      } else {
+        return [item];
+      }
+    });
+    putEpisodeOrder(newOrder.map(({ episodeId }) => episodeId));
+    refreshOrder();
+  }
 </script>
 
 <style>
   ul {
-    --padding-bottom: calc(
+    /* --padding-bottom: calc(
       var(--mini-player-height) + var(--mini-player-bottom)
-    );
+    ); */
     list-style: none;
     margin: 0;
     padding: 0 0 var(--padding-bottom) 0;
   }
+
+  ul > :global(li) {
+    border-top-width: 0;
+    border-bottom-width: 0;
+    border-top-style: solid;
+    border-bottom-style: solid;
+    border-color: #444;
+    /* NOTE: The transition is set in PlaylistItem because there is another transition too. Ugly but avoids a wrapper element.*/
+  }
+
+  ul > :global(li.dropBefore) {
+    border-top-style: solid;
+    border-top-width: 4px;
+  }
+  ul > :global(li.dropAfter) {
+    border-bottom-style: solid;
+    border-bottom-width: 4px;
+  }
 </style>
 
 <div>
-  <PageTitle>Playlist</PageTitle>
+  <PageTitle>Episode Queue</PageTitle>
   {#if $playlist.state === 'loaded'}
-    <ul>
+    <ul
+      use:orderable={{ css: { beforeClass: 'dropBefore', afterClass: 'dropAfter' } }}
+      on:orderstart={handleOrderStart}
+      on:orderend={handleOrderEnd}
+      bind:this={ul}>
       {#each $playlist.data as episode, index (episodeKey(episode.episodeId))}
         <PlaylistItem
           {episode}
           playing={playerPlaying && currentEpisode && areEpisodesEqual(currentEpisode, episode)}
           expanded={areEpisodesEqual(expandedEpisode, episode)}
           delayInTransition={indexOfPreviouslyExpandedEpisode !== -1 && indexOfPreviouslyExpandedEpisode < index}
-          on:click={() => toggleExpanded(episode)} />
+          {dragHandleVisible}
+          on:click={() => {
+            if (index !== indexOfOrderedItem) toggleExpanded(episode);
+            indexOfOrderedItem = undefined;
+          }} />
       {/each}
     </ul>
   {/if}

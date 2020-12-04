@@ -4,20 +4,30 @@
 
   import ShowIcon from "./ShowIcon.svelte";
   import EpisodeDescription from "./EpisodeDescription.svelte";
+  import DragHandleIcon from "./icons/DragHandleIcon.svelte";
+  import { createEventDispatcher } from "svelte";
 
   export let episode;
   export let playing = false;
   export let expanded = false;
   export let delayInTransition = false;
+  export let dragHandleVisible = false;
+
+  let li;
+  const dispatch = createEventDispatcher();
 
   const { showTitle, episodeTitle, episodeDescription } = episode;
+
+  function handleExpandClick() {
+    dispatch("click", { li });
+  }
 </script>
 
 <style>
   li {
     overflow: hidden;
     /* 400ms must be coordinated with the slide animation below */
-    transition: background-color ease-out 400ms;
+    transition: background-color ease-out 400ms, border-width 100ms;
   }
 
   li.expanded {
@@ -107,6 +117,7 @@
     white-space: nowrap;
     overflow-x: hidden;
     text-overflow: ellipsis;
+    text-align: left;
   }
 
   .showTitle {
@@ -126,6 +137,11 @@
     padding: var(--spacing-3);
   }
 
+  .dragHandle {
+    flex-shrink: 0;
+    padding-right: var(--spacing-3);
+  }
+
   @media (hover: hover) {
     li:hover:not(.expanded) {
       background-color: var(--background-hover-list);
@@ -140,14 +156,22 @@
   }
 </style>
 
-<li class:expanded>
+<li class:expanded bind:this={li}>
   <article>
     <div class="alwaysVisible pointer">
       <ShowIcon {episode} {playing} />
-      <button class="rightOfImage" on:click ariaExpanded={expanded}>
+      <button
+        class="rightOfImage"
+        on:click={handleExpandClick}
+        ariaExpanded={expanded}>
         <span class="episodeTitle">{episodeTitle}</span>
         <span class="showTitle">{showTitle}</span>
       </button>
+      {#if dragHandleVisible}
+        <div class="dragHandle">
+          <DragHandleIcon />
+        </div>
+      {/if}
     </div>
     {#if expanded}
       <!--durations and delays below must be coordinated with the transition of

@@ -22,6 +22,10 @@ export default function openUserDataDb() {
         "showId.provider",
         "showId.providerShowId",
       ]);
+
+      // the "episodeOrder" store contains a single item holding a sorted array
+      // of episodeId's
+      db.createObjectStore(episodeOrderMetadata.storeName);
     },
   });
 }
@@ -39,4 +43,9 @@ export const episodesMetadata = {
     status: "status",
     showId: "showId",
   },
+};
+
+export const episodeOrderMetadata = {
+  storeName: "episodeOrder",
+  singletonKey: "there_is_only_max_one_item_here",
 };

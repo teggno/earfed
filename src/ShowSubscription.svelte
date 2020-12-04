@@ -33,7 +33,7 @@
     const show = await provider.subscribeToShow(providerMapping);
 
     const episodesToAdd = selectedIndices.map((i) => episodes[i]);
-    await provider.addEpisodes(show.showId, episodesToAdd);
+    await provider.addEpisodes(show.showId, episodesToAdd, new Date());
 
     refreshShows();
     refreshPlaylist();

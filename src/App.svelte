@@ -27,6 +27,7 @@
     const u1 = connectNotificationBarToPlayerService();
     const u2 = startUpdatingDbWithPlayerStatus();
     setLastPlayedEpisode();
+
     return () => {
       u1();
       u2();
@@ -93,6 +94,9 @@
 </script>
 
 <style>
+  .container {
+    padding-bottom: var(--bottom-bar-height);
+  }
 </style>
 
 <div class="container">

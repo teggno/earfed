@@ -1,4 +1,4 @@
-import dragDownDetectorFactory from "./dragToCloseDetector";
+import dragDownDetectorFactory from "../dom/dragToCloseDetector";
 
 export default function dragToClose(node) {
   const detector = dragDownDetectorFactory(dragEndCallback, draggingCallback);

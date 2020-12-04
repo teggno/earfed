@@ -19,7 +19,7 @@
   } from "./playerService";
   import * as bodyScroll from "./toggleBodyScroll";
   import EpisodeTimeline from "./EpisodeTimeline.svelte";
-  import dragToClose from "./dragToCloseAction";
+  import dragToClose from "./actions/dragToCloseAction";
   import { tick } from "svelte";
   import { showImageUrlThumb } from "./config";
   import EpisodeDescription from "./EpisodeDescription.svelte";

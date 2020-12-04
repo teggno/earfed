@@ -4,7 +4,7 @@
   import { fade } from "svelte/transition";
   import * as easing from "svelte/easing";
   import { createEventDispatcher, onMount } from "svelte";
-  import { hitTest } from "./dom";
+  import { hitTest } from "./dom/hitTest";
   import { animationTargetRectSetterFactory } from "./animationTargetRect";
 
   export var status = disabled;
