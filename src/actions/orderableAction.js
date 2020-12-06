@@ -19,10 +19,14 @@ export default function orderable(node, { css: { beforeClass, afterClass } }) {
   let isTouchDevice = false;
 
   let elementBeingDragged;
+  let elementBeingDraggedPosition;
   let targetNode;
   let beforeTargetNode = false;
   let scroller;
   let yBefore;
+  let pointerStartTopLeft;
+  let ghost;
+  let settingGhostPosition = false;
 
   addEventListeners(node);
 
@@ -48,7 +52,7 @@ export default function orderable(node, { css: { beforeClass, afterClass } }) {
     if (e.button !== 0 || isTouchDevice) return;
     isMouseDown = true;
 
-    node.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mousemove", handleMouseMove);
     // adding this to document instead of node to also be notified when the
     // mouse button is released outside of node.
     document.addEventListener("mouseup", handleMouseUp);
@@ -60,14 +64,14 @@ export default function orderable(node, { css: { beforeClass, afterClass } }) {
     if (isDragging()) {
       move(e);
     } else {
-      start(getContainingLi(e.target));
+      start(getContainingLi(e.target), e);
     }
   }
 
   function handleMouseUp(e) {
     if (isDragging()) stop(!hitTest(e.clientX, e.clientY, node));
 
-    node.removeEventListener("mousemove", handleMouseMove);
+    document.removeEventListener("mousemove", handleMouseMove);
     document.removeEventListener("mouseup", handleMouseUp);
     isMouseDown = false;
   }
@@ -80,13 +84,14 @@ export default function orderable(node, { css: { beforeClass, afterClass } }) {
 
     longPressDetectionTimeout = setTimeout(() => {
       longPressDetectionTimeout = undefined;
-      start(getContainingLi(e.touches[0].target));
+      start(getContainingLi(e.touches[0].target), e.touches[0]);
     }, minLongPressMilliseconds);
     node.addEventListener("touchmove", handleTouchMove);
     node.addEventListener("touchend", handleTouchEnd);
   }
 
   function handleTouchMove(e) {
+    if (e.changedTouches.length !== 1) return;
     clearTimeoutIfApplicable();
     if (isDragging()) {
       e.preventDefault(); // prevent scrolling that's happening normally
@@ -102,9 +107,28 @@ export default function orderable(node, { css: { beforeClass, afterClass } }) {
     node.removeEventListener("touchend", handleTouchEnd);
   }
 
-  function start(li) {
-    console.log("start");
+  function start(li, pointerTopLeft) {
     elementBeingDragged = li;
+    const {
+      x: clientX,
+      y: clientY,
+    } = elementBeingDragged.getBoundingClientRect();
+    elementBeingDraggedPosition = { clientX, clientY };
+    pointerStartTopLeft = {
+      clientX: pointerTopLeft.clientX,
+      clientY: pointerTopLeft.clientY,
+    };
+    ghost = createGhost();
+    setGhostPosition(pointerTopLeft);
+    requestAnimationFrame(() => {
+      document.body.appendChild(ghost);
+      requestAnimationFrame(() => {
+        ghost.style.boxShadow = "var(--now-playing-shadow)";
+        ghost.style.opacity = 1;
+      });
+    });
+    elementBeingDragged.style.opacity = 0.6;
+
     node.dispatchEvent(
       new CustomEvent("orderstart", {
         detail: { indexOfOrderedItem: indexOfChild(node, li) },
@@ -112,14 +136,83 @@ export default function orderable(node, { css: { beforeClass, afterClass } }) {
     );
   }
 
+  function createGhost() {
+    const clone = elementBeingDragged.cloneNode(true);
+    const rect = elementBeingDragged.getBoundingClientRect();
+    let element;
+    if (clone.tagName === "LI") {
+      element = document.createElement("ul");
+      element.style.listStyle = "none";
+      element.style.padding = 0;
+      element.style.margin = 0;
+      element.appendChild(clone);
+    } else {
+      element = clone;
+    }
+    element.style.zIndex = 10;
+    element.style.position = "fixed";
+    element.style.width = rect.width + "px";
+    element.style.height = rect.height + "px";
+    element.style.transition = "opacity 400ms ease, box-shadow 400ms ease";
+    element.style.backgroundColor = "white";
+    element.style.opacity = 0;
+    // necessary because when using touch, longpress might show the context menu
+    element.addEventListener("contextmenu", (e) => e.preventDefault());
+    return element;
+  }
+
+  function ghostTopLeft(pointerTopLeft) {
+    return pointerStartTopLeft && elementBeingDraggedPosition
+      ? {
+          clientX: ghostCoord(
+            pointerTopLeft.clientX,
+            pointerStartTopLeft.clientX,
+            elementBeingDraggedPosition.clientX
+          ),
+          clientY: ghostCoord(
+            pointerTopLeft.clientY,
+            pointerStartTopLeft.clientY,
+            elementBeingDraggedPosition.clientY
+          ),
+        }
+      : undefined;
+  }
+
+  function setGhostPosition(pointerTopLeft) {
+    const coords = ghostTopLeft(pointerTopLeft);
+    if (!coords) return;
+    ghost.style.left = coords.clientX + "px";
+    ghost.style.top = coords.clientY + "px";
+  }
+
   function move(clientPoint) {
-    console.log("move");
     if (
       yBefore !== undefined &&
       Math.abs(yBefore - clientPoint.clientY) < 0.5
     ) {
       return;
     }
+
+    setMoveTarget(clientPoint);
+
+    if (scroller) {
+      scroller.cancel();
+    }
+    scroller = makeScroller(() => {
+      setMoveTarget(clientPoint);
+    });
+    scrollTo(clientPoint.clientY);
+
+    if (!settingGhostPosition) {
+      settingGhostPosition = true;
+      requestAnimationFrame(() => {
+        setGhostPosition(clientPoint);
+        settingGhostPosition = false;
+      });
+    }
+  }
+
+  function setMoveTarget(clientPoint) {
     const moveTarget = elementAt(node.children, clientPoint);
 
     if (targetNode && moveTarget !== targetNode) {
@@ -134,12 +227,6 @@ export default function orderable(node, { css: { beforeClass, afterClass } }) {
       enter(moveTarget);
       targetNode = moveTarget;
     }
-
-    if (scroller) {
-      scroller.cancel();
-    }
-    scroller = makeScroller();
-    scrollTo(clientPoint.clientY);
   }
 
   function stop(cancelled) {
@@ -148,15 +235,36 @@ export default function orderable(node, { css: { beforeClass, afterClass } }) {
     }
     if (targetNode) leave(targetNode);
 
-    let detail = cancelled
-      ? {}
-      : {
+    const hasReordered =
+      !cancelled && targetNode && elementBeingDragged !== targetNode;
+    const detail = hasReordered
+      ? {
           orderedNodeIndex: indexOfChild(node, elementBeingDragged),
           targetNodeIndex: indexOfChild(node, targetNode),
           beforeTargetNode,
-        };
+        }
+      : {};
     node.dispatchEvent(new CustomEvent("orderend", { detail }));
+    elementBeingDragged.style.opacity = 1;
+
+    if (ghost) {
+      const targetRect = (hasReordered
+        ? targetNode
+        : elementBeingDragged
+      ).getBoundingClientRect();
+      ghost.style.left = targetRect.x + "px";
+      ghost.style.top = targetRect.y + "px";
+      ghost.style.boxShadow = "none";
+      ghost.style.transition = "all 100ms cubic-bezier(0.11, 0, 0.5, 0)";
+      let g = ghost;
+      ghost = undefined;
+      setTimeout(() => {
+        document.body.removeChild(g);
+      }, 100);
+    }
     elementBeingDragged = undefined;
+    targetNode = undefined;
+    pointerStartTopLeft = undefined;
   }
 
   function clearTimeoutIfApplicable() {
@@ -262,7 +370,7 @@ function indexOfChild(parent, child) {
   return undefined;
 }
 
-function makeScroller() {
+function makeScroller(scrolled) {
   let cancelled = false;
   function cancel() {
     cancelled = true;
@@ -274,6 +382,7 @@ function makeScroller() {
           ? 0
           : window.pageYOffset - scrollIncrement;
       window.scrollTo({ top: newScrollTop });
+      scrolled();
       await wait(scrollWaitMillis);
     }
   }
@@ -285,6 +394,7 @@ function makeScroller() {
           ? window.pageYOffset + scrollIncrement
           : document.body.scrollHeight - window.innerHeight;
       window.scrollTo({ top: newScrollTop });
+      scrolled();
       await wait(scrollWaitMillis);
     }
   }
@@ -296,4 +406,8 @@ function wait(ms) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
+}
+
+function ghostCoord(pointerCoord, pointerStartCoord, elementBeingDraggedCoord) {
+  return pointerCoord - pointerStartCoord + elementBeingDraggedCoord;
 }
