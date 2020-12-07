@@ -112,19 +112,19 @@
     margin: 0 0 var(--spacing-1) 0;
     padding: 0;
     font-size: var(--font-size-medium);
-    font-weight: normal;
+    text-align: left;
     max-width: 100%;
     white-space: nowrap;
     overflow-x: hidden;
     text-overflow: ellipsis;
-    text-align: left;
   }
 
   .showTitle {
-    font-size: var(--font-size-small);
     color: var(--color-text-muted);
-    white-space: nowrap;
+    font-size: var(--font-size-small);
+    text-align: left;
     max-width: 100%;
+    white-space: nowrap;
     overflow-x: hidden;
     text-overflow: ellipsis;
   }
