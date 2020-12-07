@@ -1,7 +1,10 @@
 import { showImageUrlMedium } from "./config";
 
+export function supportsNotificationBar() {
+  return "mediaSession" in navigator;
+}
 export function connectNotificationBar(playerService) {
-  if (!("mediaSession" in navigator)) return noOp;
+  if (!supportsNotificationBar()) return noOp;
 
   // adapted from https://developers.google.com/web/updates/2017/02/media-session
 

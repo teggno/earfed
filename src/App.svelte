@@ -3,8 +3,12 @@
   import AddShowRss from "./AddShowRss.svelte";
   import { initAnimationTargetRect } from "./animationTargetRect";
   import BottomBar from "./BottomBar.svelte";
+  import { showImageUrlMedium } from "./config";
   import { areEpisodesEqual } from "./episode";
-  import { connectNotificationBar } from "./notificationBarService";
+  import {
+    connectNotificationBar,
+    supportsNotificationBar,
+  } from "./notificationBarService";
   import NowPlaying from "./NowPlaying.svelte";
   import * as playerService from "./playerService";
   import Playlist from "./Playlist.svelte";
@@ -22,15 +26,20 @@
 
   initAnimationTargetRect();
 
+  let showImageUrls;
+
   onMount(() => {
     registerServiceWorker();
-    const u1 = connectNotificationBarToPlayerService();
-    const u2 = startUpdatingDbWithPlayerStatus();
+    const unsubscribers = [
+      connectNotificationBarToPlayerService(),
+      startUpdatingDbWithPlayerStatus(),
+      preloadNotificationBarShowImages(),
+    ];
+
     setLastPlayedEpisode();
 
     return () => {
-      u1();
-      u2();
+      unsubscribers.forEach((u) => u());
     };
   });
 
@@ -76,6 +85,21 @@
     );
   }
 
+  function preloadNotificationBarShowImages() {
+    if (!supportsNotificationBar()) return () => {};
+    return playlist.subscribe((list) => {
+      showImageUrls =
+        list.state === "loaded"
+          ? Object.keys(
+              list.data.reduce((prev, playlistItem) => {
+                prev[playlistItem.showImageUrl] = true;
+                return prev;
+              }, {})
+            ).map(showImageUrlMedium)
+          : [];
+    });
+  }
+
   function registerServiceWorker() {
     if (!("serviceWorker" in navigator)) return Promise.resolve();
 
@@ -111,3 +135,20 @@
   </main>
   <BottomBar />
 </div>
+
+<svelte:head>
+  <!-- 
+    preload the (medium size) images displayed in the notification bar for two
+    reasons:
+    1. So that they are available offline even when none of a show's episode has
+       ever been played while online.
+    2. The `mediaSession` API's `artwork` property doesn't allow specifying CORS
+       which causes problems when caching the images while they are implicitly
+       requested by `mediaSession`. The `<link rel="preload">` **does** support
+       specifying CORS-->
+  {#if showImageUrls}
+    {#each showImageUrls as showImageUrl}
+      <link rel="preload" href={showImageUrl} as="image" crossorigin />
+    {/each}
+  {/if}
+</svelte:head>
