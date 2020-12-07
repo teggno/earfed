@@ -19,13 +19,13 @@
 </style>
 
 <div>
+  <BottomBarButton text={'Queue'} path="/">
+    <PlaylistIcon />
+  </BottomBarButton>
   <BottomBarButton
     text={'Shows'}
     path={shows}
     isActive={(activePath) => activePath.indexOf(shows) === 0}>
     <LibraryIcon />
-  </BottomBarButton>
-  <BottomBarButton text={'Playlist'} path="/">
-    <PlaylistIcon />
   </BottomBarButton>
 </div>
