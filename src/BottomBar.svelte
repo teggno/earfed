@@ -13,7 +13,7 @@
     width: var(--app-max-width, 100%);
     display: flex;
     justify-content: space-evenly;
-    background-color: var(--color-background);
+    background-color: #fefefe;
     z-index: 5;
   }
 </style>

@@ -31,7 +31,7 @@
   }
 
   li.expanded {
-    background-color: white;
+    background-color: #f9f9f9;
   }
 
   .alwaysVisible {

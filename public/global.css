@@ -6,7 +6,8 @@
   --color-accent-pressed: #ff400046;
   --color-success: rgb(0, 190, 0);
   --color-danger: rgb(190, 0, 0);
-  --color-background: #f5f5f5;
+  --color-background-outside: #ddd;
+  --color-background: #f1f1f1;
   --color-text: #332;
   --color-text-muted: #888;
   --color-disabled: #aaa;
@@ -23,7 +24,7 @@
   --field-spacing: var(--spacing-3);
   --lh-copy: 160%;
   --focus-shadow: 0 0 3pt 2pt #ff6600;
-  --color-hover: #eee;
+  --color-hover: #e6e6e6;
 
   /* browser's "normal" line height if not set otherwise */
   --assumed-normal-lh: 1.2;
@@ -55,8 +56,9 @@ body {
 }
 
 html {
-  background-color: #eee;
+  background-color: var(--color-background-outside);
   font-size: 16px;
+  height: -webkit-fill-available;
 }
 
 body {
