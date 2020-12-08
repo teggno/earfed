@@ -20,13 +20,18 @@
   } from "./playlistService";
   import Route from "./routing/Route.svelte";
   import Router from "./routing/Router.svelte";
+  import Search from "./Search.svelte";
   import Shows from "./Shows.svelte";
   import ShowSubscription from "./ShowSubscription.svelte";
   import { setEnded, updatePositionSeconds } from "./userData/episodes";
+  import virtualKeyboardDetector, {
+    virtualkeyboard,
+  } from "./virtualKeyboardDetector";
 
   initAnimationTargetRect();
 
   let showImageUrls;
+  let virtualKeyboardVisible = false;
 
   onMount(() => {
     registerServiceWorker();
@@ -34,6 +39,8 @@
       connectNotificationBarToPlayerService(),
       startUpdatingDbWithPlayerStatus(),
       preloadNotificationBarShowImages(),
+      virtualKeyboardDetector(),
+      watchVirtualKeyboard(),
     ];
 
     setLastPlayedEpisode();
@@ -100,6 +107,19 @@
     });
   }
 
+  function watchVirtualKeyboard() {
+    window.addEventListener(virtualkeyboard, handleVirtualKeyboard);
+
+    function handleVirtualKeyboard({ detail: { visible } }) {
+      console.log("foo");
+      virtualKeyboardVisible = visible;
+    }
+
+    return () => {
+      window.removeEventListener(virtualkeyboard, handleVirtualKeyboard);
+    };
+  }
+
   function registerServiceWorker() {
     if (!("serviceWorker" in navigator)) return Promise.resolve();
 
@@ -128,12 +148,15 @@
     <Router>
       <Route component={Playlist} path="" getProps={() => ({ playlist })} />
       <Route component={Shows} path="shows" />
+      <Route component={Search} path="shows/search" />
       <Route component={AddShowRss} path="shows/addrss" />
       <Route component={ShowSubscription} path="shows/subscribe" />
     </Router>
-    <NowPlaying />
   </main>
-  <BottomBar />
+  {#if !virtualKeyboardVisible}
+    <NowPlaying />
+    <BottomBar />
+  {/if}
 </div>
 
 <svelte:head>

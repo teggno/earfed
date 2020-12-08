@@ -5,6 +5,7 @@
 </script>
 
 <div>
-  <button use:link={{ path: '/shows/addrss' }}>Add Show</button>
+  <button use:link={{ path: '/shows/search' }}>Search</button>
+  <button use:link={{ path: '/shows/addrss' }}>Add RSS Feed</button>
   <ShowList shows={$allShowsStore.data} />
 </div>
