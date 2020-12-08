@@ -33,11 +33,14 @@
   --mini-player-height: 160px;
   --mini-player-bottom: 150px;
 
+  /* 
+    bottom-bar-height is:
+    icon + height of the span + padding-top of the span + v-padding of the button 
+  */
   --bottom-bar-height: calc(
-    24px + var(--font-size-tiny) * var(--assumed-normal-lh) + 2 *
-      var(--spacing-2)
+    24px + var(--font-size-tiny) * var(--assumed-normal-lh) + var(--spacing-2) +
+      2 * var(--spacing-2)
   );
-
   --min-touchable-size: 44px;
 
   --image-fallback-color: var(--color-accent);
