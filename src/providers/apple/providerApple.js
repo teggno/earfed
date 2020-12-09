@@ -29,11 +29,21 @@ function appleShowToShow(appleShow) {
 }
 
 function appleEpisodeToEpisode(appleEpisode) {
+  console.log(appleEpisode.description);
   return {
     ...appleEpisode,
     episodeTitle: appleEpisode.trackName,
     pubDate: new Date(appleEpisode.releaseDate),
-    episodeDescription: { type: "text" },
+    episodeDescription: {
+      type: "html",
+      value: appleEpisode.description
+        .replace(/\n/g, "<br/>")
+        .replace(
+          /\t/g,
+          '<span style="display:inline-block;width: 10px;"></span>'
+        ),
+    },
+    durationSeconds: appleEpisode.trackTimeMillis / 1000,
   };
 }
 
