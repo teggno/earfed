@@ -48,6 +48,12 @@
     align-items: center;
   }
 
+  li:first-child {
+    border-top: var(--spacing-4) solid transparent;
+  }
+  li {
+    border-bottom: var(--spacing-3) solid transparent;
+  }
   li a {
     text-decoration: none;
     color: inherit;
@@ -64,6 +70,7 @@
   }
   .subtitle {
     color: var(--color-text-muted);
+    margin-top: var(--spacing-1);
   }
 
   .title,
@@ -122,6 +129,9 @@
         <div class="rightOfImage">
           <div class="title">{episode.trackName}</div>
           <div class="subtitle">{episode.collectionName}</div>
+          <div class="subtitle">
+            {new Date(episode.releaseDate).toDateString()}
+          </div>
         </div>
       </li>
     {/each}
