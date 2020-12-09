@@ -1,6 +1,6 @@
 <script>
-  import { showImageUrlThumb } from "./config";
-  import ImgWithFallback from "./ImgWithFallback.svelte";
+  import { showImageUrlThumb } from "../config";
+  import ImgWithFallback from "../ImgWithFallback.svelte";
 
   export let show;
 </script>

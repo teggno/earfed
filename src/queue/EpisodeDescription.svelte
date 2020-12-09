@@ -1,5 +1,5 @@
 <script>
-  import sanitizeHtml from "./html/sanitizeHtml";
+  import sanitizeHtml from "../html/sanitizeHtml";
   export let episodeDescription = { type: "text", value: "" };
 </script>
 

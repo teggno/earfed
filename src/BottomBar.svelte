@@ -1,9 +1,11 @@
 <script>
   import BottomBarButton from "./BottomBarButton.svelte";
-  import LibraryIcon from "./icons/LibraryIcon.svelte";
   import PlaylistIcon from "./icons/PlaylistIcon.svelte";
+  import SearchIcon from "./icons/SearchIcon.svelte";
+  import SubscriptionsIcon from "./icons/SubscriptionsIcon.svelte";
 
-  const shows = "shows";
+  const subscriptions = "subscriptions";
+  const search = "search";
 </script>
 
 <style>
@@ -23,9 +25,15 @@
     <PlaylistIcon />
   </BottomBarButton>
   <BottomBarButton
-    text={'Shows'}
-    path={shows}
-    isActive={(activePath) => activePath.indexOf(shows) === 0}>
-    <LibraryIcon />
+    text={'Subscriptions'}
+    path={`/${subscriptions}`}
+    isActive={(activePath) => activePath.indexOf(subscriptions) === 0}>
+    <SubscriptionsIcon />
+  </BottomBarButton>
+  <BottomBarButton
+    text={'Search'}
+    path={`/${search}`}
+    isActive={(activePath) => activePath.indexOf(search) === 0}>
+    <SearchIcon />
   </BottomBarButton>
 </div>

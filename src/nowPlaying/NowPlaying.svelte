@@ -1,7 +1,7 @@
 <script>
-  import ArrowLeftIcon from "./icons/ArrowLeftIcon.svelte";
-  import ArrowRightIcon from "./icons/ArrowRightIcon.svelte";
-  import DeleteIcon from "./icons/DeleteIcon.svelte";
+  import ArrowLeftIcon from "../icons/ArrowLeftIcon.svelte";
+  import ArrowRightIcon from "../icons/ArrowRightIcon.svelte";
+  import DeleteIcon from "../icons/DeleteIcon.svelte";
   import PlayPauseButton from "./PlayPauseButton.svelte";
   import {
     play,
@@ -16,13 +16,13 @@
     noEpisode,
     seekBackwardSeconds,
     seekForwardSeconds,
-  } from "./playerService";
-  import * as bodyScroll from "./toggleBodyScroll";
-  import EpisodeTimeline from "./EpisodeTimeline.svelte";
-  import dragToClose from "./actions/dragToCloseAction";
+  } from "../playerService";
+  import * as bodyScroll from "../toggleBodyScroll";
+  import EpisodeTimeline from "../EpisodeTimeline.svelte";
+  import dragToClose from "../actions/dragToCloseAction";
   import { tick } from "svelte";
-  import { showImageUrlThumb } from "./config";
-  import EpisodeDescription from "./EpisodeDescription.svelte";
+  import { showImageUrlThumb } from "../config";
+  import EpisodeDescription from "../queue/EpisodeDescription.svelte";
 
   $: disabled = $playerInfo.status === noEpisode;
 

@@ -1,12 +1,12 @@
 <script>
-  import { getAnimationTargetRect } from "./animationTargetRect";
-  import { showImageUrlThumb } from "./config";
+  import { getAnimationTargetRect } from "../animationTargetRect";
+  import { showImageUrlThumb } from "../config";
 
-  import AnimatedPlayToPauseIcon from "./icons/AnimatedPlayToPauseIcon.svelte";
-  import PauseIcon from "./icons/PauseIcon.svelte";
+  import AnimatedPlayToPauseIcon from "../icons/AnimatedPlayToPauseIcon.svelte";
+  import PauseIcon from "../icons/PauseIcon.svelte";
 
-  import PlayIcon from "./icons/PlayIcon.svelte";
-  import { pause, play } from "./playerService";
+  import PlayIcon from "../icons/PlayIcon.svelte";
+  import { pause, play } from "../playerService";
 
   export let episode;
   export let playing = false;

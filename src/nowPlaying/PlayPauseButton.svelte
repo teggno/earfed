@@ -1,11 +1,11 @@
 <script>
-  import PauseIcon from "./icons/PauseIcon.svelte";
-  import PlayIcon from "./icons/PlayIcon.svelte";
+  import PauseIcon from "../icons/PauseIcon.svelte";
+  import PlayIcon from "../icons/PlayIcon.svelte";
   import { fade } from "svelte/transition";
   import * as easing from "svelte/easing";
   import { createEventDispatcher, onMount } from "svelte";
-  import { hitTest } from "./dom/hitTest";
-  import { animationTargetRectSetterFactory } from "./animationTargetRect";
+  import { hitTest } from "../dom/hitTest";
+  import { animationTargetRectSetterFactory } from "../animationTargetRect";
 
   export var status = disabled;
   export var backgroundImageUrl = "";

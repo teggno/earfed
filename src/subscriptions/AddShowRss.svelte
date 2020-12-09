@@ -1,14 +1,15 @@
 <script>
-  import { subscriptionQuery } from "./providers/rss/providerRss";
+  import { subscriptionQuery } from "../providers/rss/providerRss";
 
-  import navigate from "./routing/navigate";
+  import navigate from "../routing/navigate";
 
   let url = "https://feed.syntax.fm/rss";
 
   function handleSubmit(e) {
     e.preventDefault();
     navigate(
-      "/shows/subscribe?" + subscriptionQuery(encodeURIComponent(url.trim()))
+      "/subscriptions/subscribe?" +
+        subscriptionQuery(encodeURIComponent(url.trim()))
     );
   }
 </script>

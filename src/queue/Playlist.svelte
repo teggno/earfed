@@ -1,12 +1,12 @@
 <script>
-  import PageTitle from "./PageTitle.svelte";
+  import PageTitle from "../PageTitle.svelte";
   import PlaylistItem from "./PlaylistItem.svelte";
-  import { playerInfo, playing } from "./playerService";
-  import { areEpisodesEqual } from "./episode";
+  import { playerInfo, playing } from "../playerService";
+  import { areEpisodesEqual } from "../episode";
   import { afterUpdate } from "svelte";
-  import orderable from "./actions/orderableAction";
-  import { putEpisodeOrder } from "./userData/episodeOrder";
-  import { refreshOrder } from "./playlistService";
+  import orderable from "../actions/orderableAction";
+  import { putEpisodeOrder } from "../userData/episodeOrder";
+  import { refreshOrder } from "../playlistService";
 
   export let playlist;
   let expandedEpisode;

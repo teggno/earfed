@@ -32,8 +32,8 @@ export function subscriptionQuery(rssFeedUrlEncoded) {
   return `rssFeedUrl=${rssFeedUrlEncoded}`;
 }
 
-export function subscribeToShow(showProviderMapping) {
-  return subscribe("rss", showProviderMapping.rssFeedUrl, showProviderMapping);
+export function subscribeToShow(rssFeedUrl) {
+  return subscribe("rss", rssFeedUrl, { rssFeedUrl });
 }
 
 export function addEpisodes(showId, episodes, date) {

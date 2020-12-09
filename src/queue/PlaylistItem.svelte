@@ -4,7 +4,7 @@
 
   import ShowIcon from "./ShowIcon.svelte";
   import EpisodeDescription from "./EpisodeDescription.svelte";
-  import DragHandleIcon from "./icons/DragHandleIcon.svelte";
+  import DragHandleIcon from "../icons/DragHandleIcon.svelte";
   import { createEventDispatcher } from "svelte";
 
   export let episode;
@@ -67,14 +67,14 @@
     padding: var(--spacing-3);
     padding-left: 0;
     min-width: 0;
+    background-color: transparent;
+    border: 0 none;
+    display: flex;
+    position: relative;
     align-self: stretch;
     flex-grow: 1;
-    background-color: transparent;
-    position: relative;
-    display: flex;
     flex-direction: column;
     justify-content: center;
-    border: 0 none;
   }
 
   /* The overflow:hidden on the li prevents the focus box-shadow from 

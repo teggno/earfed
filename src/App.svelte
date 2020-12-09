@@ -1,7 +1,8 @@
 <script>
   import { onMount } from "svelte";
-  import AddShowRss from "./AddShowRss.svelte";
+  import AddShowRss from "./subscriptions/AddShowRss.svelte";
   import { initAnimationTargetRect } from "./animationTargetRect";
+  import AppleShow from "./search/AppleShow.svelte";
   import BottomBar from "./BottomBar.svelte";
   import { showImageUrlMedium } from "./config";
   import { areEpisodesEqual } from "./episode";
@@ -9,9 +10,9 @@
     connectNotificationBar,
     supportsNotificationBar,
   } from "./notificationBarService";
-  import NowPlaying from "./NowPlaying.svelte";
+  import NowPlaying from "./nowPlaying/NowPlaying.svelte";
   import * as playerService from "./playerService";
-  import Playlist from "./Playlist.svelte";
+  import Playlist from "./queue/Playlist.svelte";
   import {
     episodeAfter,
     lastPlayedEpisode,
@@ -20,9 +21,9 @@
   } from "./playlistService";
   import Route from "./routing/Route.svelte";
   import Router from "./routing/Router.svelte";
-  import Search from "./Search.svelte";
-  import Shows from "./Shows.svelte";
-  import ShowSubscription from "./ShowSubscription.svelte";
+  import Search from "./search/Search.svelte";
+  import Subscriptions from "./subscriptions/Subscriptions.svelte";
+  import ShowSubscription from "./subscriptions/RssShow.svelte";
   import { setEnded, updatePositionSeconds } from "./userData/episodes";
   import virtualKeyboardDetector, {
     virtualkeyboard,
@@ -111,7 +112,6 @@
     window.addEventListener(virtualkeyboard, handleVirtualKeyboard);
 
     function handleVirtualKeyboard({ detail: { visible } }) {
-      console.log("foo");
       virtualKeyboardVisible = visible;
     }
 
@@ -138,19 +138,20 @@
 </script>
 
 <style>
-  .container {
+  .withBottomBarPadding {
     padding-bottom: var(--bottom-bar-height);
   }
 </style>
 
-<div class="container">
+<div class:withBottomBarPadding={!virtualKeyboardVisible}>
   <main>
     <Router>
       <Route component={Playlist} path="" getProps={() => ({ playlist })} />
-      <Route component={Shows} path="shows" />
-      <Route component={Search} path="shows/search" />
-      <Route component={AddShowRss} path="shows/addrss" />
-      <Route component={ShowSubscription} path="shows/subscribe" />
+      <Route component={Subscriptions} path="subscriptions" />
+      <Route component={Search} path="search" />
+      <Route component={AddShowRss} path="subscriptions/addrss" />
+      <Route component={ShowSubscription} path="subscriptions/subscribe" />
+      <Route component={AppleShow} path="search/shows/apple/:collectionId" />
     </Router>
   </main>
   {#if !virtualKeyboardVisible}

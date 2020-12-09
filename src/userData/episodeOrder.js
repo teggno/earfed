@@ -26,7 +26,7 @@ export async function addEpisodesToEnd(store, episodeIdsOrdered, date) {
   }
   return putEpisodeOrderInternal(
     store,
-    existing ? [...existing, ...episodeIdsOrdered] : episodeIdsOrdered,
+    existing ? [...existing.value, ...episodeIdsOrdered] : episodeIdsOrdered,
     date
   );
 }
