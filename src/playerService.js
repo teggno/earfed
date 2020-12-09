@@ -102,7 +102,7 @@ let pendingPlay = false;
 function audioWithEpisodeFactory(episode) {
   if (!audio) {
     audio = new Audio();
-    audio.crossOrigin = "anonymous";
+    // audio.crossOrigin = "anonymous";
   }
   const currentSecond =
     episode.positionSeconds && episode.positionSeconds.value
