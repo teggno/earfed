@@ -29,7 +29,6 @@ function appleShowToShow(appleShow) {
 }
 
 function appleEpisodeToEpisode(appleEpisode) {
-  console.log(appleEpisode.description);
   return {
     ...appleEpisode,
     episodeTitle: appleEpisode.trackName,

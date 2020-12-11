@@ -1,28 +1,60 @@
 <script>
+  import { onMount } from "svelte";
   import { searchShows, searchEpisodes } from "../providers/apple/api";
+  import { replaceState } from "../routing/Router.svelte";
+  import { debounce } from "../utils";
   import { makeUrl } from "./AppleShow.svelte";
-  let searchText = "syntax";
+
+  export let searchText = "";
+  export let pageYOffset = undefined;
+
   let shows = [];
   let episodes = [];
   let showingShows = true;
 
-  function handleSubmit(e) {
-    e.preventDefault();
+  onMount(() => {
+    const debounced = debounce(handleScroll);
+    window.addEventListener("scroll", debounced);
 
-    if (!searchText.trim()) return;
+    if (searchText && searchText.trim()) {
+      search().then(() => {
+        if (typeof pageYOffset !== "undefined") {
+          window.scrollTo({ top: pageYOffset });
+        }
+      });
+    }
 
-    search();
+    return () => {
+      window.removeEventListener("scroll", debounced);
+    };
+  });
+
+  function handleScroll() {
+    replaceState((old) => ({
+      ...old,
+      pageYOffset: window.pageYOffset,
+    }));
   }
 
   function search() {
-    Promise.all([searchShows(searchText), searchEpisodes(searchText)]).then(
-      ([{ results: s }, { results: e }]) => {
-        shows = s;
-        episodes = e;
-      }
-    );
+    return Promise.all([
+      searchShows(searchText),
+      searchEpisodes(searchText),
+    ]).then(([{ results: s }, { results: e }]) => {
+      shows = s;
+      episodes = e;
+    });
   }
 
+  function handleSubmit(e) {
+    e.preventDefault();
+
+    if (!searchText || !searchText.trim()) return;
+
+    search().then(() => {
+      replaceState((old) => ({ ...old, searchText }));
+    });
+  }
   function handleFocus(e) {
     e.target.select();
   }
@@ -79,7 +111,13 @@
     text-overflow: ellipsis;
     overflow-x: hidden;
   }
-  input {
+
+  /* note: must make this some fixed size and not depend on 
+  the actual image size to prevent having the document height 
+  change while images are loaded. */
+  img {
+    width: 60px;
+    height: 60px;
   }
 </style>
 

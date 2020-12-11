@@ -3,6 +3,25 @@
 
   export const registerRouteFn = {};
   export const activeRoute = writable({ activePath: "/" });
+
+  export function pushState(innerState) {
+    history.pushState(
+      { ...history.state, innerState: execFnOrGetValue(innerState) },
+      ""
+    );
+  }
+  export function replaceState(innerState) {
+    history.replaceState(
+      { ...history.state, innerState: execFnOrGetValue(innerState) },
+      ""
+    );
+  }
+
+  function execFnOrGetValue(fnOrValue) {
+    return typeof fnOrValue === "function"
+      ? fnOrValue(history.state.innerState)
+      : fnOrValue;
+  }
 </script>
 
 <script>
@@ -13,8 +32,7 @@
 
   let routes = [];
   let currentRoute;
-
-  $: currentComponentProps = currentRoute ? currentRoute.getProps() : {};
+  let currentComponentProps = {};
 
   setContext(registerRouteFn, doRegisterRoute);
 
@@ -22,18 +40,31 @@
     page.base(basePath);
     routes.forEach((route) => {
       page("*", (context, next) => {
-        activeRoute.update((old) => ({ ...old, activePath: context.path }));
+        activeRoute.update((old) => ({
+          ...old,
+          activePath: context.path,
+        }));
         next();
       });
       page(route.path, opener(route));
     });
     page();
+    return () => {
+      page.stop();
+    };
   });
 
   function opener(route) {
     return (context) => {
       currentRoute = route;
+      refreshCurrentComponentProps(context.state.innerState);
     };
+  }
+
+  function refreshCurrentComponentProps(innerState) {
+    currentComponentProps = currentRoute
+      ? currentRoute.getProps(innerState)
+      : {};
   }
 
   function doRegisterRoute(path, component, getProps) {
