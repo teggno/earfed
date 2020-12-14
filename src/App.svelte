@@ -150,7 +150,7 @@
         if (!nowPlayingVisible) {
           timeoutShow = setTimeout(() => {
             nowPlayingVisible = true;
-          }, 300);
+          }, 1200);
         }
       }
     }
