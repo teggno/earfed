@@ -98,11 +98,6 @@
     position: relative;
   }
 
-  button,
-  button::after {
-    border-radius: var(--spacing-2);
-  }
-
   .showImage {
     width: 100%;
     position: absolute;

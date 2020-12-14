@@ -6,6 +6,7 @@
   import EpisodeDescription from "./EpisodeDescription.svelte";
   import DragHandleIcon from "../icons/DragHandleIcon.svelte";
   import { createEventDispatcher } from "svelte";
+  import { formatDate } from "../dates";
 
   export let episode;
   export let playing = false;
@@ -16,7 +17,7 @@
   let li;
   const dispatch = createEventDispatcher();
 
-  const { showTitle, episodeTitle, episodeDescription } = episode;
+  const { showTitle, episodeTitle, episodeDescription, pubDate } = episode;
 
   function handleExpandClick() {
     dispatch("click", { li });
@@ -26,6 +27,7 @@
 <style>
   li {
     overflow: hidden;
+    padding: var(--spacing-2) 0;
     /* 400ms must be coordinated with the slide animation below */
     transition: background-color ease-out 400ms, border-width 100ms;
   }
@@ -37,6 +39,14 @@
   .alwaysVisible {
     display: flex;
     align-items: center;
+    --square-size: max(
+      calc(
+        2 * var(--assumed-normal-lh) * var(--font-size-small) +
+          var(--assumed-normal-lh) * var(--font-size-small) + var(--spacing-2) *
+          2
+      ),
+      44px
+    );
   }
 
   .alwaysVisible :global(:first-child) {
@@ -47,34 +57,24 @@
     animation: expanding 500ms;
   }
 
-  .alwaysVisible {
-    --square-size: max(
-      calc(
-        var(--assumed-normal-lh) * var(--font-size-medium) +
-          var(--assumed-normal-lh) * var(--font-size-small) + var(--spacing-1)
-      ),
-      44px
-    );
-  }
-
   .alwaysVisible > :global(:first-child) {
-    margin: var(--spacing-3);
     width: var(--square-size);
     height: var(--square-size);
   }
 
   .rightOfImage {
-    padding: var(--spacing-3);
+    padding: var(--spacing-2);
     padding-left: 0;
+    margin-left: var(--spacing-2);
     min-width: 0;
     background-color: transparent;
     border: 0 none;
     display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
     position: relative;
     align-self: stretch;
     flex-grow: 1;
-    flex-direction: column;
-    justify-content: center;
   }
 
   /* The overflow:hidden on the li prevents the focus box-shadow from 
@@ -109,14 +109,14 @@
   }
 
   .episodeTitle {
-    margin: 0 0 var(--spacing-1) 0;
     padding: 0;
-    font-size: var(--font-size-medium);
+    font-size: var(--font-size-small);
+    font-weight: 500;
     text-align: left;
     max-width: 100%;
-    white-space: nowrap;
-    overflow-x: hidden;
-    text-overflow: ellipsis;
+    overflow: hidden;
+    /* two lines of text */
+    max-height: calc(var(--font-size-small) * var(--assumed-normal-lh) * 2);
   }
 
   .showTitle {
@@ -165,7 +165,7 @@
         on:click={handleExpandClick}
         ariaExpanded={expanded}>
         <span class="episodeTitle">{episodeTitle}</span>
-        <span class="showTitle">{showTitle}</span>
+        <span class="showTitle">{formatDate(pubDate)} &#149; {showTitle}</span>
       </button>
       {#if dragHandleVisible}
         <div class="dragHandle">

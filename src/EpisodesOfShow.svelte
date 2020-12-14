@@ -1,5 +1,6 @@
 <script>
   import { createEventDispatcher } from "svelte";
+  import { formatDate } from "./dates";
 
   export let episodes;
   export let selectedIndices;
@@ -25,10 +26,10 @@
   }
 
   label {
-    font-size: var(--font-size-normal);
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow-x: hidden;
+    font-size: var(--font-size-small);
+    max-height: calc(var(--font-size-small) * 2 * var(--assumed-normal-lh));
+    overflow: hidden;
+    font-weight: 500;
     padding-bottom: var(--spacing-1);
   }
 
@@ -74,7 +75,7 @@
         <label
           for={`cb-${i}`}
           on:click|preventDefault>{episode.episodeTitle}</label>
-        <div class="pubDate">{episode.pubDate.toDateString()}</div>
+        <div class="pubDate">{formatDate(episode.pubDate)}</div>
       </div>
     </li>
   {/each}

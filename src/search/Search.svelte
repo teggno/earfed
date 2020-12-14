@@ -1,5 +1,6 @@
 <script>
   import { onMount } from "svelte";
+  import { formatDate } from "../dates";
   import { searchShows, searchEpisodes } from "../providers/apple/api";
   import { replaceState } from "../routing/Router.svelte";
   import { debounce } from "../utils";
@@ -7,10 +8,10 @@
 
   export let searchText = "";
   export let pageYOffset = undefined;
+  export let showingShows = true;
 
   let shows = [];
   let episodes = [];
-  let showingShows = true;
 
   onMount(() => {
     const debounced = debounce(handleScroll);
@@ -43,6 +44,12 @@
     ]).then(([{ results: s }, { results: e }]) => {
       shows = s;
       episodes = e;
+
+      if (showingShows && !shows.length && episodes.length) {
+        showingShows = false;
+      } else if (!showingShows && !episodes.length && shows.length) {
+        showingShows = true;
+      }
     });
   }
 
@@ -61,10 +68,12 @@
 
   function handleShowsClick() {
     showingShows = true;
+    replaceState((old) => ({ ...old, showingShows }));
   }
 
   function handleEpisodesClick() {
     showingShows = false;
+    replaceState((old) => ({ ...old, showingShows }));
   }
 </script>
 
@@ -99,13 +108,14 @@
 
   .title {
     margin-bottom: var(--spacing-1);
+    overflow: hidden;
+    font-weight: 500;
   }
   .subtitle {
     color: var(--color-text-muted);
     margin-top: var(--spacing-1);
   }
 
-  .title,
   .subtitle {
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -166,10 +176,12 @@
         <img src={episode.artworkUrl60} alt="" crossorigin="anonymous" />
         <div class="rightOfImage">
           <div class="title">{episode.trackName}</div>
-          <div class="subtitle">{episode.collectionName}</div>
           <div class="subtitle">
-            {new Date(episode.releaseDate).toDateString()}
+            {formatDate(new Date(episode.releaseDate))}
+            &#149;
+            {episode.collectionName}
           </div>
+          <a href={makeUrl(episode.collectionId)} class="container">Show</a>
         </div>
       </li>
     {/each}
