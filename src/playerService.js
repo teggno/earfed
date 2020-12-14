@@ -70,7 +70,7 @@ function pause() {
   audioWithEpisode.pause();
 }
 
-function removeEpisode() {
+function forgetEpisode() {
   if (!audioWithEpisode) {
     console.warn("No episode to remove");
     return;
@@ -85,7 +85,7 @@ export {
   seekBackward,
   seekForward,
   pause,
-  removeEpisode,
+  forgetEpisode,
   playerInfo,
   playing,
   paused,

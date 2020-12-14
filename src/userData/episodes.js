@@ -74,7 +74,15 @@ export async function updatePositionSeconds(episodeId, positionSeconds, date) {
   return episode;
 }
 
-export async function setEnded(episodeId, date) {
+export function setEpisodeEnded(episodeId, date) {
+  return endOrRemove(episodeId, status.ended, date);
+}
+
+export function removeEpisode(episodeId, date) {
+  return endOrRemove(episodeId, status.deleted, date);
+}
+
+async function endOrRemove(episodeId, newStatus, date) {
   const db = await openUserDataDb();
   const tran = db.transaction(
     [episodesMetadata.storeName, episodeOrderMetadata.storeName],
@@ -87,7 +95,7 @@ export async function setEnded(episodeId, date) {
     episodeId.providerEpisodeId,
   ]);
   if (!episode.status || episode.status.updated < date) {
-    episode.status = { value: status.ended, updated: date };
+    episode.status = { value: newStatus, updated: date };
     try {
       await episodeStore.put(episode);
       await removeEpisodeOrder(orderStore, episodeId, date);

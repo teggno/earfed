@@ -18,12 +18,12 @@
     seekForward,
     pause,
     playerInfo,
-    removeEpisode,
     playing,
     paused,
     noEpisode,
     seekBackwardSeconds,
     seekForwardSeconds,
+    forgetEpisode,
   } from "../playerService";
   import * as bodyScroll from "../toggleBodyScroll";
   import EpisodeTimeline from "../EpisodeTimeline.svelte";
@@ -31,6 +31,8 @@
   import { tick } from "svelte";
   import { showImageUrlThumb } from "../config";
   import EpisodeDescription from "../queue/EpisodeDescription.svelte";
+  import { removeEpisode } from "../userData/episodes";
+  import { refreshPlaylist } from "../playlistService";
 
   $: disabled = $playerInfo.status === noEpisode;
 
@@ -97,8 +99,11 @@
     seekForward();
   }
 
-  function handleNotInterested() {
-    removeEpisode();
+  function handleForget() {
+    const e = $playerInfo.episode;
+    forgetEpisode();
+    removeEpisode(e.episodeId, new Date());
+    refreshPlaylist();
   }
 
   function handleTimeChange({ detail: { second } }) {
@@ -426,7 +431,7 @@ iOS won't make nice with the :active pseudoclass.-->
     <span class="delete-wrapper">
       <button
         class="navButton"
-        on:click|stopPropagation={handleNotInterested}
+        on:click|stopPropagation={handleForget}
         ontouchstart=""
         title="Discard Episode"
         {disabled}>

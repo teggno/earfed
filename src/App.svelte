@@ -24,7 +24,7 @@
   import Search from "./search/Search.svelte";
   import Subscriptions from "./subscriptions/Subscriptions.svelte";
   import ShowSubscription from "./subscriptions/RssShow.svelte";
-  import { setEnded, updatePositionSeconds } from "./userData/episodes";
+  import { setEpisodeEnded, updatePositionSeconds } from "./userData/episodes";
   import virtualKeyboardDetector, {
     virtualkeyboard,
   } from "./virtualKeyboardDetector";
@@ -88,7 +88,7 @@
           if (episodeToPlayNext) {
             playerService.play(episodeToPlayNext);
           }
-          await setEnded(episode.episodeId, new Date());
+          await setEpisodeEnded(episode.episodeId, new Date());
           refreshPlaylist();
         }
       }
