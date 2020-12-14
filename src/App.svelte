@@ -10,7 +10,7 @@
     connectNotificationBar,
     supportsNotificationBar,
   } from "./notificationBarService";
-  import NowPlaying from "./nowPlaying/NowPlaying.svelte";
+  import NowPlaying, { sizes } from "./nowPlaying/NowPlaying.svelte";
   import * as playerService from "./playerService";
   import Playlist from "./queue/Playlist.svelte";
   import {
@@ -33,6 +33,7 @@
 
   let showImageUrls;
   let virtualKeyboardVisible = false;
+  let nowPlayingVisible = true;
 
   onMount(() => {
     registerServiceWorker();
@@ -42,6 +43,7 @@
       preloadNotificationBarShowImages(),
       virtualKeyboardDetector(),
       watchVirtualKeyboard(),
+      presentNowPlaying(),
     ];
 
     setLastPlayedEpisode();
@@ -120,6 +122,49 @@
     };
   }
 
+  function presentNowPlaying() {
+    let timeoutHide;
+    let timeoutShow;
+    function handleTouchStart() {
+      document.documentElement.addEventListener("touchend", handleTouchEnd);
+      window.addEventListener("scroll", handleScroll);
+
+      function handleScroll() {
+        window.removeEventListener("scroll", handleScroll);
+        clearTimeout(timeoutShow);
+        if (nowPlayingVisible) {
+          timeoutHide = setTimeout(() => {
+            nowPlayingVisible = false;
+          }, 100);
+        }
+      }
+
+      function handleTouchEnd() {
+        clearTimeout(timeoutShow);
+        clearTimeout(timeoutHide);
+        document.documentElement.removeEventListener(
+          "touchend",
+          handleTouchEnd
+        );
+        window.removeEventListener("scroll", handleScroll);
+        if (!nowPlayingVisible) {
+          timeoutShow = setTimeout(() => {
+            nowPlayingVisible = true;
+          }, 300);
+        }
+      }
+    }
+
+    document.documentElement.addEventListener("touchstart", handleTouchStart);
+
+    return () => {
+      document.documentElement.removeEventListener(
+        "touchstart",
+        handleTouchStart
+      );
+    };
+  }
+
   function registerServiceWorker() {
     if (!("serviceWorker" in navigator)) return Promise.resolve();
 
@@ -158,7 +203,7 @@
     </Router>
   </main>
   {#if !virtualKeyboardVisible}
-    <NowPlaying />
+    <NowPlaying size={nowPlayingVisible ? sizes.medium : sizes.mini} />
     <BottomBar />
   {/if}
 </div>

@@ -1,3 +1,11 @@
+<script context="module">
+  export const sizes = {
+    mini: "mini",
+    medium: "medium",
+    maximized: "maximized",
+  };
+</script>
+
 <script>
   import ArrowLeftIcon from "../icons/ArrowLeftIcon.svelte";
   import ArrowRightIcon from "../icons/ArrowRightIcon.svelte";
@@ -26,7 +34,8 @@
 
   $: disabled = $playerInfo.status === noEpisode;
 
-  let maximized = false;
+  export let size = sizes.medium;
+  $: maximized = size === sizes.maximized;
   let dragDownDistance = 0;
   let containerHeightWhenMaximized = 0;
   let textElement;
@@ -37,7 +46,8 @@
     if (maximized || disabled) return;
 
     dragDownDistance = 0;
-    maximized = true;
+    // maximized = true;
+    size = sizes.maximized;
     tick().then(() => {
       bodyScroll.disable();
     });
@@ -64,7 +74,7 @@
   }
 
   function minimize() {
-    maximized = false;
+    size = sizes.medium;
     tick().then(() => {
       bodyScroll.enable();
       textElement.scrollTo(0, 0);
@@ -110,13 +120,14 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    /*copied from material UI dialog*/
+    /* box-shadow copied from material UI dialog*/
     box-shadow: var(--now-playing-shadow);
     z-index: 6;
     overflow: hidden;
     --maximize-duration: 360ms;
   }
 
+  /* while being maximized */
   .container:not(.draggingDown) {
     transition: width var(--maximize-duration) ease-out,
       height var(--maximize-duration) ease-out,
@@ -125,8 +136,10 @@
       box-shadow var(--maximize-duration) ease-out;
   }
 
+  /* while being dragged down or resized to medium or resized from/to mini */
   .container:not(.maximized) {
-    transition: width var(--maximize-duration) ease-in,
+    transition: min-width var(--maximize-duration) ease-in,
+      width var(--maximize-duration) ease-in,
       height var(--maximize-duration) ease-out,
       bottom var(--maximize-duration) ease-out,
       border-radius var(--maximize-duration) ease-out,
@@ -340,12 +353,18 @@
   .container.maximized .closeBar::after {
     opacity: 1;
   }
+
+  .mini {
+    width: 50px;
+    min-width: 50px;
+  }
 </style>
 
 <div
   class="container"
   class:draggingDown
   class:maximized
+  class:mini={size === sizes.mini}
   use:dragToClose
   on:click={handleClickComponent}
   on:dragdown|stopPropagation={maximized ? handleDragDown : undefined}
