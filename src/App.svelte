@@ -129,6 +129,17 @@
     let scrollHandlerAdded = false;
     let touching = false;
 
+    document.documentElement.addEventListener("touchstart", handleTouchStart, {
+      passive: true,
+    });
+
+    return () => {
+      document.documentElement.removeEventListener(
+        "touchstart",
+        handleTouchStart
+      );
+    };
+
     function handleTouchStart() {
       clearTimeout(timeoutShow);
       document.documentElement.addEventListener("touchend", handleTouchEnd);
@@ -180,15 +191,6 @@
       clearTimeout(timeoutShow);
       nowPlayingVisible = false;
     }
-
-    document.documentElement.addEventListener("touchstart", handleTouchStart);
-
-    return () => {
-      document.documentElement.removeEventListener(
-        "touchstart",
-        handleTouchStart
-      );
-    };
   }
 
   function registerServiceWorker() {

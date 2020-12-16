@@ -2,7 +2,7 @@ import dragDownDetectorFactory from "../dom/dragToCloseDetector";
 
 export default function dragToClose(node) {
   const detector = dragDownDetectorFactory(dragEndCallback, draggingCallback);
-  node.addEventListener("touchstart", handleTouchStart);
+  node.addEventListener("touchstart", handleTouchStart, { passive: true });
 
   function handleTouchStart(e) {
     node.addEventListener("touchmove", detector.handleTouchMove);

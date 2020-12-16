@@ -42,7 +42,7 @@
     value={currentSecond}
     step="10"
     disabled={!durationSeconds}
-    on:touchstart|stopPropagation
+    on:touchstart|stopPropagation|passive
     on:change={handleChange}
     aria-label="Episode Timeline" />
 </div>
