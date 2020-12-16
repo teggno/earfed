@@ -15,6 +15,7 @@
   import Playlist from "./queue/Playlist.svelte";
   import {
     episodeAfter,
+    firstEpisode,
     lastPlayedEpisode,
     playlist,
     refreshPlaylist,
@@ -84,15 +85,25 @@
           );
           refreshPlaylist();
         } else if (status === playerService.ended) {
-          const episodeToPlayNext = await episodeAfter(episode);
+          const episodeToPlayNext = await getEpisodeToPlayNext(episode);
           if (episodeToPlayNext) {
             playerService.play(episodeToPlayNext);
+          } else {
+            playerService.forgetEpisode();
           }
           await setEpisodeEnded(episode.episodeId, new Date());
           refreshPlaylist();
         }
       }
     );
+  }
+
+  async function getEpisodeToPlayNext(currentEpisode) {
+    const episode =
+      (await episodeAfter(currentEpisode)) || (await firstEpisode());
+    return episode && areEpisodesEqual(currentEpisode, episode)
+      ? undefined
+      : episode;
   }
 
   function preloadNotificationBarShowImages() {

@@ -93,6 +93,11 @@ export async function episodeAfter(episode) {
   return episodes[indexOfEpisode + 1];
 }
 
+export async function firstEpisode() {
+  const episodes = await playlistEpisodes();
+  return episodes[0];
+}
+
 function playlistEpisodes() {
   let unsubscribe;
   return new Promise((resolve) => {
