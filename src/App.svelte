@@ -123,36 +123,62 @@
   }
 
   function presentNowPlaying() {
-    let timeoutHide;
     let timeoutShow;
+    let timeoutScrollCheck;
+    let scrolling = false;
+    let scrollHandlerAdded = false;
+    let touching = false;
+
     function handleTouchStart() {
+      clearTimeout(timeoutShow);
       document.documentElement.addEventListener("touchend", handleTouchEnd);
-      window.addEventListener("scroll", handleScroll);
-
-      function handleScroll() {
-        window.removeEventListener("scroll", handleScroll);
-        clearTimeout(timeoutShow);
-        if (nowPlayingVisible) {
-          timeoutHide = setTimeout(() => {
-            nowPlayingVisible = false;
-          }, 100);
-        }
+      touching = true;
+      if (!scrollHandlerAdded) {
+        window.addEventListener("scroll", handleScroll);
+        scrollHandlerAdded = true;
       }
+    }
 
-      function handleTouchEnd() {
-        clearTimeout(timeoutShow);
-        clearTimeout(timeoutHide);
-        document.documentElement.removeEventListener(
-          "touchend",
-          handleTouchEnd
-        );
-        window.removeEventListener("scroll", handleScroll);
-        if (!nowPlayingVisible) {
-          timeoutShow = setTimeout(() => {
-            nowPlayingVisible = true;
-          }, 1200);
-        }
+    function handleScroll() {
+      clearTimeout(timeoutScrollCheck);
+      if (nowPlayingVisible && !scrolling) {
+        hide();
       }
+      scrolling = true;
+      timeoutScrollCheck = setTimeout(() => {
+        scrolling = false;
+        if (!touching && scrollHandlerAdded) {
+          window.removeEventListener("scroll", handleScroll);
+          scrollHandlerAdded = false;
+        }
+        if (!nowPlayingVisible && !touching) {
+          show();
+        }
+      }, 66);
+    }
+
+    function handleTouchEnd() {
+      touching = false;
+      document.documentElement.removeEventListener("touchend", handleTouchEnd);
+      if (!nowPlayingVisible && !scrolling) {
+        show();
+      }
+      if (scrollHandlerAdded && !scrolling) {
+        window.removeEventListener("scroll", handleScroll);
+        scrollHandlerAdded = false;
+      }
+    }
+
+    function show() {
+      clearTimeout(timeoutShow);
+      timeoutShow = setTimeout(() => {
+        nowPlayingVisible = true;
+      }, 400);
+    }
+
+    function hide() {
+      clearTimeout(timeoutShow);
+      nowPlayingVisible = false;
     }
 
     document.documentElement.addEventListener("touchstart", handleTouchStart);
