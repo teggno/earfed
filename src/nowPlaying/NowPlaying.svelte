@@ -372,9 +372,9 @@
   class:mini={size === sizes.mini}
   use:dragToClose
   on:click={handleClickComponent}
-  on:dragdown|stopPropagation={maximized ? handleDragDown : undefined}
-  on:dragend|stopPropagation={maximized ? handleDragEnd : undefined}
-  on:closethroughdrag|stopPropagation={maximized ? handleCloseThroughDrag : undefined}
+  on:dragdown={maximized ? handleDragDown : undefined}
+  on:dragend={maximized ? handleDragEnd : undefined}
+  on:closethroughdrag={maximized ? handleCloseThroughDrag : undefined}
   style={`${maximized && draggingDown ? `height:${containerHeightWhenMaximized - dragDownDistance / 3}px` : ''}`}>
   <button
     class="closeBar"

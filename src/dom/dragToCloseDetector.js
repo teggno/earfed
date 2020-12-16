@@ -49,7 +49,11 @@ export default function dragDownDetectorFactory(
         contiguousDownwardTouches[contiguousDownwardTouches.length - 2]?.touch;
       const dragDownDistance =
         currentTouch.clientY - secondButLastTouch?.clientY || 0;
-      if (dragDownDistance !== 0) draggingCallback(dragDownDistance);
+      if (dragDownDistance !== 0) {
+        e.preventDefault();
+        e.stopPropagation();
+        draggingCallback(dragDownDistance);
+      }
     },
 
     handleTouchEnd(e) {
