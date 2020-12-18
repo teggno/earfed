@@ -1,30 +1,31 @@
 import { writable } from "svelte/store";
 import { oncer } from "./oncer";
 import { providerByMapping } from "./providers/providers";
-import { allShowSubscriptions } from "./userData/showSubscriptions";
+import { allShows as allShowsFromDb, status } from "./userData/shows";
 
 async function allShows() {
-  const userDataShows = await allShowSubscriptions();
-  const showPromises = userDataShows.map((ss) => showSubscriptionToShow(ss));
+  const userDataShows = await allShowsFromDb();
+  const showPromises = userDataShows.map(userDataShowToShow);
   return await Promise.all(showPromises);
 }
 
-async function showSubscriptionToShow(showSubscription) {
-  const provider = providerByMapping(showSubscription.providerMapping);
+async function userDataShowToShow(userDataShow) {
+  const provider = providerByMapping(userDataShow.providerMapping);
   if (!provider) {
     throw new Error(
       `could not determine provider for ${JSON.stringify(
-        showSubscription.providerM
+        userDataShow.provider
       )}`
     );
   }
   const fetchedShowData = await provider.fetchShow(
-    showSubscription.providerMapping
+    userDataShow.providerMapping
   );
   const episodeFor = (episodeProviderMapping) =>
     provider.episodeFor(episodeProviderMapping, fetchedShowData.episodes);
   return {
-    showId: showSubscription.showId,
+    showId: userDataShow.showId,
+    subscribed: userDataShow.status.value === status.subscribed,
     showTitle: fetchedShowData.showTitle,
     showImageUrl: fetchedShowData.showImageUrl,
     episodeFor,

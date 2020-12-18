@@ -1,12 +1,8 @@
 import { parseShowFeed } from "./rssFeedParser";
-import { subscribeToShow as subscribe } from "../../userData/showSubscriptions";
+import { subscribeToShow as subscribe } from "../../userData/shows";
 import { corsProxyUrl } from "../../config";
 import parseXmlString from "../../xml";
 import { addEpisodes as addEpisodesToDb } from "../../userData/episodes";
-
-export function showProviderMapping(rssFeedUrl) {
-  return { rssFeedUrl };
-}
 
 export function providerFor(showProviderMapping) {
   return typeof showProviderMapping.rssFeedUrl !== "undefined";
@@ -33,7 +29,7 @@ export function subscriptionQuery(rssFeedUrlEncoded) {
 }
 
 export function subscribeToShow(rssFeedUrl) {
-  return subscribe("rss", rssFeedUrl, { rssFeedUrl });
+  return subscribe("rss", rssFeedUrl, makeProviderMapping(rssFeedUrl));
 }
 
 export function addEpisodes(showId, episodes, date) {
@@ -44,4 +40,8 @@ export function addEpisodes(showId, episodes, date) {
   }));
 
   return addEpisodesToDb(payload, date);
+}
+
+function makeProviderMapping(rssFeedUrl) {
+  return { rssFeedUrl };
 }

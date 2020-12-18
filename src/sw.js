@@ -7,6 +7,10 @@ import {
   NetworkOnly,
   StaleWhileRevalidate,
 } from "workbox-strategies";
+self.__WB_DISABLE_DEV_LOGS = true;
+// self.addEventListener("fetch", (event) => {
+//   console.log("fetch", event.request.destination, event.request.url);
+// });
 
 if (process.env.NODE_ENV === "production") {
   // This is where rollup-plugin-workbox-inject will inject the list of static app
@@ -56,7 +60,6 @@ registerRoute(
 
 // Everything that is not one of the static web files, image or audio is expected to be
 // some show/episode metadata like titles, descriptions, images in xml or json format.
-
 if (process.env.NODE_ENV === "production") {
   setDefaultHandler(
     new StaleWhileRevalidate({

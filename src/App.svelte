@@ -235,7 +235,7 @@
       <Route
         component={Search}
         path="search"
-        getProps={(innerState) => innerState} />
+        getProps={(innerState) => ({ ...innerState, playlist })} />
       <Route component={AddShowRss} path="subscriptions/addrss" />
       <Route component={ShowSubscription} path="subscriptions/subscribe" />
       <Route component={AppleShow} path="search/shows/apple/:collectionId" />

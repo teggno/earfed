@@ -3,7 +3,7 @@
 
   import navigate from "../routing/navigate";
 
-  let url = "https://feed.syntax.fm/rss";
+  let url = "";
 
   function handleSubmit(e) {
     e.preventDefault();

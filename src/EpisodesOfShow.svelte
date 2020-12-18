@@ -1,20 +1,14 @@
 <script>
   import { createEventDispatcher } from "svelte";
   import { formatDate } from "./dates";
+  import QueueEpisodeButton from "./QueueEpisodeButton.svelte";
 
   export let episodes;
-  export let selectedIndices;
 
   const dispatch = createEventDispatcher();
 
-  function handleItemClick(episodeIndex) {
-    const index = selectedIndices.indexOf(episodeIndex);
-    if (index === -1) {
-      selectedIndices = [...selectedIndices, episodeIndex];
-    } else {
-      selectedIndices = selectedIndices.filter((i) => i !== episodeIndex);
-    }
-    dispatch("change", { selectedIndices });
+  function handleQueueEpisodeClick(episode) {
+    dispatch("queueepisode", { episode });
   }
 </script>
 
@@ -25,7 +19,7 @@
     padding: 0;
   }
 
-  label {
+  span {
     font-size: var(--font-size-small);
     max-height: calc(var(--font-size-small) * 2 * var(--assumed-normal-lh));
     overflow: hidden;
@@ -43,10 +37,6 @@
     cursor: inherit;
   }
 
-  input {
-    margin-right: var(--spacing-3);
-  }
-
   .pubDate {
     font-size: var(--font-size-small);
     color: var(--color-text-muted);
@@ -55,28 +45,18 @@
   .text {
     overflow-x: hidden;
   }
-
-  @media (hover: hover) {
-    li:hover {
-      background-color: var(--background-hover-list);
-    }
-  }
 </style>
 
 <ul>
   {#each episodes as episode, i}
-    <li class="pointer" on:click={() => handleItemClick(i)}>
-      <input
-        type="checkbox"
-        on:change|preventDefault
-        checked={selectedIndices.indexOf(i) !== -1}
-        id={`cb-${i}`} />
+    <li>
       <div class="text">
-        <label
-          for={`cb-${i}`}
-          on:click|preventDefault>{episode.episodeTitle}</label>
+        <span>{episode.episodeTitle}</span>
         <div class="pubDate">{formatDate(episode.pubDate)}</div>
       </div>
+      <QueueEpisodeButton
+        {episode}
+        on:click={() => handleQueueEpisodeClick(episode)} />
     </li>
   {/each}
 </ul>

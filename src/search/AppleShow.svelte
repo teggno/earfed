@@ -10,38 +10,27 @@
 
 <script>
   import EpisodesOfShow from "../EpisodesOfShow.svelte";
-  import { refreshPlaylist } from "../playlistService";
-
   import {
     subscribeToShow,
-    addEpisodes,
     fetchShow,
+    queueEpisode,
   } from "../providers/apple/providerApple";
   import Show from "../Show.svelte";
   import { refreshShows } from "../showService";
-  import { arrayOfLength } from "../utils";
+  import { refreshPlaylist } from "../playlistService";
 
   let collectionId = extractCollectionId(location.href);
-  let show;
-  let showPromise = fetchShow({ collectionId }).then((s) => {
-    show = s;
-    selectedIndices = arrayOfLength(Math.min(5, s.episodes.length), (i) => i);
-    return show;
-  });
-  let selectedIndices = [];
+  let showPromise = fetchShow({ collectionId });
 
   async function handleSubscribeClick() {
-    const showJustSubscribed = await subscribeToShow(collectionId);
-
-    const episodesToAdd = selectedIndices.map((i) => show.episodes[i]);
-    await addEpisodes(showJustSubscribed.showId, episodesToAdd, new Date());
-
+    await subscribeToShow(collectionId, new Date());
     refreshShows();
-    refreshPlaylist();
   }
 
-  function handleEpisodeSelectionChange({ detail: { selectedIndices: sel } }) {
-    selectedIndices = sel;
+  async function handleQueueEpisode({ detail: { episode } }) {
+    await queueEpisode(episode);
+    refreshShows();
+    refreshPlaylist();
   }
 </script>
 
@@ -50,6 +39,5 @@
   <button on:click={handleSubscribeClick}>Subscribe</button>
   <EpisodesOfShow
     episodes={show.episodes}
-    {selectedIndices}
-    on:change={handleEpisodeSelectionChange} />
+    on:queueepisode={handleQueueEpisode} />
 {/await}

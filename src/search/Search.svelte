@@ -1,17 +1,34 @@
 <script>
   import { onMount } from "svelte";
+  import { derived, writable } from "svelte/store";
   import { formatDate } from "../dates";
+  import { refreshPlaylist } from "../playlistService";
   import { searchShows, searchEpisodes } from "../providers/apple/api";
+  import { apple, queueEpisode } from "../providers/apple/providerApple";
+  import QueueEpisodeButton from "../QueueEpisodeButton.svelte";
   import { replaceState } from "../routing/Router.svelte";
+  import { refreshShows } from "../showService";
   import { debounce } from "../utils";
   import { makeUrl } from "./AppleShow.svelte";
 
   export let searchText = "";
   export let pageYOffset = undefined;
   export let showingShows = true;
+  export let playlist;
 
   let shows = [];
-  let episodes = [];
+  let appleEpisodes = writable([]);
+
+  let episodes = derived(
+    [playlist, appleEpisodes],
+    ([{ data: queue, state }, aes]) =>
+      state === "loaded"
+        ? aes.map((ae) => ({
+            ...ae,
+            queued: queue.some((qe) => areEqual(ae, qe)),
+          }))
+        : []
+  );
 
   onMount(() => {
     const debounced = debounce(handleScroll);
@@ -43,11 +60,11 @@
       searchEpisodes(searchText),
     ]).then(([{ results: s }, { results: e }]) => {
       shows = s;
-      episodes = e;
+      appleEpisodes.set(e);
 
-      if (showingShows && !shows.length && episodes.length) {
+      if (showingShows && !shows.length && e.length) {
         showingShows = false;
-      } else if (!showingShows && !episodes.length && shows.length) {
+      } else if (!showingShows && !e.length && shows.length) {
         showingShows = true;
       }
     });
@@ -74,6 +91,18 @@
   function handleEpisodesClick() {
     showingShows = false;
     replaceState((old) => ({ ...old, showingShows }));
+  }
+
+  async function handleQueueEpisodeClick(episode) {
+    await queueEpisode(episode);
+    refreshShows();
+    refreshPlaylist();
+  }
+
+  function areEqual({ trackId }, { episodeId }) {
+    return (
+      episodeId.providerEpisodeId === trackId && episodeId.provider === apple
+    );
   }
 </script>
 
@@ -140,7 +169,7 @@
     bind:value={searchText} />
   <button>Go</button>
 </form>
-{#if shows.length && episodes.length}
+{#if shows.length && $episodes.length}
   <div>
     <button
       on:click={handleShowsClick}
@@ -149,7 +178,7 @@
     <button
       on:click={handleEpisodesClick}
       type="button"
-      disabled={!showingShows}>Episodes ({episodes.length})</button>
+      disabled={!showingShows}>Episodes ({$episodes.length})</button>
   </div>
 {/if}
 {#if shows.length && showingShows}
@@ -168,10 +197,10 @@
     {/each}
   </ul>
 {/if}
-{#if episodes.length && (!showingShows || !shows.length)}
+{#if $episodes.length && (!showingShows || !shows.length)}
   <h2>Episodes</h2>
   <ul>
-    {#each episodes as episode}
+    {#each $episodes as episode}
       <li class="container">
         <img src={episode.artworkUrl60} alt="" crossorigin="anonymous" />
         <div class="rightOfImage">
@@ -182,6 +211,9 @@
             {episode.collectionName}
           </div>
           <a href={makeUrl(episode.collectionId)} class="container">Show</a>
+          <QueueEpisodeButton
+            queued={episode.queued}
+            on:click={() => handleQueueEpisodeClick(episode)} />
         </div>
       </li>
     {/each}

@@ -1,10 +1,11 @@
 import { lookupEpisodes, lookupShow } from "./api";
-import { subscribeToShow as subscribeInDb } from "../../userData/showSubscriptions";
+import {
+  subscribeToShow as subscribeInDb,
+  addShowIfNotAdded as addShowIfNotAddedToDb,
+} from "../../userData/shows";
 import { addEpisodes as addEpisodesTodb } from "../../userData/episodes";
 
-export function showProviderMapping(collectionId) {
-  return { collectionId };
-}
+export const apple = "apple";
 
 export function providerFor(showProviderMapping) {
   return typeof showProviderMapping.collectionId !== "undefined";
@@ -46,10 +47,31 @@ function appleEpisodeToEpisode(appleEpisode) {
   };
 }
 
-export function subscribeToShow(collectionId) {
-  return subscribeInDb("apple", collectionId, {
+export function subscribeToShow(collectionId, date) {
+  return subscribeInDb(
+    apple,
     collectionId,
-  });
+    makeProviderMapping(collectionId),
+    date
+  );
+}
+
+export async function queueEpisode({ collectionId, trackId }) {
+  const { showId } = await addShowIfNotAdded(collectionId);
+  await addEpisodes(showId, [{ trackId }], new Date());
+}
+
+export function addShowIfNotAdded(collectionId, date) {
+  return addShowIfNotAddedToDb(
+    apple,
+    collectionId,
+    makeProviderMapping(collectionId),
+    date
+  );
+}
+
+function makeProviderMapping(collectionId) {
+  return { collectionId };
 }
 
 export function addEpisodes(showId, episodes, date) {

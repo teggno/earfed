@@ -6,5 +6,5 @@
 
 <div>
   <button use:link={{ path: '/subscriptions/addrss' }}>Add RSS Feed</button>
-  <ShowList shows={$allShowsStore.data} />
+  <ShowList shows={$allShowsStore.data.filter((show) => show.subscribed)} />
 </div>
