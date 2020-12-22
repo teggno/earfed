@@ -1,5 +1,10 @@
 import { allShowsStore, refreshShows } from "./showService";
-import { addEpisodes, queryListedEpisodes, status } from "./userData/episodes";
+import {
+  addEpisodes,
+  queryListedEpisodes,
+  status,
+  removeEpisode as removeEpisodeFromDb,
+} from "./userData/episodes";
 import { arrayToMap, sortedInsert } from "./utils";
 import { derived, writable } from "svelte/store";
 import { oncer } from "./oncer";
@@ -151,5 +156,10 @@ export async function enqueue(showRecord, episodeRecord) {
   if (showAdded) {
     await refreshShows();
   }
+  await refreshPlaylist();
+}
+
+export async function removeEpisode(episodeId) {
+  await removeEpisodeFromDb(episodeId, new Date());
   await refreshPlaylist();
 }

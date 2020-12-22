@@ -31,8 +31,7 @@
   import { tick } from "svelte";
   import { showImageUrlThumb } from "../config";
   import EpisodeDescription from "../queue/EpisodeDescription.svelte";
-  import { removeEpisode } from "../userData/episodes";
-  import { refreshPlaylist } from "../playlistService";
+  import { removeEpisode } from "../playlistService";
 
   $: disabled = $playerInfo.status === noEpisode;
 
@@ -102,8 +101,7 @@
   function handleForget() {
     const e = $playerInfo.episode;
     forgetEpisode();
-    removeEpisode(e.episodeId, new Date());
-    refreshPlaylist();
+    removeEpisode(e.episodeId);
   }
 
   function handleTimeChange({ detail: { second } }) {
