@@ -10,7 +10,7 @@ export const status = {
   deleted: "d",
 };
 
-export async function listedEpisodes() {
+export async function queryListedEpisodes() {
   const db = await openUserDataDb();
   return db.getAllFromIndex(
     episodesMetadata.storeName,

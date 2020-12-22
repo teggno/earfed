@@ -10,6 +10,10 @@
   function handleQueueEpisodeClick(episode) {
     dispatch("queueepisode", { episode });
   }
+
+  function byPubDate(a, b) {
+    return b.pubDate.valueOf() - a.pubDate.valueOf();
+  }
 </script>
 
 <style>
@@ -48,14 +52,14 @@
 </style>
 
 <ul>
-  {#each episodes as episode, i}
+  {#each episodes.sort(byPubDate) as episode}
     <li>
       <div class="text">
         <span>{episode.episodeTitle}</span>
         <div class="pubDate">{formatDate(episode.pubDate)}</div>
       </div>
       <QueueEpisodeButton
-        {episode}
+        queued={episode.queued}
         on:click={() => handleQueueEpisodeClick(episode)} />
     </li>
   {/each}

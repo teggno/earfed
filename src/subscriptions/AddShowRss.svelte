@@ -1,16 +1,12 @@
 <script>
-  import { subscriptionQuery } from "../providers/rss/providerRss";
-
   import navigate from "../routing/navigate";
+  import { makeUrl } from "./RssShow.svelte";
 
   let url = "";
 
   function handleSubmit(e) {
     e.preventDefault();
-    navigate(
-      "/subscriptions/subscribe?" +
-        subscriptionQuery(encodeURIComponent(url.trim()))
-    );
+    navigate("/subscriptions/subscribe?" + makeUrl(url.trim()));
   }
 </script>
 
@@ -23,7 +19,7 @@
 <form on:submit={handleSubmit}>
   <div>
     <label for="url">URL</label>
-    <input id="url" type="url" bind:value={url} />
+    <input id="url" type="url" bind:value={url} required />
   </div>
   <div><button>Confirm</button></div>
 </form>

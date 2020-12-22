@@ -1,51 +1,37 @@
-<script>
+<script context="module">
   import { parseQuery } from "../urls";
-  import { arrayOfLength } from "../utils";
-  import { refreshPlaylist } from "../playlistService";
-  import { refreshShows } from "../showService";
-  import Show from "../Show.svelte";
-  import {
-    fetchShow,
-    subscribeToShow,
-    addEpisodes,
-  } from "../providers/rss/providerRss";
-  import EpisodesOfShow from "../EpisodesOfShow.svelte";
 
-  let selectedIndices = [];
-  let show;
-
-  let showPromise = fetchShow({ rssFeedUrl: rssFeedUrlFromQuery() }).then(
-    (fetchedShow) => {
-      selectedIndices = arrayOfLength(
-        Math.min(5, fetchedShow.episodes.length),
-        (i) => i
-      );
-      show = {
-        ...fetchedShow,
-        episodes: fetchedShow.episodes.sort(
-          (a, b) => b.pubDate.valueOf() - a.pubDate.valueOf()
-        ),
-      };
-      return show;
-    }
-  );
-
-  async function handleSubscribeClick() {
-    const showJustSubscribed = await subscribeToShow(rssFeedUrlFromQuery());
-
-    const episodesToAdd = selectedIndices.map((i) => show.episodes[i]);
-    await addEpisodes(showJustSubscribed.showId, episodesToAdd, new Date());
-
-    refreshShows();
-    refreshPlaylist();
+  export function makeUrl(rssFeedUrl) {
+    return `rssFeedUrl=${encodeURIComponent(rssFeedUrl)}`;
   }
-
   function rssFeedUrlFromQuery() {
     return decodeURIComponent(parseQuery(window.location.search).rssFeedUrl);
   }
+</script>
 
-  function handleEpisodeSelectionChange({ detail: { selectedIndices: sel } }) {
-    selectedIndices = sel;
+<script>
+  import EpisodesOfShow from "../EpisodesOfShow.svelte";
+  import { refreshPlaylist } from "../playlistService";
+  import {
+    fetchShow,
+    queueEpisode,
+    subscribeToShow,
+  } from "../providers/rss/providerRss";
+  import Show from "../Show.svelte";
+  import { refreshShows } from "../showService";
+
+  let rssFeedUrl = rssFeedUrlFromQuery();
+  let showPromise = fetchShow({ rssFeedUrl });
+
+  async function handleSubscribeClick() {
+    await subscribeToShow(rssFeedUrl, new Date());
+    refreshShows();
+  }
+
+  async function handleQueueEpisode({ detail: { episode } }) {
+    await queueEpisode({ rssFeedUrl, guid: episode.guid }, new Date());
+    refreshShows();
+    refreshPlaylist();
   }
 </script>
 
@@ -54,6 +40,5 @@
   <button on:click={handleSubscribeClick}>Subscribe</button>
   <EpisodesOfShow
     episodes={show.episodes}
-    {selectedIndices}
-    on:change={handleEpisodeSelectionChange} />
+    on:queueepisode={handleQueueEpisode} />
 {/await}

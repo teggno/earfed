@@ -21,6 +21,10 @@ export async function fetchShow({ collectionId }) {
   }));
 }
 
+export function episodeFor({ trackId }, allShowEpisodes) {
+  return allShowEpisodes.find((e) => e.trackId.toString() === trackId);
+}
+
 function appleShowToShow(appleShow) {
   return {
     showTitle: appleShow.collectionName,
@@ -51,27 +55,23 @@ export function subscribeToShow(collectionId, date) {
   return subscribeInDb(
     apple,
     collectionId,
-    makeProviderMapping(collectionId),
+    makeShowProviderMapping(collectionId),
     date
   );
 }
 
-export async function queueEpisode({ collectionId, trackId }) {
-  const { showId } = await addShowIfNotAdded(collectionId);
-  await addEpisodes(showId, [{ trackId }], new Date());
+export async function queueEpisode({ collectionId, trackId }, date) {
+  const { showId } = await addShowIfNotAdded(collectionId, date);
+  await addEpisodes(showId, [{ trackId }], date);
 }
 
 export function addShowIfNotAdded(collectionId, date) {
   return addShowIfNotAddedToDb(
     apple,
     collectionId,
-    makeProviderMapping(collectionId),
+    makeShowProviderMapping(collectionId),
     date
   );
-}
-
-function makeProviderMapping(collectionId) {
-  return { collectionId };
 }
 
 export function addEpisodes(showId, episodes, date) {
@@ -84,8 +84,6 @@ export function addEpisodes(showId, episodes, date) {
   return addEpisodesTodb(payload, date);
 }
 
-export function episodeFor(episodeProviderMapping, allShowEpisodes) {
-  return allShowEpisodes.find(
-    (e) => e.trackId.toString() === episodeProviderMapping.trackId
-  );
+function makeShowProviderMapping(collectionId) {
+  return { collectionId };
 }

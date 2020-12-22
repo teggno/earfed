@@ -2,24 +2,24 @@
   export function makeUrl(collectionId) {
     return `/search/shows/apple/${collectionId}`;
   }
-  function extractCollectionId(url) {
-    const parts = url.split("/");
+  function collectionIdFromUrl() {
+    const parts = location.href.split("/");
     return parts[parts.length - 1];
   }
 </script>
 
 <script>
   import EpisodesOfShow from "../EpisodesOfShow.svelte";
+  import { refreshPlaylist } from "../playlistService";
   import {
-    subscribeToShow,
     fetchShow,
     queueEpisode,
+    subscribeToShow,
   } from "../providers/apple/providerApple";
   import Show from "../Show.svelte";
   import { refreshShows } from "../showService";
-  import { refreshPlaylist } from "../playlistService";
 
-  let collectionId = extractCollectionId(location.href);
+  let collectionId = collectionIdFromUrl();
   let showPromise = fetchShow({ collectionId });
 
   async function handleSubscribeClick() {
@@ -28,7 +28,7 @@
   }
 
   async function handleQueueEpisode({ detail: { episode } }) {
-    await queueEpisode(episode);
+    await queueEpisode({ collectionId, trackId: episode.trackId }, new Date());
     refreshShows();
     refreshPlaylist();
   }

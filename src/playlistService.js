@@ -1,5 +1,5 @@
 import { allShowsStore } from "./showService";
-import { listedEpisodes, status } from "./userData/episodes";
+import { queryListedEpisodes, status } from "./userData/episodes";
 import { arrayToMap, sortedInsert } from "./utils";
 import { derived, writable } from "svelte/store";
 import { oncer } from "./oncer";
@@ -11,9 +11,9 @@ const once2 = oncer();
 const initial = "initial";
 const loaded = "loaded";
 
-const userDataEpisodesStore = writable({ state: initial, data: [] }, (set) => {
+const listedEpisodesStore = writable({ state: initial, data: [] }, (set) => {
   once1(() =>
-    listedEpisodes().then((data) => {
+    queryListedEpisodes().then((data) => {
       set({ state: loaded, data });
     })
   );
@@ -30,16 +30,16 @@ const episodeIdsOrderedStore = writable({ state: initial, data: [] }, (set) => {
 });
 
 export const playlist = derived(
-  [allShowsStore, userDataEpisodesStore, episodeIdsOrderedStore],
-  ([shows, episodeSubscriptions, episodeIdsOrdered]) => {
+  [allShowsStore, listedEpisodesStore, episodeIdsOrderedStore],
+  ([shows, listedEpisodes, episodeIdsOrdered]) => {
     if (
       shows.state === loaded &&
-      episodeSubscriptions.state === loaded &&
+      listedEpisodes.state === loaded &&
       episodeIdsOrdered.state === loaded
     ) {
       const showsById = arrayToMap(shows.data, (s) => showIdToString(s.showId));
       const episodeKeysOrdered = episodeIdsOrdered.data.map(episodeStringKey);
-      const data = episodeSubscriptions.data
+      const data = listedEpisodes.data
         .reduce((result, e) => {
           const show = showsById[showIdToString(e.showId)];
           if (show) {
@@ -66,8 +66,8 @@ export const playlist = derived(
 );
 
 export function refreshPlaylist() {
-  listedEpisodes().then((data) =>
-    userDataEpisodesStore.set({ state: loaded, data })
+  queryListedEpisodes().then((data) =>
+    listedEpisodesStore.set({ state: loaded, data })
   );
 }
 
