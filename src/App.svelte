@@ -251,7 +251,7 @@
   <!-- 
     preload the (medium size) images displayed in the notification bar for two
     reasons:
-    1. So that they are available offline even when none of a show's episode has
+    1. So that they are available offline even when none of a show's episodes has
        ever been played while online.
     2. The `mediaSession` API's `artwork` property doesn't allow specifying CORS
        which causes problems when caching the images while they are implicitly
