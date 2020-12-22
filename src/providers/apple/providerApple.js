@@ -1,9 +1,4 @@
 import { lookupEpisodes, lookupShow } from "./api";
-import {
-  subscribeToShow as subscribeInDb,
-  addShowIfNotAdded as addShowIfNotAddedToDb,
-} from "../../userData/shows";
-import { addEpisodes as addEpisodesTodb } from "../../userData/episodes";
 
 export const apple = "apple";
 
@@ -22,7 +17,7 @@ export async function fetchShow({ collectionId }) {
 }
 
 export function episodeFor({ trackId }, allShowEpisodes) {
-  return allShowEpisodes.find((e) => e.trackId.toString() === trackId);
+  return allShowEpisodes.find((e) => e.trackId === trackId);
 }
 
 function appleShowToShow(appleShow) {
@@ -51,37 +46,16 @@ function appleEpisodeToEpisode(appleEpisode) {
   };
 }
 
-export function subscribeToShow(collectionId, date) {
-  return subscribeInDb(
-    apple,
-    collectionId,
-    makeShowProviderMapping(collectionId),
-    date
-  );
+export function showRecord({ collectionId }) {
+  return {
+    provider: apple,
+    providerShowId: collectionId,
+    providerMapping: makeShowProviderMapping(collectionId),
+  };
 }
 
-export async function queueEpisode({ collectionId, trackId }, date) {
-  const { showId } = await addShowIfNotAdded(collectionId, date);
-  await addEpisodes(showId, [{ trackId }], date);
-}
-
-export function addShowIfNotAdded(collectionId, date) {
-  return addShowIfNotAddedToDb(
-    apple,
-    collectionId,
-    makeShowProviderMapping(collectionId),
-    date
-  );
-}
-
-export function addEpisodes(showId, episodes, date) {
-  const payload = episodes.map((episode) => ({
-    providerEpisodeId: episode.trackId,
-    showId,
-    providerMapping: { trackId: episode.trackId.toString() },
-  }));
-
-  return addEpisodesTodb(payload, date);
+export function episodeRecord({ trackId }) {
+  return { providerEpisodeId: trackId, providerMapping: { trackId } };
 }
 
 function makeShowProviderMapping(collectionId) {

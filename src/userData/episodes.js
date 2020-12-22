@@ -22,7 +22,7 @@ export async function queryListedEpisodes() {
 /**
  * @param {Object[]} episodes
  * @param {string} episodes[].providerEpisodeId
- * @param {string} episodes[].showId
+ * @param {Object} episodes[].showId
  * @param {Object} episodes[].providerMapping
  */
 export async function addEpisodes(episodes, date) {
@@ -33,12 +33,12 @@ export async function addEpisodes(episodes, date) {
   );
   const episodesForStore = episodes.map(
     ({ providerEpisodeId, showId, providerMapping }) => ({
-      status: { value: status.listed, updated: date },
       episodeId: {
         provider: showId.provider,
         providerEpisodeId,
       },
       showId,
+      status: { value: status.listed, updated: date },
       providerMapping,
     })
   );

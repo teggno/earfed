@@ -20,6 +20,7 @@ export async function addShowIfNotAdded(
   const tran = db.transaction(showsMetadata.storeName, "readwrite");
 
   let show = await tran.store.get(makeShowIdForGet(provider, providerShowId));
+  const added = !show;
   if (!show) {
     show = {
       showId: makeShowId(provider, providerShowId),
@@ -28,7 +29,7 @@ export async function addShowIfNotAdded(
     };
     await tran.store.put(show);
   }
-  return tran.done.then(() => show);
+  return tran.done.then(() => ({ show, added }));
 }
 
 export async function subscribeToShow(

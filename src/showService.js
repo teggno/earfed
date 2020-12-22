@@ -1,7 +1,11 @@
 import { writable } from "svelte/store";
 import { oncer } from "./oncer";
 import { providerByMapping } from "./providers/providers";
-import { allShows as allShowsFromDb, status } from "./userData/shows";
+import {
+  allShows as allShowsFromDb,
+  status,
+  subscribeToShow as subscribeToShowInDb,
+} from "./userData/shows";
 
 async function allShows() {
   const userDataShows = await allShowsFromDb();
@@ -43,7 +47,21 @@ export const allShowsStore = writable({ state: "initial", data: [] }, (set) => {
 });
 
 export function refreshShows() {
-  allShows().then((shows) => {
+  return allShows().then((shows) => {
     allShowsStore.set({ state: "loaded", data: shows });
   });
+}
+
+export async function subscribeToShow({
+  provider,
+  providerShowId,
+  providerMapping,
+}) {
+  await subscribeToShowInDb(
+    provider,
+    providerShowId,
+    providerMapping,
+    new Date()
+  );
+  refreshShows();
 }

@@ -1,6 +1,4 @@
 <script context="module">
-  import { parseQuery } from "../urls";
-
   export function makeUrl(rssFeedUrl) {
     return `rssFeedUrl=${encodeURIComponent(rssFeedUrl)}`;
   }
@@ -11,27 +9,25 @@
 
 <script>
   import EpisodesOfShow from "../EpisodesOfShow.svelte";
-  import { refreshPlaylist } from "../playlistService";
+  import { enqueue } from "../playlistService";
   import {
+    episodeRecord,
     fetchShow,
-    queueEpisode,
-    subscribeToShow,
+    showRecord,
   } from "../providers/rss/providerRss";
   import Show from "../Show.svelte";
-  import { refreshShows } from "../showService";
+  import { subscribeToShow } from "../showService";
+  import { parseQuery } from "../urls";
 
   let rssFeedUrl = rssFeedUrlFromQuery();
   let showPromise = fetchShow({ rssFeedUrl });
 
-  async function handleSubscribeClick() {
-    await subscribeToShow(rssFeedUrl, new Date());
-    refreshShows();
+  function handleSubscribeClick() {
+    subscribeToShow(showRecord({ rssFeedUrl }));
   }
 
-  async function handleQueueEpisode({ detail: { episode } }) {
-    await queueEpisode({ rssFeedUrl, guid: episode.guid }, new Date());
-    refreshShows();
-    refreshPlaylist();
+  function handleQueueEpisode({ detail: { episode } }) {
+    enqueue(showRecord({ rssFeedUrl }), episodeRecord(episode));
   }
 </script>
 

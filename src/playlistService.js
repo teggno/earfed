@@ -1,10 +1,11 @@
-import { allShowsStore } from "./showService";
-import { queryListedEpisodes, status } from "./userData/episodes";
+import { allShowsStore, refreshShows } from "./showService";
+import { addEpisodes, queryListedEpisodes, status } from "./userData/episodes";
 import { arrayToMap, sortedInsert } from "./utils";
 import { derived, writable } from "svelte/store";
 import { oncer } from "./oncer";
 import { areEpisodesEqual } from "./episode";
 import { getEpisodeOrder } from "./userData/episodeOrder";
+import { addShowIfNotAdded } from "./userData/shows";
 
 const once1 = oncer();
 const once2 = oncer();
@@ -66,7 +67,7 @@ export const playlist = derived(
 );
 
 export function refreshPlaylist() {
-  queryListedEpisodes().then((data) =>
+  return queryListedEpisodes().then((data) =>
     listedEpisodesStore.set({ state: loaded, data })
   );
 }
@@ -123,4 +124,32 @@ function findLastPlayedEpisode(episodes) {
 
 function showIdToString(showId) {
   return `${showId.provider}_${showId.providerShowId}`;
+}
+
+export async function enqueue(showRecord, episodeRecord) {
+  const now = new Date();
+
+  const { added: showAdded } = await addShowIfNotAdded(
+    showRecord.provider,
+    showRecord.providerShowId,
+    showRecord.providerMapping,
+    now
+  );
+  await addEpisodes(
+    [
+      {
+        ...episodeRecord,
+        showId: {
+          provider: showRecord.provider,
+          providerShowId: showRecord.providerShowId,
+        },
+      },
+    ],
+    now
+  );
+
+  if (showAdded) {
+    await refreshShows();
+  }
+  await refreshPlaylist();
 }

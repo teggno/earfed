@@ -2,12 +2,15 @@
   import { onMount } from "svelte";
   import { derived, writable } from "svelte/store";
   import { formatDate } from "../dates";
-  import { refreshPlaylist } from "../playlistService";
+  import { enqueue } from "../playlistService";
   import { searchShows, searchEpisodes } from "../providers/apple/api";
-  import { apple, queueEpisode } from "../providers/apple/providerApple";
+  import {
+    apple,
+    episodeRecord,
+    showRecord,
+  } from "../providers/apple/providerApple";
   import QueueEpisodeButton from "../QueueEpisodeButton.svelte";
   import { replaceState } from "../routing/Router.svelte";
-  import { refreshShows } from "../showService";
   import { debounce } from "../utils";
   import { makeUrl } from "./AppleShow.svelte";
 
@@ -94,9 +97,9 @@
   }
 
   async function handleQueueEpisodeClick(episode) {
-    await queueEpisode(episode);
-    refreshShows();
-    refreshPlaylist();
+    const sr = showRecord(episode);
+    const er = episodeRecord(episode);
+    enqueue(sr, er);
   }
 
   function areEqual({ trackId }, { episodeId }) {
