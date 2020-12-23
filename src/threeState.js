@@ -6,7 +6,7 @@ export const error = "error";
 
 export function threeStateFromPromise(promise) {
   return readable({ state: initial }, (set) => {
-    promiseToThreeState(promise).finally(set);
+    promiseToThreeState(promise).then(set);
   });
 }
 
