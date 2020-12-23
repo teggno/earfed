@@ -11,8 +11,9 @@
   } from "../providers/apple/providerApple";
   import QueueEpisodeButton from "../QueueEpisodeButton.svelte";
   import { replaceState } from "../routing/Router.svelte";
+  import { loaded } from "../threeState";
   import { debounce } from "../utils";
-  import { makeUrl } from "./AppleShow.svelte";
+  import { makeUrl } from "./AppleShowPage.svelte";
 
   export let searchText = "";
   export let pageYOffset = undefined;
@@ -20,12 +21,12 @@
   export let playlist;
 
   let shows = [];
-  let appleEpisodes = writable([]);
+  const appleEpisodesStore = writable([]);
 
-  let episodes = derived(
-    [playlist, appleEpisodes],
+  const episodes = derived(
+    [playlist, appleEpisodesStore],
     ([{ data: queue, state }, aes]) =>
-      state === "loaded"
+      state === loaded
         ? aes.map((ae) => ({
             ...ae,
             queued: queue.some((qe) => areEqual(ae, qe)),
@@ -63,7 +64,7 @@
       searchEpisodes(searchText),
     ]).then(([{ results: s }, { results: e }]) => {
       shows = s;
-      appleEpisodes.set(e);
+      appleEpisodesStore.set(e);
 
       if (showingShows && !shows.length && e.length) {
         showingShows = false;
@@ -102,10 +103,11 @@
     enqueue(sr, er);
   }
 
-  function areEqual({ trackId }, { episodeId }) {
-    return (
-      episodeId.providerEpisodeId === trackId && episodeId.provider === apple
-    );
+  function areEqual(
+    { trackId },
+    { episodeId: { provider, providerEpisodeId } }
+  ) {
+    return providerEpisodeId === trackId && provider === apple;
   }
 </script>
 

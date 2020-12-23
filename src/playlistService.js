@@ -11,11 +11,10 @@ import { oncer } from "./oncer";
 import { areEpisodesEqual } from "./episode";
 import { getEpisodeOrder } from "./userData/episodeOrder";
 import { addShowIfNotAdded } from "./userData/shows";
+import { initial, loaded } from "./threeState";
 
 const once1 = oncer();
 const once2 = oncer();
-const initial = "initial";
-const loaded = "loaded";
 
 const listedEpisodesStore = writable({ state: initial, data: [] }, (set) => {
   once1(() =>
@@ -140,6 +139,9 @@ export async function enqueue(showRecord, episodeRecord) {
     showRecord.providerMapping,
     now
   );
+  // TODO: Only add if not already added. Change status from deleted or ended to
+  // listed if already exists and status isn't listed. Currently an error is thrown
+  // when trying to enqueue an episode that already exists.
   await addEpisodes(
     [
       {

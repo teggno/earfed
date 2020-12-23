@@ -1,6 +1,7 @@
 import { writable } from "svelte/store";
 import { oncer } from "./oncer";
 import { providerByMapping } from "./providers/providers";
+import { initial, loaded } from "./threeState";
 import {
   allShows as allShowsFromDb,
   status,
@@ -37,10 +38,10 @@ async function userDataShowToShow(userDataShow) {
 }
 
 const once = oncer();
-export const allShowsStore = writable({ state: "initial", data: [] }, (set) => {
+export const allShowsStore = writable({ state: initial, data: [] }, (set) => {
   once(() =>
     allShows().then((shows) => {
-      set({ state: "loaded", data: shows });
+      set({ state: loaded, data: shows });
     })
   );
   return () => {};
@@ -48,7 +49,7 @@ export const allShowsStore = writable({ state: "initial", data: [] }, (set) => {
 
 export function refreshShows() {
   return allShows().then((shows) => {
-    allShowsStore.set({ state: "loaded", data: shows });
+    allShowsStore.set({ state: loaded, data: shows });
   });
 }
 

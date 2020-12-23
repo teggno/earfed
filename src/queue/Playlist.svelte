@@ -7,6 +7,7 @@
   import orderable from "../actions/orderableAction";
   import { putEpisodeOrder } from "../userData/episodeOrder";
   import { refreshOrder } from "../playlistService";
+  import { loaded } from "../threeState";
 
   export let playlist;
   let expandedEpisode;
@@ -21,7 +22,7 @@
   afterUpdate(() => {
     const { state, data } = $playlist;
     indexOfPreviouslyExpandedEpisode =
-      state === "loaded"
+      state === loaded
         ? data.findIndex((e) => areEpisodesEqual(e, expandedEpisode))
         : -1;
   });

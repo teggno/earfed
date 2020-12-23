@@ -19,8 +19,8 @@
   import { subscribeToShow } from "../showService";
   import { parseQuery } from "../urls";
 
-  let rssFeedUrl = rssFeedUrlFromQuery();
-  let showPromise = fetchShow({ rssFeedUrl });
+  const rssFeedUrl = rssFeedUrlFromQuery();
+  const showPromise = fetchShow({ rssFeedUrl });
 
   function handleSubscribeClick() {
     subscribeToShow(showRecord({ rssFeedUrl }));

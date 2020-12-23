@@ -1,6 +1,6 @@
 <script>
   import navigate from "../routing/navigate";
-  import { makeUrl } from "./RssShow.svelte";
+  import { makeUrl } from "./RssShowPage.svelte";
 
   let url = "";
 

@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import AddShowRss from "./subscriptions/AddShowRss.svelte";
   import { initAnimationTargetRect } from "./animationTargetRect";
-  import AppleShow from "./search/AppleShow.svelte";
+  import AppleShowPage from "./search/AppleShowPage.svelte";
   import BottomBar from "./BottomBar.svelte";
   import { showImageUrlMedium } from "./config";
   import { areEpisodesEqual } from "./episode";
@@ -24,11 +24,12 @@
   import Router from "./routing/Router.svelte";
   import Search from "./search/Search.svelte";
   import Subscriptions from "./subscriptions/Subscriptions.svelte";
-  import ShowSubscription from "./subscriptions/RssShow.svelte";
+  import RssShowPage from "./subscriptions/RssShowPage.svelte";
   import { setEpisodeEnded, updatePositionSeconds } from "./userData/episodes";
   import virtualKeyboardDetector, {
     virtualkeyboard,
   } from "./virtualKeyboardDetector";
+  import { loaded } from "./threeState";
 
   initAnimationTargetRect();
 
@@ -110,7 +111,7 @@
     if (!supportsNotificationBar()) return () => {};
     return playlist.subscribe((list) => {
       showImageUrls =
-        list.state === "loaded"
+        list.state === loaded
           ? Object.keys(
               list.data.reduce((prev, playlistItem) => {
                 prev[playlistItem.showImageUrl] = true;
@@ -237,8 +238,10 @@
         path="search"
         getProps={(innerState) => ({ ...innerState, playlist })} />
       <Route component={AddShowRss} path="subscriptions/addrss" />
-      <Route component={ShowSubscription} path="subscriptions/subscribe" />
-      <Route component={AppleShow} path="search/shows/apple/:collectionId" />
+      <Route component={RssShowPage} path="subscriptions/subscribe" />
+      <Route
+        component={AppleShowPage}
+        path="search/shows/apple/:collectionId" />
     </Router>
   </main>
   {#if !virtualKeyboardVisible}
