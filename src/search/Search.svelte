@@ -1,6 +1,6 @@
 <script>
   import { onMount } from "svelte";
-  import { derived, writable } from "svelte/store";
+  import { derived } from "svelte/store";
   import { formatDate } from "../dates";
   import { enqueue } from "../playlistService";
   import { searchShows, searchEpisodes } from "../providers/apple/api";
@@ -11,7 +11,7 @@
   } from "../providers/apple/providerApple";
   import QueueEpisodeButton from "../QueueEpisodeButton.svelte";
   import { replaceState } from "../routing/Router.svelte";
-  import { loaded } from "../threeState";
+  import { loaded, whenLoaded, writableThreeState } from "../threeState";
   import { debounce } from "../utils";
   import { makeUrl } from "./AppleShowPage.svelte";
 
@@ -21,17 +21,16 @@
   export let playlist;
 
   let shows = [];
-  const appleEpisodesStore = writable([]);
+  const appleEpisodesStore = writableThreeState();
 
   const episodes = derived(
     [playlist, appleEpisodesStore],
-    ([{ data: queue, state }, aes]) =>
-      state === loaded
-        ? aes.map((ae) => ({
-            ...ae,
-            queued: queue.some((qe) => areEqual(ae, qe)),
-          }))
-        : []
+    whenLoaded(([queue, appleEpisodes]) =>
+      appleEpisodes.map((ae) => ({
+        ...ae,
+        queued: queue.some((qe) => areEqual(ae, qe)),
+      }))
+    )
   );
 
   onMount(() => {
@@ -64,7 +63,7 @@
       searchEpisodes(searchText),
     ]).then(([{ results: s }, { results: e }]) => {
       shows = s;
-      appleEpisodesStore.set(e);
+      appleEpisodesStore.loaded(e);
 
       if (showingShows && !shows.length && e.length) {
         showingShows = false;
@@ -174,7 +173,7 @@
     bind:value={searchText} />
   <button>Go</button>
 </form>
-{#if shows.length && $episodes.length}
+{#if shows.length && $episodes.state === loaded && $episodes.data.length}
   <div>
     <button
       on:click={handleShowsClick}
@@ -183,7 +182,7 @@
     <button
       on:click={handleEpisodesClick}
       type="button"
-      disabled={!showingShows}>Episodes ({$episodes.length})</button>
+      disabled={!showingShows}>Episodes ({$episodes.data.length})</button>
   </div>
 {/if}
 {#if shows.length && showingShows}
@@ -202,10 +201,10 @@
     {/each}
   </ul>
 {/if}
-{#if $episodes.length && (!showingShows || !shows.length)}
+{#if $episodes.state === loaded && $episodes.data.length && (!showingShows || !shows.length)}
   <h2>Episodes</h2>
   <ul>
-    {#each $episodes as episode}
+    {#each $episodes.data as episode}
       <li class="container">
         <img src={episode.artworkUrl60} alt="" crossorigin="anonymous" />
         <div class="rightOfImage">
