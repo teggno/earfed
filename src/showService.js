@@ -1,18 +1,17 @@
-import { writable } from "svelte/store";
+import { derived } from "svelte/store";
 import { oncer } from "./oncer";
 import { providerByMapping } from "./providers/providers";
-import { initial, loaded } from "./threeState";
+import {
+  loaded,
+  makeError,
+  makeLoaded,
+  writableThreeState,
+} from "./threeState";
 import {
   allShows as allShowsFromDb,
   status,
   subscribeToShow as subscribeToShowInDb,
 } from "./userData/shows";
-
-async function allShows() {
-  const userDataShows = await allShowsFromDb();
-  const showPromises = userDataShows.map(userDataShowToShow);
-  return await Promise.all(showPromises);
-}
 
 async function userDataShowToShow(userDataShow) {
   const provider = providerByMapping(userDataShow.providerMapping);
@@ -38,20 +37,34 @@ async function userDataShowToShow(userDataShow) {
 }
 
 const once = oncer();
-export const allShowsStore = writable({ state: initial, data: [] }, (set) => {
+const userDataShowsStore = writableThreeState((set) => {
   once(() =>
-    allShows().then((shows) => {
-      set({ state: loaded, data: shows });
+    allShowsFromDb().then((data) => {
+      set(makeLoaded(data));
     })
   );
-  return () => {};
 });
 
 export function refreshShows() {
-  return allShows().then((shows) => {
-    allShowsStore.set({ state: loaded, data: shows });
+  return allShowsFromDb().then((data) => {
+    userDataShowsStore.setLoaded(data);
   });
 }
+
+export const allShowsStore = derived(
+  userDataShowsStore,
+  (userDataShows, set) => {
+    if (userDataShows.state === loaded) {
+      Promise.all(userDataShows.data.map(userDataShowToShow))
+        .then((shows) => {
+          set(makeLoaded(shows));
+        })
+        .catch((err) => set(makeError(err)));
+    } else {
+      set(userDataShows);
+    }
+  }
+);
 
 export async function subscribeToShow({
   provider,

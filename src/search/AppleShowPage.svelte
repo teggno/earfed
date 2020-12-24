@@ -18,16 +18,16 @@
     fetchShow,
     showRecord,
   } from "../providers/apple/providerApple";
-  import { threeStateFromPromise, whenLoaded } from "../threeState";
+  import { loaded, threeStateFromPromise, whenLoaded } from "../threeState";
   import Show from "../Show.svelte";
   import { subscribeToShow } from "../showService";
 
   const collectionId = collectionIdFromUrl();
 
-  const showState = threeStateFromPromise(fetchShow({ collectionId }));
+  const appleShowState = threeStateFromPromise(fetchShow({ collectionId }));
 
   const episodesState = derived(
-    [showState, playlistState],
+    [appleShowState, playlistState],
     whenLoaded(([show, playlist]) =>
       show.episodes.map((e) => ({
         ...e,
@@ -45,11 +45,11 @@
   }
 </script>
 
-{#if $showState.state === 'loaded'}
-  <Show show={$showState.data} />
+{#if $appleShowState.state === loaded}
+  <Show show={$appleShowState.data} />
   <button on:click={handleSubscribeClick}>Subscribe</button>
 {/if}
-{#if $episodesState.state === 'loaded'}
+{#if $episodesState.state === loaded}
   <EpisodesOfShow
     episodes={$episodesState.data}
     on:queueepisode={handleQueueEpisode} />
