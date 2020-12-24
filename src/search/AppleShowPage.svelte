@@ -2,6 +2,7 @@
   export function makeUrl(collectionId) {
     return `/search/shows/apple/${collectionId}`;
   }
+
   function collectionIdFromUrl() {
     const parts = location.href.split("/");
     return parts[parts.length - 1];
@@ -32,16 +33,14 @@
 
   const showState = derived(
     [appleShowState, userDataShowsState],
-    whenLoaded(([appleShow, userDataShows]) => {
-      return {
-        ...appleShow,
-        subscribed: userDataShows.some(
-          (uds) =>
-            uds.showId.providerShowId === collectionId &&
-            uds.status.value === status.subscribed
-        ),
-      };
-    })
+    whenLoaded(([appleShow, userDataShows]) => ({
+      ...appleShow,
+      subscribed: userDataShows.some(
+        (uds) =>
+          uds.showId.providerShowId === collectionId &&
+          uds.status.value === status.subscribed
+      ),
+    }))
   );
 
   const episodesState = derived(

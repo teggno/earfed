@@ -2,28 +2,63 @@
   export function makeUrl(rssFeedUrl) {
     return `rssFeedUrl=${encodeURIComponent(rssFeedUrl)}`;
   }
+
   function rssFeedUrlFromQuery() {
     return decodeURIComponent(parseQuery(window.location.search).rssFeedUrl);
   }
 </script>
 
 <script>
+  import { derived } from "svelte/store";
   import EpisodesOfShow from "../EpisodesOfShow.svelte";
-  import { enqueue } from "../playlistService";
+  import { enqueue, playlist as playlistState } from "../playlistService";
   import {
     episodeRecord,
     fetchShow,
     showRecord,
   } from "../providers/rss/providerRss";
   import Show from "../Show.svelte";
-  import { subscribeToShow } from "../showService";
+  import {
+    subscribeToShow,
+    unsubscribeFromShow,
+    userDataShowsState,
+  } from "../showService";
+  import { loaded, threeStateFromPromise, whenLoaded } from "../threeState";
   import { parseQuery } from "../urls";
+  import { status } from "../userData/shows";
 
   const rssFeedUrl = rssFeedUrlFromQuery();
-  const showPromise = fetchShow({ rssFeedUrl });
+
+  const rssShowState = threeStateFromPromise(fetchShow({ rssFeedUrl }));
+
+  const showState = derived(
+    [rssShowState, userDataShowsState],
+    whenLoaded(([rssShow, userDataShows]) => ({
+      ...rssShow,
+      subscribed: userDataShows.some(
+        (uds) =>
+          uds.showId.providerShowId === rssFeedUrl &&
+          uds.status.value === status.subscribed
+      ),
+    }))
+  );
+
+  const episodesState = derived(
+    [rssShowState, playlistState],
+    whenLoaded(([show, playlist]) =>
+      show.episodes.map((e) => ({
+        ...e,
+        queued: playlist.some((ple) => ple.guid === e.guid),
+      }))
+    )
+  );
 
   function handleSubscribe() {
     subscribeToShow(showRecord({ rssFeedUrl }));
+  }
+
+  function handleUnsubscribe() {
+    unsubscribeFromShow(showRecord({ rssFeedUrl }));
   }
 
   function handleQueueEpisode({ detail: { episode } }) {
@@ -31,9 +66,14 @@
   }
 </script>
 
-{#await showPromise then show}
-  <Show {show} on:subscribe={handleSubscribe} />
+{#if $showState.state === loaded}
+  <Show
+    show={$showState.data}
+    on:subscribe={handleSubscribe}
+    on:unsubscribe={handleUnsubscribe} />
+{/if}
+{#if $episodesState.state === loaded}
   <EpisodesOfShow
-    episodes={show.episodes}
+    episodes={$episodesState.data}
     on:queueepisode={handleQueueEpisode} />
-{/await}
+{/if}
