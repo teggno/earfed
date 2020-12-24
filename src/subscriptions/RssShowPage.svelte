@@ -22,7 +22,7 @@
   const rssFeedUrl = rssFeedUrlFromQuery();
   const showPromise = fetchShow({ rssFeedUrl });
 
-  function handleSubscribeClick() {
+  function handleSubscribe() {
     subscribeToShow(showRecord({ rssFeedUrl }));
   }
 
@@ -32,8 +32,7 @@
 </script>
 
 {#await showPromise then show}
-  <Show {show} />
-  <button on:click={handleSubscribeClick}>Subscribe</button>
+  <Show {show} on:subscribe={handleSubscribe} />
   <EpisodesOfShow
     episodes={show.episodes}
     on:queueepisode={handleQueueEpisode} />

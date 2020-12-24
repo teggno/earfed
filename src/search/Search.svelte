@@ -63,7 +63,7 @@
       searchEpisodes(searchText),
     ]).then(([{ results: s }, { results: e }]) => {
       shows = s;
-      appleEpisodesStore.loaded(e);
+      appleEpisodesStore.setLoaded(e);
 
       if (showingShows && !shows.length && e.length) {
         showingShows = false;

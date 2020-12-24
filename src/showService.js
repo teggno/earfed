@@ -11,6 +11,7 @@ import {
   allShows as allShowsFromDb,
   status,
   subscribeToShow as subscribeToShowInDb,
+  unsubscribeFromShow as unsubscribeFromShowInDb,
 } from "./userData/shows";
 
 async function userDataShowToShow(userDataShow) {
@@ -37,7 +38,7 @@ async function userDataShowToShow(userDataShow) {
 }
 
 const once = oncer();
-const userDataShowsStore = writableThreeState((set) => {
+export const userDataShowsState = writableThreeState((set) => {
   once(() =>
     allShowsFromDb().then((data) => {
       set(makeLoaded(data));
@@ -47,12 +48,12 @@ const userDataShowsStore = writableThreeState((set) => {
 
 export function refreshShows() {
   return allShowsFromDb().then((data) => {
-    userDataShowsStore.setLoaded(data);
+    userDataShowsState.setLoaded(data);
   });
 }
 
 export const allShowsStore = derived(
-  userDataShowsStore,
+  userDataShowsState,
   (userDataShows, set) => {
     if (userDataShows.state === loaded) {
       Promise.all(userDataShows.data.map(userDataShowToShow))
@@ -77,5 +78,10 @@ export async function subscribeToShow({
     providerMapping,
     new Date()
   );
+  refreshShows();
+}
+
+export async function unsubscribeFromShow(showId) {
+  await unsubscribeFromShowInDb(showId, new Date());
   refreshShows();
 }

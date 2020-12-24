@@ -48,10 +48,10 @@ export async function subscribeToShow(
   return show;
 }
 
-export async function unsubscribeFromShow(showId, date) {
+export async function unsubscribeFromShow({ provider, providerShowId }, date) {
   const db = await openUserDataDb();
   const tran = db.transaction(showsMetadata.storeName, "readwrite");
-  const show = await tran.store.get(makeShowIdForGet(showId));
+  const show = await tran.store.get(makeShowIdForGet(provider, providerShowId));
   if (!show) {
     console.warn("tried to unsubscribe from non existing show", showId);
     return;

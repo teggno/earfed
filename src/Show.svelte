@@ -1,7 +1,18 @@
 <script>
+  import { createEventDispatcher } from "svelte";
+
   import { showImageUrlThumb } from "./config";
 
   export let show;
+
+  const dispatch = createEventDispatcher();
+
+  function handleSubscribeClick() {
+    dispatch("subscribe");
+  }
+  function handleUnsubscribeClick() {
+    dispatch("unsubscribe");
+  }
 </script>
 
 <style>
@@ -29,3 +40,6 @@
     {/each}
   </ul>
 {/if}
+{#if show.subscribed}
+  <button on:click={handleUnsubscribeClick}>Unsubscribe</button>
+{:else}<button on:click={handleSubscribeClick}>Subscribe</button>{/if}
