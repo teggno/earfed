@@ -141,20 +141,17 @@
     let scrollHandlerAdded = false;
     let touching = false;
 
-    document.documentElement.addEventListener("touchstart", handleTouchStart, {
+    document.addEventListener("touchstart", handleTouchStart, {
       passive: true,
     });
 
     return () => {
-      document.documentElement.removeEventListener(
-        "touchstart",
-        handleTouchStart
-      );
+      document.removeEventListener("touchstart", handleTouchStart);
     };
 
     function handleTouchStart() {
       clearTimeout(timeoutShow);
-      document.documentElement.addEventListener("touchend", handleTouchEnd);
+      document.addEventListener("touchend", handleTouchEnd);
       touching = true;
       if (!scrollHandlerAdded) {
         window.addEventListener("scroll", handleScroll);
@@ -182,7 +179,7 @@
 
     function handleTouchEnd() {
       touching = false;
-      document.documentElement.removeEventListener("touchend", handleTouchEnd);
+      document.removeEventListener("touchend", handleTouchEnd);
       if (!nowPlayingVisible && !scrolling) {
         show();
       }
