@@ -45,14 +45,12 @@
   // itself and then, only when the button is released (mouse/touch up), the icon gets changed.
   let buttonDown = false;
 
-  function handleTouchStart(e) {
+  function handleTouchStart() {
     if (status === disabled) return;
-    console.log("touchstart");
     buttonDown = true;
   }
 
   function handleTouchEnd(e) {
-    console.log("touchend");
     if (e.cancelable) {
       e.preventDefault();
     }
@@ -68,13 +66,11 @@
 
   function handleMouseDown(e) {
     if (e.button !== 0) return;
-    console.log("mousedown");
     buttonDown = true;
   }
 
   function handleMouseUp(e) {
     if (!buttonDown) return;
-    console.log("mouseup");
     if (e.cancelable) {
       e.preventDefault();
     }

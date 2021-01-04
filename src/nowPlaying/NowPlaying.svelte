@@ -402,7 +402,7 @@ iOS won't make nice with the :active pseudoclass.-->
       <button
         class="navButton"
         on:click|stopPropagation={handleSeekBackward}
-        ontouchstart=""
+        on:touchstart|passive
         title={`Back ${seekBackwardSeconds} Seconds`}
         {disabled}>
         <span>-{seekBackwardSeconds}s</span>
@@ -419,7 +419,7 @@ iOS won't make nice with the :active pseudoclass.-->
       <button
         class="navButton"
         on:click|stopPropagation={handleSeekForward}
-        ontouchstart=""
+        on:touchstart|passive
         title={`Forward ${seekForwardSeconds} Seconds`}
         {disabled}>
         <span>+{seekForwardSeconds}s</span>
@@ -430,7 +430,7 @@ iOS won't make nice with the :active pseudoclass.-->
       <button
         class="navButton"
         on:click|stopPropagation={handleForget}
-        ontouchstart=""
+        on:touchstart|passive
         title="Discard Episode"
         {disabled}>
         <DeleteIcon />

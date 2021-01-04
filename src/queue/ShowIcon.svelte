@@ -210,7 +210,7 @@
 </style>
 
 <button
-  ontouchstart=""
+  on:touchstart|passive
   style={`--start-size:${playIconStartSize}px;`}
   on:click|stopPropagation={handleClick}
   title={`${playing ? 'Pause' : 'Play'}`}>

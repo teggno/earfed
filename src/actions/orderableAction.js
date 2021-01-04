@@ -37,7 +37,7 @@ export default function orderable(node, { css: { beforeClass, afterClass } }) {
   };
 
   function addEventListeners() {
-    node.addEventListener("touchstart", handleTouchStart);
+    node.addEventListener("touchstart", handleTouchStart, { passive: true });
     node.addEventListener("contextmenu", justPreventDefault);
     node.addEventListener("mousedown", handleMouseDown);
   }
