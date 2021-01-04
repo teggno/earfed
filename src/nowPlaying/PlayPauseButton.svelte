@@ -165,8 +165,8 @@
 </style>
 
 <button
-  on:touchend={handleTouchEnd}
   on:touchstart={handleTouchStart}
+  on:touchend={handleTouchEnd}
   on:mousedown={handleMouseDown}
   on:contextmenu={handleContextMenu}
   bind:this={button}

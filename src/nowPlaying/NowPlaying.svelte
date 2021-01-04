@@ -32,6 +32,7 @@
   import { showImageUrlThumb } from "../config";
   import EpisodeDescription from "../queue/EpisodeDescription.svelte";
   import { removeEpisode } from "../playlistService";
+  import TinyButton from "./TinyButton.svelte";
 
   $: disabled = $playerInfo.status === noEpisode;
 
@@ -98,7 +99,7 @@
     seekForward();
   }
 
-  function handleForget() {
+  function handleDiscard() {
     const e = $playerInfo.episode;
     forgetEpisode();
     removeEpisode(e.episodeId);
@@ -276,26 +277,6 @@
     fill: var(--color-disabled);
   }
 
-  .navButton {
-    background-color: whitesmoke;
-    border-radius: 50%;
-    border: 0 none;
-    padding: 0;
-    margin: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    font-size: var(--font-size-small);
-    width: 48px;
-    height: 48px;
-    transition: transform 120ms ease-in-out;
-  }
-
-  .navButton:not(:disabled):active {
-    transform: scale(0.85);
-  }
-
   .closeBar {
     --total-bar-height: 44px;
     --visible-bar-height: 4px;
@@ -396,18 +377,14 @@
       on:change={handleTimeChange} />
   </div>
   <div class="buttons">
-    <!--NOTE about ontouchstart="" below: This is a hack because otherwise Safari on
-iOS won't make nice with the :active pseudoclass.-->
     <span>
-      <button
-        class="navButton"
-        on:click|stopPropagation={handleSeekBackward}
-        on:touchstart|passive
+      <TinyButton
+        {disabled}
         title={`Back ${seekBackwardSeconds} Seconds`}
-        {disabled}>
+        on:click={handleSeekBackward}>
         <span>-{seekBackwardSeconds}s</span>
         <ArrowLeftIcon />
-      </button>
+      </TinyButton>
     </span>
     <span class="play-pause-wrapper">
       <PlayPauseButton
@@ -416,25 +393,18 @@ iOS won't make nice with the :active pseudoclass.-->
         backgroundImageUrl={$playerInfo.episode && $playerInfo.episode.showImageUrl ? showImageUrlThumb($playerInfo.episode.showImageUrl) : ''} />
     </span>
     <span>
-      <button
-        class="navButton"
-        on:click|stopPropagation={handleSeekForward}
-        on:touchstart|passive
+      <TinyButton
+        {disabled}
         title={`Forward ${seekForwardSeconds} Seconds`}
-        {disabled}>
+        on:click={handleSeekForward}>
         <span>+{seekForwardSeconds}s</span>
         <ArrowRightIcon />
-      </button>
+      </TinyButton>
     </span>
     <span class="delete-wrapper">
-      <button
-        class="navButton"
-        on:click|stopPropagation={handleForget}
-        on:touchstart|passive
-        title="Discard Episode"
-        {disabled}>
+      <TinyButton {disabled} title="Discard Episode" on:click={handleDiscard}>
         <DeleteIcon />
-      </button>
+      </TinyButton>
     </span>
   </div>
 </div>
