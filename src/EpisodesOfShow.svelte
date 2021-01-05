@@ -1,6 +1,10 @@
 <script>
   import { createEventDispatcher } from "svelte";
   import { formatDate } from "./dates";
+  import ItemLayout from "./layouts/ItemLayout.svelte";
+  import ItemSubtitle from "./layouts/ItemSubtitle.svelte";
+  import ItemTitle from "./layouts/ItemTitle.svelte";
+  import ListLayout from "./layouts/ListLayout.svelte";
   import QueueEpisodeButton from "./QueueEpisodeButton.svelte";
 
   export let episodes;
@@ -16,47 +20,18 @@
   }
 </script>
 
-<style>
-  ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  span {
-    font-size: var(--font-size-small);
-    max-height: calc(var(--font-size-small) * 2 * var(--assumed-normal-lh));
-    overflow: hidden;
-    font-weight: 500;
-    padding-bottom: var(--spacing-1);
-  }
-
-  li {
-    display: flex;
-    align-items: center;
-    padding: var(--spacing-3);
-  }
-
-  .pubDate {
-    font-size: var(--font-size-small);
-    color: var(--color-text-muted);
-  }
-
-  .text {
-    overflow-x: hidden;
-  }
-</style>
-
-<ul>
-  {#each episodes.sort(byPubDate) as episode}
-    <li>
-      <div class="text">
-        <span>{episode.episodeTitle}</span>
-        <div class="pubDate">{formatDate(episode.pubDate)}</div>
-      </div>
+<ListLayout items={episodes.sort(byPubDate)} let:item={episode}>
+  <ItemLayout>
+    <div slot="title">
+      <ItemTitle>{episode.episodeTitle}</ItemTitle>
+    </div>
+    <div slot="subtitle">
+      <ItemSubtitle>{formatDate(episode.pubDate)}</ItemSubtitle>
+    </div>
+    <div slot="actions">
       <QueueEpisodeButton
         queued={episode.queued}
         on:click={() => handleQueueEpisodeClick(episode)} />
-    </li>
-  {/each}
-</ul>
+    </div>
+  </ItemLayout>
+</ListLayout>
