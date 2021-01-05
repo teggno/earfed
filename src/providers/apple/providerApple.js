@@ -12,6 +12,7 @@ export async function fetchShow({ collectionId }) {
     lookupEpisodes(collectionId),
   ]).then(([appleShow, appleEpisodes]) => ({
     ...appleShowToShow(appleShow),
+    subscribedShowUrl: subscribedShowUrl(collectionId),
     episodes: appleEpisodes.map(appleEpisodeToEpisode),
   }));
 }
@@ -25,6 +26,7 @@ function appleShowToShow(appleShow) {
     showTitle: appleShow.collectionName,
     showImageUrl: appleShow.artworkUrl60,
     categories: appleShow.genres,
+    artistName: appleShow.artistName,
   };
 }
 
@@ -60,4 +62,8 @@ export function episodeRecord({ trackId }) {
 
 function makeShowProviderMapping(collectionId) {
   return { collectionId };
+}
+
+function subscribedShowUrl(collectionId) {
+  return "/subscriptions/shows/" + apple + "/" + collectionId.toString();
 }

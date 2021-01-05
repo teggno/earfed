@@ -1,19 +1,33 @@
 <script>
-  import ShowListItem from "./ShowListItem.svelte";
+  import ItemLayout from "../layouts/ItemLayout.svelte";
+  import ItemSubtitle from "../layouts/ItemSubtitle.svelte";
+  import ItemTitle from "../layouts/ItemTitle.svelte";
+  import ListLayout from "../layouts/ListLayout.svelte";
 
   export let shows = [];
 </script>
 
 <style>
-  ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+  a {
+    color: inherit;
+    text-decoration: none;
   }
 </style>
 
-<ul>
-  {#each shows as show}
-    <ShowListItem {show} />
-  {/each}
-</ul>
+<ListLayout items={shows} let:item={show}>
+  <a href={show.subscribedShowUrl}>
+    <ItemLayout>
+      <img
+        slot="image"
+        src={show.showImageUrl}
+        alt=""
+        crossorigin="anonymous" />
+      <div slot="title">
+        <ItemTitle>{show.showTitle}</ItemTitle>
+      </div>
+      <div slot="subtitle">
+        <ItemSubtitle>{show.artistName}</ItemSubtitle>
+      </div>
+    </ItemLayout>
+  </a>
+</ListLayout>

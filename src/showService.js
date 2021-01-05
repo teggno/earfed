@@ -33,6 +33,8 @@ async function userDataShowToShow(userDataShow) {
     subscribed: userDataShow.status.value === status.subscribed,
     showTitle: fetchedShowData.showTitle,
     showImageUrl: fetchedShowData.showImageUrl,
+    artistName: fetchedShowData.artistName,
+    subscribedShowUrl: fetchedShowData.subscribedShowUrl,
     episodeFor,
   };
 }

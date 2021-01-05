@@ -13,7 +13,10 @@ export async function fetchShow(showProviderMapping) {
     `${corsProxyUrl ? corsProxyUrl + "/" : ""}${showProviderMapping.rssFeedUrl}`
   ).then((res) => res.text());
   const feedXmlDocument = parseXmlString(feedXmlString);
-  return parseShowFeed(feedXmlDocument);
+  return {
+    ...parseShowFeed(feedXmlDocument),
+    subscribedShowUrl: subscribedShowUrl(showProviderMapping.rssFeedUrl),
+  };
 }
 
 export function episodeFor({ guid, showUrl }, allShowEpisodes) {
@@ -36,4 +39,13 @@ export function episodeRecord({ guid }) {
 
 function makeShowProviderMapping(rssFeedUrl) {
   return { rssFeedUrl };
+}
+
+function subscribedShowUrl(rssFeedUrl) {
+  return (
+    "/subscriptions/shows/" +
+    rss +
+    "?rssFeedUrl=" +
+    encodeURIComponent(rssFeedUrl)
+  );
 }

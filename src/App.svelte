@@ -235,10 +235,13 @@
         path="search"
         getProps={(innerState) => ({ ...innerState, playlist })} />
       <Route component={AddShowRss} path="subscriptions/addrss" />
-      <Route component={RssShowPage} path="subscriptions/subscribe" />
+      <Route component={RssShowPage} path="subscriptions/shows/rss" />
       <Route
         component={AppleShowPage}
         path="search/shows/apple/:collectionId" />
+      <Route
+        component={AppleShowPage}
+        path="subscriptions/shows/apple/:collectionId" />
     </Router>
   </main>
   {#if !virtualKeyboardVisible}

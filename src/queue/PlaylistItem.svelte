@@ -120,7 +120,7 @@
   }
 
   .showTitle {
-    color: var(--color-text-muted);
+    color: var(--color-text-muted-little);
     font-size: var(--font-size-small);
     text-align: left;
     max-width: 100%;

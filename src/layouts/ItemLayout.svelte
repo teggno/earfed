@@ -24,15 +24,16 @@
         flex-direction: column;
         justify-content: center;
         flex-grow: 1;
-        padding: var(--spacing-2);
+        padding: 0 var(--spacing-2);
         overflow: hidden;
     }
 
     /* Targets the element passed for the title slot */
     .text > :global(*):first-child {
         margin-bottom: var(--spacing-2);
-        max-height: 2em;
         overflow: hidden;
+        /* two lines of text */
+        max-height: calc(var(--font-size-small) * var(--assumed-normal-lh) * 2);
     }
 
     .actions {
@@ -43,9 +44,11 @@
 </style>
 
 <div class="root">
-    <div class="image">
-        <slot name="image" />
-    </div>
+    {#if $$slots.image}
+        <div class="image">
+            <slot name="image" />
+        </div>
+    {/if}
     <div class="text">
         <slot name="title" />
         <slot name="subtitle" />

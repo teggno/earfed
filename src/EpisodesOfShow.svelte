@@ -37,10 +37,6 @@
     padding: var(--spacing-3);
   }
 
-  li :global(*) {
-    cursor: inherit;
-  }
-
   .pubDate {
     font-size: var(--font-size-small);
     color: var(--color-text-muted);

@@ -43,7 +43,6 @@
                 {formatDate(new Date(episode.releaseDate))}
                 &#149;
                 <a
-                    class="showLink"
                     href={makeUrl(episode.collectionId)}>{episode.collectionName}</a>
             </ItemSubtitle>
         </div>

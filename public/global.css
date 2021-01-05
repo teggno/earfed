@@ -8,7 +8,8 @@
   --color-danger: rgb(190, 0, 0);
   --color-background-outside: #ddd;
   --color-background: #f1f1f1;
-  --color-text: #332;
+  --color-text: #333;
+  --color-text-muted-little: #666;
   --color-text-muted: #888;
   --color-disabled: #aaa;
   --input-border: 1px solid #aaa;

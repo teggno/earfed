@@ -20,6 +20,8 @@ export function parseShowFeed(feedXmlDocument) {
       // TODO: as seen these images can get quite big. So maybe pass them
       // through some image resize (and then caching) service.
       show.showImageUrl = node.getAttribute("href");
+    } else if (node.nodeName === "itunes:author") {
+      show.artistName = node.textContent;
     } else if (node.nodeName === "item") {
       const episode = parseEpisode(node);
       if (episode) {

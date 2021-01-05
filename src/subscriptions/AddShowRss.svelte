@@ -6,7 +6,7 @@
 
   function handleSubmit(e) {
     e.preventDefault();
-    navigate("/subscriptions/subscribe?" + makeUrl(url.trim()));
+    navigate("/subscriptions/shows/rss?" + makeUrl(url.trim()));
   }
 </script>
 
