@@ -63,6 +63,7 @@
   }
 
   .rightOfImage {
+    position: relative;
     padding: var(--spacing-2);
     padding-left: 0;
     margin-left: var(--spacing-2);
@@ -72,9 +73,8 @@
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
-    position: relative;
-    align-self: stretch;
     flex-grow: 1;
+    align-self: stretch;
   }
 
   /* The overflow:hidden on the li prevents the focus box-shadow from 
@@ -165,7 +165,9 @@
         on:click={handleExpandClick}
         ariaExpanded={expanded}>
         <span class="episodeTitle">{episodeTitle}</span>
-        <span class="showTitle">{formatDate(pubDate)} &#149; {showTitle}</span>
+        <span class="showTitle">{!!pubDate && formatDate(pubDate)}
+          &#149;
+          {showTitle}</span>
       </button>
       {#if dragHandleVisible}
         <div class="dragHandle">

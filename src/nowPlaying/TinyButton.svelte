@@ -21,7 +21,7 @@
     }
 
     button:not(:disabled):active {
-        transform: scale(0.85);
+        transform: var(--button-press-transform);
     }
 
     button:disabled {
