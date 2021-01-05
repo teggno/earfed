@@ -76,8 +76,10 @@
       replaceState((old) => ({ ...old, searchText }));
     });
   }
-  function handleFocus(e) {
+
+  function handleTouchStart(e) {
     e.target.select();
+    e.preventDefault();
   }
 
   function handleShowsClick() {
@@ -106,7 +108,7 @@
   <input
     id="searchField"
     type="search"
-    on:focus={handleFocus}
+    on:touchstart={handleTouchStart}
     bind:value={searchText} />
   <button>Go</button>
 </form>
