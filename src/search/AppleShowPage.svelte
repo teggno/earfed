@@ -5,7 +5,7 @@
 
   function collectionIdFromUrl() {
     const parts = location.href.split("/");
-    return parts[parts.length - 1];
+    return parseInt(parts[parts.length - 1]);
   }
 </script>
 
