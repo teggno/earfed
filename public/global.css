@@ -78,6 +78,9 @@ body {
 body,
 body * {
   box-sizing: border-box;
+}
+
+body *:not(input):not(textarea) {
   user-select: none;
   -webkit-user-select: none;
 }
