@@ -7,6 +7,6 @@ export function parseQuery(query) {
         const [k, v] = cur.split("=");
         prev[k] = v;
         return prev;
-      }, {}) ?? {}
+      }, {}) || {}
   );
 }
