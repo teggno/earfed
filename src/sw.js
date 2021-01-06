@@ -31,7 +31,7 @@ registerRoute(/.*\/livereload.js(\?.+)[0, 1]/, new NetworkOnly());
 registerRoute(
   ({ request }) =>
     request.destination === "audio" || request.destination === "video", // NOTE: due to a bug in chromium, we also check for video
-  ({ request }) => {
+  ({ request, event }) => {
     if (request.headers.has("range")) {
       request = new Request(request, {
         headers: {
@@ -39,8 +39,8 @@ registerRoute(
         },
       });
     }
-    // return event.respondWith(fetch(request));
-    return new NetworkOnly().handle({ request });
+    return event.respondWith(fetch(request));
+    // return new NetworkOnly().handle({ request });
   }
 );
 
