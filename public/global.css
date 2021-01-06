@@ -146,7 +146,7 @@ input:focus-visible {
 }
 
 input[type="search"] {
-  -webkit-appearance: textfield;
+  -webkit-appearance: none;
 }
 
 input[type="search"]::-webkit-search-decoration {
