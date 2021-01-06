@@ -12,14 +12,13 @@
   } from "./notificationBarService";
   import NowPlaying, { sizes } from "./nowPlaying/NowPlaying.svelte";
   import * as playerService from "./playerService";
-  import Playlist from "./queue/Playlist.svelte";
   import {
     episodeAfter,
     firstEpisode,
     lastPlayedEpisode,
-    playlist,
-    refreshPlaylist,
-  } from "./playlistService";
+    queueState,
+  } from "./queueService";
+  import { refreshUserDataEpisodes } from "./episodeService";
   import Route from "./routing/Route.svelte";
   import Router from "./routing/Router.svelte";
   import Search from "./search/Search.svelte";
@@ -30,6 +29,7 @@
     virtualkeyboard,
   } from "./virtualKeyboardDetector";
   import { loaded } from "./threeState";
+  import QueuePage from "./queue/QueuePage.svelte";
 
   initAnimationTargetRect();
 
@@ -84,7 +84,7 @@
             currentSecond,
             new Date()
           );
-          refreshPlaylist();
+          refreshUserDataEpisodes();
         } else if (status === playerService.ended) {
           const episodeToPlayNext = await getEpisodeToPlayNext(episode);
           if (episodeToPlayNext) {
@@ -93,7 +93,7 @@
             playerService.forgetEpisode();
           }
           await setEpisodeEnded(episode.episodeId, new Date());
-          refreshPlaylist();
+          refreshUserDataEpisodes();
         }
       }
     );
@@ -109,12 +109,12 @@
 
   function preloadNotificationBarShowImages() {
     if (!supportsNotificationBar()) return () => {};
-    return playlist.subscribe((list) => {
+    return queueState.subscribe((list) => {
       showImageUrls =
         list.state === loaded
           ? Object.keys(
-              list.data.reduce((prev, playlistItem) => {
-                prev[playlistItem.showImageUrl] = true;
+              list.data.reduce((prev, queueItem) => {
+                prev[queueItem.showImageUrl] = true;
                 return prev;
               }, {})
             ).map(showImageUrlMedium)
@@ -228,12 +228,12 @@
 <div class:withBottomBarPadding={!virtualKeyboardVisible}>
   <main>
     <Router>
-      <Route component={Playlist} path="" getProps={() => ({ playlist })} />
+      <Route component={QueuePage} path="" getProps={() => ({ queueState })} />
       <Route component={Subscriptions} path="subscriptions" />
       <Route
         component={Search}
         path="search"
-        getProps={(innerState) => ({ ...innerState, playlist })} />
+        getProps={(innerState) => ({ ...innerState, queueState })} />
       <Route component={AddShowRss} path="subscriptions/addrss" />
       <Route component={RssShowPage} path="subscriptions/shows/rss" />
       <Route

@@ -4,7 +4,7 @@
     import ItemSubtitle from "../layouts/ItemSubtitle.svelte";
     import ItemTitle from "../layouts/ItemTitle.svelte";
     import ListLayout from "../layouts/ListLayout.svelte";
-    import { enqueue } from "../playlistService";
+    import { enqueue } from "../queueService";
     import {
         episodeRecord,
         showRecord,

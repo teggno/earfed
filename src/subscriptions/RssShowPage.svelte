@@ -11,7 +11,7 @@
 <script>
   import { derived } from "svelte/store";
   import EpisodesOfShow from "../EpisodesOfShow.svelte";
-  import { enqueue, playlist as playlistState } from "../playlistService";
+  import { enqueue, queueState } from "../queueService";
   import {
     episodeRecord,
     fetchShow,
@@ -44,11 +44,11 @@
   );
 
   const episodesState = derived(
-    [rssShowState, playlistState],
-    whenLoaded(([show, playlist]) =>
+    [rssShowState, queueState],
+    whenLoaded(([show, queue]) =>
       show.episodes.map((e) => ({
         ...e,
-        queued: playlist.some((ple) => ple.guid === e.guid),
+        queued: queue.some((ple) => ple.guid === e.guid),
       }))
     )
   );

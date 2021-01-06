@@ -31,7 +31,7 @@
   import { tick } from "svelte";
   import { showImageUrlThumb } from "../config";
   import EpisodeDescription from "../queue/EpisodeDescription.svelte";
-  import { removeEpisode } from "../playlistService";
+  import { removeEpisode } from "../queueService";
   import TinyButton from "./TinyButton.svelte";
 
   $: disabled = $playerInfo.status === noEpisode;

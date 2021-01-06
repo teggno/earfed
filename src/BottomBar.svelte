@@ -1,6 +1,6 @@
 <script>
   import BottomBarButton from "./BottomBarButton.svelte";
-  import PlaylistIcon from "./icons/PlaylistIcon.svelte";
+  import QueueIcon from "./icons/QueueIcon.svelte";
   import SearchIcon from "./icons/SearchIcon.svelte";
   import SubscriptionsIcon from "./icons/SubscriptionsIcon.svelte";
 
@@ -22,7 +22,7 @@
 
 <div>
   <BottomBarButton text={'Queue'} path="/">
-    <PlaylistIcon />
+    <QueueIcon />
   </BottomBarButton>
   <BottomBarButton
     text={'Subscriptions'}

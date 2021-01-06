@@ -1,15 +1,15 @@
 <script>
   import PageTitle from "../PageTitle.svelte";
-  import PlaylistItem from "./PlaylistItem.svelte";
+  import QueueItem from "./QueueItem.svelte";
   import { playerInfo, playing } from "../playerService";
   import { areEpisodesEqual } from "../episode";
   import { afterUpdate } from "svelte";
   import orderable from "../actions/orderableAction";
   import { putEpisodeOrder } from "../userData/episodeOrder";
-  import { refreshOrder } from "../playlistService";
+  import { refreshOrder } from "../queueService";
   import { loaded } from "../threeState";
 
-  export let playlist;
+  export let queueState;
   let expandedEpisode;
   let indexOfPreviouslyExpandedEpisode = -1;
   let dragHandleVisible = false;
@@ -20,7 +20,7 @@
   $: playerPlaying = $playerInfo.status === playing;
 
   afterUpdate(() => {
-    const { state, data } = $playlist;
+    const { state, data } = $queueState;
     indexOfPreviouslyExpandedEpisode =
       state === loaded
         ? data.findIndex((e) => areEpisodesEqual(e, expandedEpisode))
@@ -49,7 +49,7 @@
 
     const { orderedNodeIndex, targetNodeIndex, beforeTargetNode } = detail;
     console.log(detail);
-    const items = $playlist.data;
+    const items = $queueState.data;
     const newOrder = items.flatMap((item, index) => {
       if (index === orderedNodeIndex) {
         return [];
@@ -82,7 +82,7 @@
     border-top-style: solid;
     border-bottom-style: solid;
     border-color: #444;
-    /* NOTE: The transition is set in PlaylistItem because there is another transition too. Ugly but avoids a wrapper element.*/
+    /* NOTE: The transition is set in QueueItem because there is another transition too. Ugly but avoids a wrapper element.*/
   }
 
   ul > :global(li.dropBefore) {
@@ -97,14 +97,14 @@
 
 <div>
   <PageTitle>Episode Queue</PageTitle>
-  {#if $playlist.state === 'loaded'}
+  {#if $queueState.state === 'loaded'}
     <ul
       use:orderable={{ css: { beforeClass: 'dropBefore', afterClass: 'dropAfter' } }}
       on:orderstart={handleOrderStart}
       on:orderend={handleOrderEnd}
       bind:this={ul}>
-      {#each $playlist.data as episode, index (episodeKey(episode.episodeId))}
-        <PlaylistItem
+      {#each $queueState.data as episode, index (episodeKey(episode.episodeId))}
+        <QueueItem
           {episode}
           playing={playerPlaying && currentEpisode && areEpisodesEqual(currentEpisode, episode)}
           expanded={areEpisodesEqual(expandedEpisode, episode)}

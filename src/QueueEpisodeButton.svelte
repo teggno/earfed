@@ -1,6 +1,6 @@
 <script>
     import AddEpisodeToQueueIcon from "./icons/AddEpisodeToQueueIcon.svelte";
-    import EpisodeAddedToPlaylistIcon from "./icons/EpisodeAddedToPlaylistIcon.svelte";
+    import EpisodeAddedToQueueIcon from "./icons/EpisodeAddedToQueueIcon.svelte";
 
     export let queued;
 </script>
@@ -22,7 +22,7 @@
 
 {#if queued}
     <div class="added">
-        <EpisodeAddedToPlaylistIcon />
+        <EpisodeAddedToQueueIcon />
     </div>
 {:else}
     <button on:click title="Add to Queue" on:touchstart|passive>

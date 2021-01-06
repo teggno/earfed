@@ -1,7 +1,6 @@
 import { allShowsStore, refreshShows } from "./showService";
 import {
   addEpisodes,
-  queryListedEpisodes,
   status,
   removeEpisode as removeEpisodeFromDb,
 } from "./userData/episodes";
@@ -12,21 +11,15 @@ import { areEpisodesEqual } from "./episode";
 import { getEpisodeOrder } from "./userData/episodeOrder";
 import { addShowIfNotAdded } from "./userData/shows";
 import { initial, loaded } from "./threeState";
+import {
+  userDataEpisodesStore,
+  refreshUserDataEpisodes,
+} from "./episodeService";
 
-const once1 = oncer();
-const once2 = oncer();
-
-const listedEpisodesStore = writable({ state: initial, data: [] }, (set) => {
-  once1(() =>
-    queryListedEpisodes().then((data) => {
-      set({ state: loaded, data });
-    })
-  );
-  return () => {};
-});
+const once = oncer();
 
 const episodeIdsOrderedStore = writable({ state: initial, data: [] }, (set) => {
-  once2(() =>
+  once(() =>
     getEpisodeOrder().then((data) => {
       set({ state: loaded, data: data || [] });
     })
@@ -34,8 +27,8 @@ const episodeIdsOrderedStore = writable({ state: initial, data: [] }, (set) => {
   return () => {};
 });
 
-export const playlist = derived(
-  [allShowsStore, listedEpisodesStore, episodeIdsOrderedStore],
+export const queueState = derived(
+  [allShowsStore, userDataEpisodesStore, episodeIdsOrderedStore],
   ([shows, listedEpisodes, episodeIdsOrdered]) => {
     if (
       shows.state === loaded &&
@@ -70,12 +63,6 @@ export const playlist = derived(
   }
 );
 
-export function refreshPlaylist() {
-  return queryListedEpisodes().then((data) =>
-    listedEpisodesStore.set({ state: loaded, data })
-  );
-}
-
 export function refreshOrder() {
   getEpisodeOrder().then((ordered) =>
     episodeIdsOrderedStore.set({ state: loaded, data: ordered || [] })
@@ -87,11 +74,11 @@ function episodeStringKey({ provider, providerEpisodeId }) {
 }
 
 export function lastPlayedEpisode() {
-  return playlistEpisodes().then(findLastPlayedEpisode);
+  return queueEpisodes().then(findLastPlayedEpisode);
 }
 
 export async function episodeAfter(episode) {
-  const episodes = await playlistEpisodes();
+  const episodes = await queueEpisodes();
   const indexOfEpisode = episodes.findIndex((e) =>
     areEpisodesEqual(e, episode)
   );
@@ -99,14 +86,14 @@ export async function episodeAfter(episode) {
 }
 
 export async function firstEpisode() {
-  const episodes = await playlistEpisodes();
+  const episodes = await queueEpisodes();
   return episodes[0];
 }
 
-function playlistEpisodes() {
+function queueEpisodes() {
   let unsubscribe;
   return new Promise((resolve) => {
-    unsubscribe = playlist.subscribe(({ state, data }) => {
+    unsubscribe = queueState.subscribe(({ state, data }) => {
       if (state === loaded) {
         resolve(data);
       }
@@ -158,10 +145,10 @@ export async function enqueue(showRecord, episodeRecord) {
   if (showAdded) {
     await refreshShows();
   }
-  await refreshPlaylist();
+  await refreshUserDataEpisodes();
 }
 
 export async function removeEpisode(episodeId) {
   await removeEpisodeFromDb(episodeId, new Date());
-  await refreshPlaylist();
+  await refreshUserDataEpisodes();
 }

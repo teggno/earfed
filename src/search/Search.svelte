@@ -13,13 +13,13 @@
   export let searchText = "";
   export let pageYOffset = undefined;
   export let showingShows = true;
-  export let playlist;
+  export let queueState;
 
   let shows = [];
   const appleEpisodesStore = writableThreeState();
 
   const episodes = derived(
-    [playlist, appleEpisodesStore],
+    [queueState, appleEpisodesStore],
     whenLoaded(([queue, appleEpisodes]) =>
       appleEpisodes.map((ae) => ({
         ...ae,
