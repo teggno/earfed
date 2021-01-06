@@ -7,6 +7,7 @@
   import { loaded, whenLoaded, writableThreeState } from "../threeState";
   import { debounce } from "../utils";
   import EpisodeList from "./EpisodeList.svelte";
+  import SearchForm from "./SearchForm.svelte";
   import ShowList from "./ShowList.svelte";
 
   export let searchText = "";
@@ -67,19 +68,11 @@
     });
   }
 
-  function handleSubmit(e) {
-    e.preventDefault();
-
-    if (!searchText || !searchText.trim()) return;
-
+  function handleSearch({ detail: { searchText: newSearchText } }) {
+    searchText = newSearchText;
     search().then(() => {
       replaceState((old) => ({ ...old, searchText }));
     });
-  }
-
-  function handleTouchStart(e) {
-    e.target.select();
-    e.preventDefault();
   }
 
   function handleShowsClick() {
@@ -103,15 +96,7 @@
 <style>
 </style>
 
-<form on:submit={handleSubmit}>
-  <label for="searchField">Search</label>
-  <input
-    id="searchField"
-    type="search"
-    on:touchstart={handleTouchStart}
-    bind:value={searchText} />
-  <button>Go</button>
-</form>
+<SearchForm {searchText} on:search={handleSearch} />
 {#if shows.length && $episodes.state === loaded && $episodes.data.length}
   <div>
     <button
