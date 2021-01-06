@@ -145,6 +145,14 @@ input:focus-visible {
   box-shadow: var(--focus-shadow);
 }
 
+input[type="search"] {
+  -webkit-appearance: textfield;
+}
+
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
 .pointer {
   cursor: pointer;
   /* chrome on android makes stuff that has `cursor: pointer` 
