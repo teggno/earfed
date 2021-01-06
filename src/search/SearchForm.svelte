@@ -28,6 +28,7 @@
         spellcheck={false}
         autocorrect="off"
         autocomplete="off"
+        autocapitalize="off"
         on:touchstart={handleTouchStart}
         bind:value={searchText} />
     <button>Go</button>
