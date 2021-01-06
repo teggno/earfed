@@ -17,8 +17,7 @@ if (process.env.NODE_ENV === "production") {
   // files.
   precacheAndRoute(self.__WB_MANIFEST);
 } else {
-  // For development serve app assets from network always. Only works if precacheAndRoute
-  // (above) is commented out
+  // For development serve app assets from network always.
   registerRoute(
     ({ request }) => new URL(request.url).origin === self.origin,
     new NetworkOnly()
