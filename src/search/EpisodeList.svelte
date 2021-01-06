@@ -15,9 +15,7 @@
     export let episodes = [];
 
     function handleQueueEpisodeClick(episode) {
-        const sr = showRecord(episode);
-        const er = episodeRecord(episode);
-        enqueue(sr, er);
+        enqueue(showRecord(episode), episodeRecord(episode));
     }
 </script>
 
