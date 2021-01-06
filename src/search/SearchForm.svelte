@@ -25,6 +25,9 @@
     <input
         id="searchField"
         type="search"
+        spellcheck={false}
+        autocorrect="off"
+        autocomplete="off"
         on:touchstart={handleTouchStart}
         bind:value={searchText} />
     <button>Go</button>
