@@ -47,12 +47,10 @@
   const dispatch = createEventDispatcher();
   function handleClick() {
     if (!playing) {
-      // play(episode);
       if (animationStatus === "notRunning") {
         animatePlay();
       }
     } else {
-      // pause();
     }
     dispatch("click");
   }

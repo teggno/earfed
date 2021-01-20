@@ -1,7 +1,6 @@
 <script lang="ts">
   import PageTitle from "../PageTitle.svelte";
   import QueueItem from "./QueueItem.svelte";
-  // import { playerInfo, PlayerStatus } from "../playerServiceOld";
   import player from "../player/player";
   import { afterUpdate } from "svelte";
   import orderable from "../actions/orderableAction";
@@ -44,7 +43,7 @@
   }
 
   function togglePlay(episode: AppleEpisode | RssEpisode) {
-    if (currentEpisode === episode) {
+    if (currentEpisode?.uniqueEpisodeId === episode?.uniqueEpisodeId) {
       if (playing) {
         player.pause();
       } else {
