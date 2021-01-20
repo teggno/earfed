@@ -15,7 +15,7 @@ export async function getEpisodeOrder() {
 }
 
 export async function addEpisodesToEnd(
-  store: EpisodeOrderStore,
+  store: EpisodeOrderStore<"readwrite">,
   episodeIdsOrdered: UniqueEpisodeId[],
   date: Date
 ) {
@@ -33,7 +33,7 @@ export async function addEpisodesToEnd(
 }
 
 export async function removeEpisodeOrder(
-  store: EpisodeOrderStore,
+  store: EpisodeOrderStore<"readwrite">,
   uniqueEpisodeId: UniqueEpisodeId,
   date: Date
 ) {
@@ -61,14 +61,14 @@ export async function putEpisodeOrder(episodeIdsOrdered: UniqueEpisodeId[]) {
   return putEpisodeOrderInternal(store, episodeIdsOrdered, new Date());
 }
 
-function getEpisodeOrderInternal(
-  store: EpisodeOrderStore
+function getEpisodeOrderInternal<M extends IDBTransactionMode>(
+  store: EpisodeOrderStore<M>
 ): Promise<EpisodeOrderValue | undefined> {
   return store.get(key);
 }
 
 function putEpisodeOrderInternal(
-  store: EpisodeOrderStore,
+  store: EpisodeOrderStore<"readwrite">,
   episodeIdsOrdered: UniqueEpisodeId[],
   date: Date
 ) {

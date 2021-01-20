@@ -82,12 +82,20 @@ interface UserDataDb extends DBSchema {
   episodes: EpisodesStructure;
 }
 
-type UserDataDbStore<T extends StoreNames<UserDataDb>> = IDBPObjectStore<
-  UserDataDb,
-  StoreNames<UserDataDb>[],
-  T
->;
+type UserDataDbStore<
+  T extends StoreNames<UserDataDb>,
+  M extends IDBTransactionMode
+> = IDBPObjectStore<UserDataDb, StoreNames<UserDataDb>[], T, M>;
 
-export type ShowStore = UserDataDbStore<ShowsStoreName>;
-export type EpisodeStore = UserDataDbStore<EpisodeOrderStoreName>;
-export type EpisodeOrderStore = UserDataDbStore<EpisodeOrderStoreName>;
+export type ShowStore<M extends IDBTransactionMode> = UserDataDbStore<
+  ShowsStoreName,
+  M
+>;
+export type EpisodeStore<M extends IDBTransactionMode> = UserDataDbStore<
+  EpisodeOrderStoreName,
+  M
+>;
+export type EpisodeOrderStore<M extends IDBTransactionMode> = UserDataDbStore<
+  EpisodeOrderStoreName,
+  M
+>;
