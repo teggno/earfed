@@ -1,35 +1,133 @@
 <script>
-    import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher } from "svelte";
+  import SearchIcon from "../icons/SearchIcon.svelte";
+  import { fade } from "svelte/transition";
+  export let searchText = "";
+  const dispatch = createEventDispatcher();
 
-    export let searchText = "";
-    const dispatch = createEventDispatcher();
+  let focused = false;
 
-    function handleSubmit(e) {
-        e.preventDefault();
+  function handleSubmit(e) {
+    e.preventDefault();
 
-        e.target.querySelector("input[type='search']").blur();
+    e.target.querySelector("input[type='search']").blur();
 
-        if (searchText && searchText.trim()) {
-            dispatch("search", { searchText });
-        }
+    if (searchText && searchText.trim()) {
+      dispatch("search", { searchText });
     }
+  }
 
-    function handleTouchStart(e) {
-        e.target.select();
-        e.preventDefault();
-    }
+  function handleTouchStart(e) {
+    e.target.select();
+    e.preventDefault();
+  }
+
+  function handleFocus() {
+    focused = true;
+  }
+
+  function handleBlur() {
+    focused = false;
+  }
 </script>
 
 <form on:submit={handleSubmit}>
-    <label for="searchField">Search</label>
+  <!-- <label for="searchField">Search</label> -->
+  <div class="fieldWrapper" class:focused>
+    <div class="searchIconWrapper">
+      <SearchIcon />
+    </div>
     <input
-        id="searchField"
-        type="search"
-        spellcheck={false}
-        autocorrect="off"
-        autocomplete="off"
-        autocapitalize="off"
-        on:touchstart={handleTouchStart}
-        bind:value={searchText} />
-    <button>Go</button>
+      id="searchField"
+      aria-label="Enter Search Text"
+      placeholder="Podcast or Episode"
+      type="search"
+      spellcheck={false}
+      autocorrect="off"
+      autocomplete="off"
+      autocapitalize="off"
+      on:touchstart={handleTouchStart}
+      on:focus={handleFocus}
+      on:blur={handleBlur}
+      bind:value={searchText}
+    />
+    {#if focused}
+      <button transition:fade title="Search"
+        ><SearchIcon title="Search" /></button
+      >
+    {/if}
+  </div>
 </form>
+
+<style>
+  .fieldWrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 0 0 var(--input-padding);
+    border: var(--input-border);
+    border-radius: var(--input-border-radius);
+    background: var(--color-input-background);
+
+    --icon-size: calc(var(--assumed-normal-lh) * var(--font-size-large));
+  }
+
+  input {
+    flex-grow: 1;
+    flex-shrink: 0;
+    border: 0;
+    margin: var(--input-padding) 0;
+    padding: 0;
+    background: transparent;
+    align-self: stretch;
+    height: var(--icon-size);
+    font-size: var(--font-size-large);
+  }
+
+  input:focus,
+  input:focus-visible {
+    /*remove focus indication because it mus be given to .fieldWrapper */
+    box-shadow: none;
+  }
+
+  .searchIconWrapper :global(svg) {
+    width: 100%;
+    height: 100%;
+    fill: var(--color-input-placeholder);
+  }
+  .searchIconWrapper {
+    display: flex;
+    justify-content: center;
+    height: var(--icon-size);
+    width: var(--icon-size);
+    transition: all 0.4s;
+  }
+  .focused .searchIconWrapper {
+    width: 0;
+    height: 0;
+  }
+
+  .focused .searchIconWrapper :global(*) {
+    /* width: 100%;
+    height: 100%; */
+    /* visibility: hidden; */
+  }
+
+  button {
+    border: 0 none;
+    /* opacity: 0; */
+    background-color: transparent;
+    /* transition: opacity 0.4s; */
+    display: flex;
+    padding: var(--input-padding);
+  }
+
+  .focused button {
+    /* opacity: 1; */
+  }
+
+  button :global(*) {
+    width: var(--icon-size);
+    height: var(--icon-size);
+  }
+</style>

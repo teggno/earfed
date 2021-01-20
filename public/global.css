@@ -26,6 +26,11 @@
   --lh-copy: 160%;
   --focus-shadow: 0 0 3pt 2pt #ff6600;
   --color-hover: #e6e6e6;
+  --color-input-background: white;
+  --input-border: 1px solid #ccc;
+  --input-border-radius: 2px;
+  --input-padding: 0.4em;
+  --color-input-placeholder: #888;
 
   /* browser's "normal" line height if not set otherwise */
   --assumed-normal-lh: 1.2;
@@ -108,10 +113,14 @@ select,
 textarea {
   font-family: inherit;
   font-size: inherit;
-  -webkit-padding: 0.4em 0;
-  padding: 0.4em;
-  border: 1px solid #ccc;
-  border-radius: 2px;
+  -webkit-padding: var(--input-pading);
+  padding: var(--input-padding);
+  border: var(--input-border);
+  border-radius: var(--input-border-radius);
+}
+
+input::placeholder {
+  color: var(--color-input-placeholder);
 }
 
 button:not(:disabled) {

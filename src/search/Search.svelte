@@ -113,7 +113,9 @@
   }
 </script>
 
-<SearchForm {searchText} on:search={handleSearch} />
+<div class="searchFormWrapper">
+  <SearchForm {searchText} on:search={handleSearch} />
+</div>
 {#if shows.length && episodes.state === loaded && episodes.data.length}
   <div>
     <button on:click={handleShowsClick} type="button" disabled={showingShows}
@@ -143,4 +145,7 @@
 {/if}
 
 <style>
+  .searchFormWrapper {
+    padding: var(--spacing-3);
+  }
 </style>
