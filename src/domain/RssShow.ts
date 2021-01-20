@@ -70,7 +70,7 @@ export default class RssShow extends ShowBase {
   makeShowId(): RssShowId {
     return {
       provider: Provider.Rss,
-      providerShowId: this.rssFeedUrl,
+      rssFeedUrl: this.rssFeedUrl,
     };
   }
 }

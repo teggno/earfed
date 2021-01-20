@@ -23,11 +23,7 @@ export async function allShows() {
   });
 }
 
-export async function findShow(
-  showId:
-    | { collectionId: AppleCollectionId; provider: Provider.Apple }
-    | { rssFeedUrl: RssFeedUrl; provider: Provider.Rss }
-) {
+export async function findShow(showId: ShowId) {
   const db = await openUserDataDb();
   return await db.get(
     showsMetadata.storeName,
@@ -91,8 +87,8 @@ export async function unsubscribeFromShow(showId: ShowId, date: Date) {
 
 function showIdToTuple(showId: ShowId) {
   return showId.provider === Provider.Apple
-    ? ([showId.provider, showId.providerShowId] as [Provider.Apple, number])
-    : ([showId.provider, showId.providerShowId] as [Provider.Rss, string]);
+    ? ([showId.provider, showId.collectionId] as [Provider.Apple, number])
+    : ([showId.provider, showId.rssFeedUrl] as [Provider.Rss, string]);
 }
 
 function showInputToShowValue(

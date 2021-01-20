@@ -70,7 +70,7 @@ export default class AppleShow extends ShowBase {
   makeShowId(): AppleShowId {
     return {
       provider: Provider.Apple,
-      providerShowId: this.collection.value.collectionId,
+      collectionId: this.collection.value.collectionId,
     };
   }
 }

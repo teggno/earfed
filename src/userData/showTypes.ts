@@ -11,14 +11,26 @@ export interface RssShowProviderMapping {
   rssFeedUrl: RssFeedUrl;
 }
 
-export interface AppleShowId {
+export interface AppleShowKey {
   provider: Provider.Apple;
   providerShowId: AppleCollectionId;
 }
 
-export interface RssShowId {
+export interface RssShowKey {
   provider: Provider.Rss;
   providerShowId: RssFeedUrl;
+}
+
+export type ShowKey = AppleShowKey | RssShowKey;
+
+export interface AppleShowId {
+  provider: Provider.Apple;
+  collectionId: AppleCollectionId;
+}
+
+export interface RssShowId {
+  provider: Provider.Rss;
+  rssFeedUrl: RssFeedUrl;
 }
 
 export type ShowId = AppleShowId | RssShowId;
@@ -32,11 +44,11 @@ export interface ShowValueBase {
   status: { value: ShowStatus; updated: Date };
 }
 
-export interface AppleShowValue extends AppleShowId, ShowValueBase {
+export interface AppleShowValue extends AppleShowKey, ShowValueBase {
   collection: { value: AppleCollection; updated: Date };
 }
 
-export interface RssShowValue extends RssShowId, ShowValueBase {
+export interface RssShowValue extends RssShowKey, ShowValueBase {
   channel: { value: RssChannel; updated: Date };
 }
 

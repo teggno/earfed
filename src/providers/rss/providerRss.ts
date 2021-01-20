@@ -4,12 +4,6 @@ import parseXmlString from "../../xml";
 import { RssItem, EpisodeDescriptionType } from "../../userData/episodeTypes";
 import type { RssChannelWithItems } from "../../userData/showTypes";
 
-export const rss = "rss";
-
-export function providerFor(showProviderMapping: RssShowProviderMapping) {
-  return typeof showProviderMapping.rssFeedUrl !== "undefined";
-}
-
 export async function fetchChannel(rssFeedUrl: string) {
   const feedXmlString = await fetch(
     `${corsProxyUrl ? corsProxyUrl + "/" : ""}${rssFeedUrl}`
@@ -25,22 +19,6 @@ export async function fetchChannel(rssFeedUrl: string) {
     );
   }
   return wrapper.rssChannel;
-}
-
-export function showRecord({ rssFeedUrl }: { rssFeedUrl: string }) {
-  return {
-    provider: rss,
-    providerShowId: rssFeedUrl,
-    providerMapping: makeShowProviderMapping(rssFeedUrl),
-  };
-}
-
-export function episodeRecord({ guid }: { guid: string }) {
-  return { providerEpisodeId: guid, providerMapping: { guid } };
-}
-
-function makeShowProviderMapping(rssFeedUrl: string) {
-  return { rssFeedUrl };
 }
 
 function validateChannel(
@@ -92,10 +70,6 @@ function validateItem(
           description: parsedItem.description ?? emptyEpisodeDescription(),
         },
       };
-}
-
-interface RssShowProviderMapping {
-  rssFeedUrl: string;
 }
 
 function emptyEpisodeDescription() {
