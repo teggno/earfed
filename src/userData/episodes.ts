@@ -20,8 +20,8 @@ import openUserDataDb, {
 
 export async function allEpisodes() {
   const db = await openUserDataDb();
-  const episodes = await db.getAll(episodesMetadata.storeName);
-  return episodes.map((e) => {
+  const episodeValues = await db.getAll(episodesMetadata.storeName);
+  return episodeValues.map((e) => {
     if (e.provider === Provider.Apple) {
       const { providerEpisodeId, ...episode } = e;
       return episode;

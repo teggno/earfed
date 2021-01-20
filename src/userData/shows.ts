@@ -1,19 +1,26 @@
 import { Provider } from "../providers";
 import {
   AppleCollection,
-  AppleShowId,
+  AppleCollectionId,
   RssChannel,
-  RssShowId,
+  RssFeedUrl,
   ShowId,
   ShowStatus,
-  RssFeedUrl,
-  AppleCollectionId,
 } from "./showTypes";
 import openUserDataDb, { showsMetadata } from "./userDataDb";
 
 export async function allShows() {
   const db = await openUserDataDb();
-  return db.getAll(showsMetadata.storeName);
+  const showValues = await db.getAll(showsMetadata.storeName);
+  return showValues.map((s) => {
+    if (s.provider === Provider.Apple) {
+      const { providerShowId, ...show } = s;
+      return show;
+    } else {
+      const { providerShowId, ...show } = s;
+      return { ...show, rssFeedUrl: providerShowId };
+    }
+  });
 }
 
 export async function findShow(

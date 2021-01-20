@@ -1,6 +1,7 @@
 import { derived } from "svelte/store";
 import AppleShow from "./domain/AppleShow";
 import RssShow from "./domain/RssShow";
+import type { ArrayElement, PromiseValue } from "./helperTypes";
 import { Provider } from "./providers";
 import { lazyRefreshableThreeState, whenLoaded } from "./threeState";
 import {
@@ -9,11 +10,7 @@ import {
   subscribeToShow as subscribeToShowInDb,
   unsubscribeFromShow as unsubscribeFromShowInDb,
 } from "./userData/shows";
-import type {
-  AppleShowValue,
-  RssShowValue,
-  ShowId,
-} from "./userData/showTypes";
+import type { ShowId } from "./userData/showTypes";
 
 const [userDataShowsState, refreshShows] = lazyRefreshableThreeState(allShows);
 
@@ -33,12 +30,12 @@ export async function unsubscribeFromShow(showId: ShowId) {
   refreshShows();
 }
 
-export function showValueToShow(showValue: AppleShowValue | RssShowValue) {
+export function showValueToShow(showValue: AppleOrRssEpisode) {
   return showValue.provider === Provider.Apple
     ? new AppleShow(showValue.collection, showValue.status)
-    : new RssShow(
-        showValue.providerShowId,
-        showValue.channel,
-        showValue.status
-      );
+    : new RssShow(showValue.rssFeedUrl, showValue.channel, showValue.status);
 }
+
+type AppleOrRssEpisode = ArrayElement<
+  PromiseValue<ReturnType<typeof allShows>>
+>;
