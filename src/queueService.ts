@@ -110,11 +110,9 @@ export async function enqueueAppleTrack(track: AppleTrack) {
     track,
   });
 
-  if (!showExists) {
-    refreshShows();
-  }
-  refreshOrder();
-  refreshUserDataEpisodes();
+  if (!showExists) await refreshShows();
+
+  refreshEpisodes();
 }
 
 async function addAppleShow(collectionId: number) {
@@ -140,9 +138,12 @@ export async function enqueueRssItem(rssFeedUrl: RssFeedUrl, item: RssItem) {
     item,
   });
 
-  if (!showExists) {
-    refreshShows();
-  }
+  if (!showExists) await refreshShows();
+
+  refreshEpisodes();
+}
+
+function refreshEpisodes() {
   refreshOrder();
   refreshUserDataEpisodes();
 }
