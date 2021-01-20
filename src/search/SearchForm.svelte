@@ -107,23 +107,11 @@
     height: 0;
   }
 
-  .focused .searchIconWrapper :global(*) {
-    /* width: 100%;
-    height: 100%; */
-    /* visibility: hidden; */
-  }
-
   button {
     border: 0 none;
-    /* opacity: 0; */
     background-color: transparent;
-    /* transition: opacity 0.4s; */
     display: flex;
     padding: var(--input-padding);
-  }
-
-  .focused button {
-    /* opacity: 1; */
   }
 
   button :global(*) {
