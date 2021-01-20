@@ -1,40 +1,62 @@
-<script>
+<script lang="ts">
   import PageTitle from "../PageTitle.svelte";
   import QueueItem from "./QueueItem.svelte";
-  import { playerInfo, playing } from "../playerService";
-  import { areEpisodesEqual } from "../episode";
+  // import { playerInfo, PlayerStatus } from "../playerServiceOld";
+  import player from "../player/player";
   import { afterUpdate } from "svelte";
   import orderable from "../actions/orderableAction";
   import { putEpisodeOrder } from "../userData/episodeOrder";
-  import { refreshOrder } from "../queueService";
+  import { queueState, refreshOrder } from "../queueService";
   import { loaded } from "../threeState";
+  import type AppleEpisode from "../domain/AppleEpisode";
+  import type RssEpisode from "../domain/RssEpisode";
 
-  export let queueState;
-  let expandedEpisode;
+  let expandedEpisode: { uniqueEpisodeId: string } | undefined;
   let indexOfPreviouslyExpandedEpisode = -1;
   let dragHandleVisible = false;
   let ul;
-  let indexOfOrderedItem;
+  let indexOfOrderedItem: number | undefined;
 
-  $: currentEpisode = $playerInfo.episode;
-  $: playerPlaying = $playerInfo.status === playing;
+  const playerStore = player.playerStore;
+
+  $: qs = $queueState;
+  $: playerInfo = $playerStore;
+  $: currentEpisode =
+    playerInfo.state === "hasEpisode" ? playerInfo.episode : undefined;
+  $: playing = playerInfo.state === "hasEpisode" && playerInfo.playing;
 
   afterUpdate(() => {
-    const { state, data } = $queueState;
+    if (qs.state !== "loaded") return;
+    const { state, data } = qs;
     indexOfPreviouslyExpandedEpisode =
       state === loaded
-        ? data.findIndex((e) => areEpisodesEqual(e, expandedEpisode))
+        ? data.findIndex(
+            (e) => e.uniqueEpisodeId === expandedEpisode?.uniqueEpisodeId
+          )
         : -1;
   });
 
-  function toggleExpanded(episode) {
-    expandedEpisode = areEpisodesEqual(expandedEpisode, episode)
-      ? undefined
-      : episode;
+  function toggleExpanded(episode: { uniqueEpisodeId: string }) {
+    expandedEpisode =
+      episode.uniqueEpisodeId === expandedEpisode?.uniqueEpisodeId
+        ? undefined
+        : episode;
   }
 
-  function episodeKey(episodeId) {
-    return `${episodeId.provider}_${episodeId.providerEpisodeId}`;
+  function togglePlay(episode: AppleEpisode | RssEpisode) {
+    if (currentEpisode === episode) {
+      if (playing) {
+        player.pause();
+      } else {
+        player.play();
+      }
+    } else {
+      player.setEpisode(episode);
+      if (episode.positionSeconds) {
+        player.seek(episode.positionSeconds);
+      }
+      player.play();
+    }
   }
 
   function handleOrderStart({ detail }) {
@@ -42,29 +64,72 @@
     dragHandleVisible = true;
   }
 
-  function handleOrderEnd({ detail }) {
+  function handleOrderEnd({
+    detail,
+  }: {
+    detail: {
+      orderedNodeIndex: number | undefined;
+      targetNodeIndex: number;
+      beforeTargetNode: boolean;
+    };
+  }) {
     dragHandleVisible = false;
 
+    if (qs.state !== loaded) return;
     if (typeof detail.orderedNodeIndex === "undefined") return;
 
     const { orderedNodeIndex, targetNodeIndex, beforeTargetNode } = detail;
-    console.log(detail);
-    const items = $queueState.data;
-    const newOrder = items.flatMap((item, index) => {
+    const queueEpisodes = qs.data;
+    const newOrder = queueEpisodes.flatMap((item, index) => {
       if (index === orderedNodeIndex) {
         return [];
       } else if (index === targetNodeIndex) {
         return beforeTargetNode
-          ? [items[orderedNodeIndex], item]
-          : [item, items[orderedNodeIndex]];
+          ? [queueEpisodes[orderedNodeIndex], item]
+          : [item, queueEpisodes[orderedNodeIndex]];
       } else {
         return [item];
       }
     });
-    putEpisodeOrder(newOrder.map(({ episodeId }) => episodeId));
+    putEpisodeOrder(newOrder.map(({ uniqueEpisodeId }) => uniqueEpisodeId));
     refreshOrder();
   }
 </script>
+
+<div>
+  <PageTitle>Episode Queue</PageTitle>
+  {#if qs.state === "loaded"}
+    <ul
+      use:orderable={{
+        css: { beforeClass: "dropBefore", afterClass: "dropAfter" },
+      }}
+      on:orderstart={handleOrderStart}
+      on:orderend={handleOrderEnd}
+      bind:this={ul}
+    >
+      {#each qs.data as episode, index (episode.uniqueEpisodeId)}
+        <QueueItem
+          {episode}
+          playing={playing &&
+            currentEpisode &&
+            currentEpisode.uniqueEpisodeId === episode.uniqueEpisodeId}
+          expanded={expandedEpisode &&
+            expandedEpisode.uniqueEpisodeId === episode.uniqueEpisodeId}
+          delayInTransition={indexOfPreviouslyExpandedEpisode !== -1 &&
+            indexOfPreviouslyExpandedEpisode < index}
+          {dragHandleVisible}
+          on:toggleplay={() => {
+            togglePlay(episode);
+          }}
+          on:click={() => {
+            if (index !== indexOfOrderedItem) toggleExpanded(episode);
+            indexOfOrderedItem = undefined;
+          }}
+        />
+      {/each}
+    </ul>
+  {/if}
+</div>
 
 <style>
   ul {
@@ -94,27 +159,3 @@
     border-bottom-width: 4px;
   }
 </style>
-
-<div>
-  <PageTitle>Episode Queue</PageTitle>
-  {#if $queueState.state === 'loaded'}
-    <ul
-      use:orderable={{ css: { beforeClass: 'dropBefore', afterClass: 'dropAfter' } }}
-      on:orderstart={handleOrderStart}
-      on:orderend={handleOrderEnd}
-      bind:this={ul}>
-      {#each $queueState.data as episode, index (episodeKey(episode.episodeId))}
-        <QueueItem
-          {episode}
-          playing={playerPlaying && currentEpisode && areEpisodesEqual(currentEpisode, episode)}
-          expanded={areEpisodesEqual(expandedEpisode, episode)}
-          delayInTransition={indexOfPreviouslyExpandedEpisode !== -1 && indexOfPreviouslyExpandedEpisode < index}
-          {dragHandleVisible}
-          on:click={() => {
-            if (index !== indexOfOrderedItem) toggleExpanded(episode);
-            indexOfOrderedItem = undefined;
-          }} />
-      {/each}
-    </ul>
-  {/if}
-</div>

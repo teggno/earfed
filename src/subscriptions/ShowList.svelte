@@ -1,10 +1,15 @@
-<script>
+<script type="ts">
   import ItemLayout from "../layouts/ItemLayout.svelte";
   import ItemSubtitle from "../layouts/ItemSubtitle.svelte";
   import ItemTitle from "../layouts/ItemTitle.svelte";
   import ListLayout from "../layouts/ListLayout.svelte";
 
-  export let shows = [];
+  export let shows = [] as {
+    showTitle: string;
+    artistName: string | undefined;
+    showImageUrl: string | undefined;
+    subscribedShowUrl: string;
+  }[];
 </script>
 
 <style>

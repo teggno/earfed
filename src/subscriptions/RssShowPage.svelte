@@ -1,5 +1,5 @@
-<script context="module">
-  export function makeUrl(rssFeedUrl) {
+<script context="module" lang="ts">
+  export function makeUrl(rssFeedUrl: string) {
     return `rssFeedUrl=${encodeURIComponent(rssFeedUrl)}`;
   }
 
@@ -8,72 +8,113 @@
   }
 </script>
 
-<script>
+<script lang="ts">
   import { derived } from "svelte/store";
-  import EpisodesOfShow from "../EpisodesOfShow.svelte";
-  import { enqueue, queueState } from "../queueService";
-  import {
-    episodeRecord,
-    fetchShow,
-    showRecord,
-  } from "../providers/rss/providerRss";
+  import RssEpisode from "../domain/RssEpisode";
+  import RssShow from "../domain/RssShow";
+  import EpisodeOfShow from "../EpisodeOfShow.svelte";
+  import { episodes as userDataEpisodesStore } from "../episodeService";
+  import ListLayout from "../layouts/ListLayout.svelte";
+  import { fetchChannel } from "../providers/rss/providerRss";
+  import { enqueueRssItem } from "../queueService";
   import Show from "../Show.svelte";
   import {
+    shows as userDataShowsState,
     subscribeToShow,
     unsubscribeFromShow,
-    userDataShowsState,
   } from "../showService";
-  import { loaded, threeStateFromPromise, whenLoaded } from "../threeState";
+  import {
+    loaded,
+    makeError,
+    makeInitial,
+    makeLoaded,
+    threeStateFromPromise,
+    whenLoaded,
+  } from "../threeState";
   import { parseQuery } from "../urls";
-  import { status } from "../userData/shows";
+  import { arrayToMap } from "../utils";
 
   const rssFeedUrl = rssFeedUrlFromQuery();
 
-  const rssShowState = threeStateFromPromise(fetchShow({ rssFeedUrl }));
+  const channelStateStore = threeStateFromPromise(fetchChannel(rssFeedUrl));
 
-  const showState = derived(
-    [rssShowState, userDataShowsState],
-    whenLoaded(([rssShow, userDataShows]) => ({
-      ...rssShow,
-      subscribed: userDataShows.some(
-        (uds) =>
-          uds.showId.providerShowId === rssFeedUrl &&
-          uds.status.value === status.subscribed
-      ),
-    }))
+  const showStateStore = derived(
+    [userDataShowsState, channelStateStore],
+    ([userDataShows, channelState], set) => {
+      if (userDataShows.state === loaded) {
+        const show = userDataShows.data.find(
+          (show) => show instanceof RssShow && show.sameShow(rssFeedUrl)
+        );
+        if (show) {
+          set(makeLoaded(show as RssShow));
+        } else if (channelState.state === "loaded") {
+          set(
+            makeLoaded(new RssShow(rssFeedUrl, { value: channelState.data }))
+          );
+        } else if (channelState.state === "error") {
+          set(makeError(channelState.error));
+        }
+      }
+    },
+    makeInitial<RssShow>()
+  );
+  $: showState = $showStateStore;
+
+  const episodesStateStore = derived(
+    [channelStateStore, userDataEpisodesStore, showStateStore],
+    whenLoaded(([channel, userDataEpisodes, show]) => {
+      const episodesFromDb = userDataEpisodes.filter(
+        (ue): ue is RssEpisode =>
+          ue instanceof RssEpisode && ue.uniqueShowId === show.uniqueShowId
+      );
+      const episodesById = arrayToMap(episodesFromDb, (e) => e.uniqueEpisodeId);
+      const episodesNotInDb = channel.items
+        .map((item) => new RssEpisode(item, show))
+        .filter((e) => !episodesById[e.uniqueEpisodeId]);
+      return [...episodesFromDb, ...episodesNotInDb]
+        .sort(byPubDate)
+        .map((episode) => ({
+          episode,
+          show,
+        }));
+    })
   );
 
-  const episodesState = derived(
-    [rssShowState, queueState],
-    whenLoaded(([show, queue]) =>
-      show.episodes.map((e) => ({
-        ...e,
-        queued: queue.some((ple) => ple.guid === e.guid),
-      }))
-    )
-  );
+  $: episodesState = $episodesStateStore;
 
   function handleSubscribe() {
-    subscribeToShow(showRecord({ rssFeedUrl }));
+    if (showState.state !== loaded) return;
+
+    subscribeToShow(showState.data.makeShowInput());
   }
 
   function handleUnsubscribe() {
-    unsubscribeFromShow(showRecord({ rssFeedUrl }));
+    if (showState.state !== loaded) return;
+
+    unsubscribeFromShow(showState.data.makeShowId());
   }
 
-  function handleQueueEpisode({ detail: { episode } }) {
-    enqueue(showRecord({ rssFeedUrl }), episodeRecord(episode));
+  function handleQueueEpisode(episode: RssEpisode) {
+    enqueueRssItem(rssFeedUrl, episode.item);
+  }
+
+  function byPubDate(a: RssEpisode, b: RssEpisode) {
+    return (b.pubDate?.valueOf() ?? 0) - (a.pubDate?.valueOf() ?? 0);
   }
 </script>
 
-{#if $showState.state === loaded}
+{#if showState.state === loaded}
   <Show
-    show={$showState.data}
+    show={showState.data}
     on:subscribe={handleSubscribe}
-    on:unsubscribe={handleUnsubscribe} />
+    on:unsubscribe={handleUnsubscribe}
+  />
 {/if}
-{#if $episodesState.state === loaded}
-  <EpisodesOfShow
-    episodes={$episodesState.data}
-    on:queueepisode={handleQueueEpisode} />
+{#if episodesState.state === loaded}
+  <ListLayout items={episodesState.data} let:item={episodeAndShow}>
+    <EpisodeOfShow
+      episode={episodeAndShow.episode}
+      on:queueepisode={() => handleQueueEpisode(episodeAndShow.episode)}
+    />
+  </ListLayout>
 {/if}

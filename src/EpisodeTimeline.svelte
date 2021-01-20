@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { createEventDispatcher } from "svelte";
 
   import { secondsToTimeString } from "./time";
@@ -11,8 +11,8 @@
   $: current = secondsToTimeString(currentSecond);
   $: remaining = secondsToTimeString(durationSeconds - currentSecond);
 
-  function handleChange(e) {
-    dispatch("change", { second: parseInt(e.target.value) });
+  function handleChange(e: any) {
+    dispatch("change", { second: parseInt(e.target?.value) });
   }
 </script>
 

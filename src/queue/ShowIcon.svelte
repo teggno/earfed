@@ -1,57 +1,60 @@
-<script>
+<script lang="ts">
+  import { createEventDispatcher } from "svelte";
+
   import { getAnimationTargetRect } from "../animationTargetRect";
-  import { showImageUrlThumb } from "../config";
 
   import AnimatedPlayToPauseIcon from "../icons/AnimatedPlayToPauseIcon.svelte";
   import PauseIcon from "../icons/PauseIcon.svelte";
 
   import PlayIcon from "../icons/PlayIcon.svelte";
-  import { pause, play } from "../playerService";
 
-  export let episode;
   export let playing = false;
+  export let showImageUrl: string | undefined;
 
-  const playButtonRect = getAnimationTargetRect();
+  const playButtonRectStore = getAnimationTargetRect();
 
   const moveAvgSpeed = 0.3;
   const playIconStartSize = 36;
 
   let playIconWrapper;
-  let playIconWrapperRect = {};
+  let playIconWrapperRect = { left: 0, top: 0 };
   let animationStatus = "notRunning";
   let scrolled = false;
 
   $: animationVisible = animationStatus !== "notRunning" && !scrolled;
+  $: playButtonRect = $playButtonRectStore;
 
   $: animationPositionCss =
     animationStatus === "notRunning"
       ? ""
       : animationStatus === "entering"
       ? `left:${playIconWrapperRect.left}px;top:${playIconWrapperRect.top}px;`
-      : `left:${$playButtonRect.left}px;top:${$playButtonRect.top}px;`;
+      : `left:${playButtonRect.left}px;top:${playButtonRect.top}px;`;
 
   $: moveDistance = Math.sqrt(
-    Math.pow($playButtonRect.left - playIconWrapperRect.left, 2) +
-      Math.pow($playButtonRect.top - playIconWrapperRect.top, 2)
+    Math.pow(playButtonRect.left - playIconWrapperRect.left, 2) +
+      Math.pow(playButtonRect.top - playIconWrapperRect.top, 2)
   );
 
   $: durationMillis = moveDistance / moveAvgSpeed;
 
   $: animationVars = `
   --start-size:${playIconStartSize}px;
-  --middle-size:${3 * $playButtonRect.width}px;
-  --end-size:${$playButtonRect.width}px;
+  --middle-size:${3 * playButtonRect.width}px;
+  --end-size:${playButtonRect.width}px;
   --duration:${durationMillis}ms;`;
 
+  const dispatch = createEventDispatcher();
   function handleClick() {
     if (!playing) {
-      play(episode);
+      // play(episode);
       if (animationStatus === "notRunning") {
         animatePlay();
       }
     } else {
-      pause();
+      // pause();
     }
+    dispatch("click");
   }
 
   function animatePlay() {
@@ -72,6 +75,31 @@
     scrolled = true;
   }
 </script>
+
+<button
+  on:touchstart|passive
+  style={`--start-size:${playIconStartSize}px;`}
+  on:click|stopPropagation={handleClick}
+  title={`${playing ? "Pause" : "Play"}`}>
+  {#if showImageUrl}
+    <img class="showImage" src={showImageUrl} alt="" crossorigin="anonymous" />
+  {/if}
+  <span class="playIconWrapper" bind:this={playIconWrapper}>
+    {#if playing}
+      <PauseIcon />
+    {:else}
+      <PlayIcon />
+    {/if}
+  </span>
+</button>
+
+{#if animationVisible}
+  <div class="playAnimation" style={`${animationVars}${animationPositionCss}`}>
+    <AnimatedPlayToPauseIcon {durationMillis} />
+  </div>
+{/if}
+
+<svelte:window on:scroll={handleWindowScroll} />
 
 <style>
   button {
@@ -208,32 +236,3 @@
     }
   }
 </style>
-
-<button
-  on:touchstart|passive
-  style={`--start-size:${playIconStartSize}px;`}
-  on:click|stopPropagation={handleClick}
-  title={`${playing ? 'Pause' : 'Play'}`}>
-  {#if episode.showImageUrl}
-    <img
-      class="showImage"
-      src={showImageUrlThumb(episode.showImageUrl)}
-      alt=""
-      crossorigin="anonymous" />
-  {/if}
-  <span class="playIconWrapper" bind:this={playIconWrapper}>
-    {#if playing}
-      <PauseIcon />
-    {:else}
-      <PlayIcon />
-    {/if}
-  </span>
-</button>
-
-{#if animationVisible}
-  <div class="playAnimation" style={`${animationVars}${animationPositionCss}`}>
-    <AnimatedPlayToPauseIcon {durationMillis} />
-  </div>
-{/if}
-
-<svelte:window on:scroll={handleWindowScroll} />

@@ -1,32 +1,45 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { derived } from "svelte/store";
+  import { episodes as userDataEpisodesStore } from "../episodeService";
+  import ListLayout from "../layouts/ListLayout.svelte";
+  import { appleUniqueEpisodeId } from "../providers";
   import { searchEpisodes, searchShows } from "../providers/apple/api";
-  import { apple } from "../providers/apple/providerApple";
+  import {
+    isValidCollection,
+    isValidTrack,
+    validateCollection,
+    validateTrack,
+  } from "../providers/apple/appleValidation";
+  import { enqueueAppleTrack } from "../queueService";
   import { replaceState } from "../routing/Router.svelte";
   import { loaded, whenLoaded, writableThreeState } from "../threeState";
+  import type { AppleTrack } from "../userData/episodeTypes";
+  import type { AppleCollection } from "../userData/showTypes";
   import { debounce } from "../utils";
-  import EpisodeList from "./EpisodeList.svelte";
+  import EpisodeItem from "./EpisodeItem.svelte";
   import SearchForm from "./SearchForm.svelte";
   import ShowList from "./ShowList.svelte";
 
   export let searchText = "";
   export let pageYOffset = undefined;
   export let showingShows = true;
-  export let queueState;
 
-  let shows = [];
-  const appleEpisodesStore = writableThreeState();
+  let shows: AppleCollection[] = [];
+  const foundEpisodesStore = writableThreeState<AppleTrack[]>();
 
-  const episodes = derived(
-    [queueState, appleEpisodesStore],
-    whenLoaded(([queue, appleEpisodes]) =>
+  const episodesStore = derived(
+    [userDataEpisodesStore, foundEpisodesStore],
+    whenLoaded(([userDataEpisodes, appleEpisodes]) =>
       appleEpisodes.map((ae) => ({
         ...ae,
-        queued: queue.some((qe) => areEqual(ae, qe)),
+        queueStatus: userDataEpisodes.find(
+          (ue) => appleUniqueEpisodeId(ae.trackId) === ue.uniqueEpisodeId
+        )?.queueStatus,
       }))
     )
   );
+  $: episodes = $episodesStore;
 
   onMount(() => {
     const debounced = debounce(handleScroll);
@@ -54,15 +67,25 @@
 
   function search() {
     return Promise.all([
-      searchShows(searchText),
-      searchEpisodes(searchText),
-    ]).then(([{ results: s }, { results: e }]) => {
-      shows = s;
-      appleEpisodesStore.setLoaded(e);
+      searchShows(searchText).then(({ results }) =>
+        results
+          .map((fetchedCollection) => validateCollection(fetchedCollection))
+          .filter(isValidCollection)
+          .map(({ appleCollection }) => appleCollection)
+      ),
+      searchEpisodes(searchText).then(({ results }) =>
+        results
+          .map((fetchedCollection) => validateTrack(fetchedCollection))
+          .filter(isValidTrack)
+          .map(({ appleTrack }) => appleTrack)
+      ),
+    ]).then(([appleCollections, appleTracks]) => {
+      shows = appleCollections;
+      foundEpisodesStore.setLoaded(appleTracks);
 
-      if (showingShows && !shows.length && e.length) {
+      if (showingShows && !shows.length && appleTracks.length) {
         showingShows = false;
-      } else if (!showingShows && !e.length && shows.length) {
+      } else if (!showingShows && !appleTracks.length && shows.length) {
         showingShows = true;
       }
     });
@@ -85,35 +108,39 @@
     replaceState((old) => ({ ...old, showingShows }));
   }
 
-  function areEqual(
-    { trackId },
-    { episodeId: { provider, providerEpisodeId } }
-  ) {
-    return providerEpisodeId === trackId && provider === apple;
+  async function handleQueueEpisode(track: AppleTrack) {
+    enqueueAppleTrack(track);
   }
 </script>
 
-<style>
-</style>
-
 <SearchForm {searchText} on:search={handleSearch} />
-{#if shows.length && $episodes.state === loaded && $episodes.data.length}
+{#if shows.length && episodes.state === loaded && episodes.data.length}
   <div>
-    <button
-      on:click={handleShowsClick}
-      type="button"
-      disabled={showingShows}>Shows ({shows.length})</button>
+    <button on:click={handleShowsClick} type="button" disabled={showingShows}
+      >Shows ({shows.length})</button
+    >
     <button
       on:click={handleEpisodesClick}
       type="button"
-      disabled={!showingShows}>Episodes ({$episodes.data.length})</button>
+      disabled={!showingShows}>Episodes ({episodes.data.length})</button
+    >
   </div>
 {/if}
 {#if shows.length && showingShows}
   <h2>Shows</h2>
   <ShowList {shows} />
 {/if}
-{#if $episodes.state === loaded && $episodes.data.length && (!showingShows || !shows.length)}
+{#if episodes.state === loaded && episodes.data.length && (!showingShows || !shows.length)}
   <h2>Episodes</h2>
-  <EpisodeList episodes={$episodes.data} />
+  <ListLayout items={episodes.data} let:item={episode}>
+    <EpisodeItem
+      {episode}
+      on:queueepisode={() => {
+        handleQueueEpisode(episode);
+      }}
+    />
+  </ListLayout>
 {/if}
+
+<style>
+</style>

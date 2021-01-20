@@ -18,7 +18,8 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "start": "sirv public --host teggno.dev --http2 --key https/teggno.dev.key --cert https/teggno.dev.crt --single"
+    "start": "sirv public --host teggno.dev --http2 --key https/teggno.dev.key --cert https/teggno.dev.crt --single",
+    "validate": "svelte-check"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
@@ -32,7 +33,13 @@
     "rollup-plugin-terser": "^7.0.0",
     "rollup-plugin-workbox-inject": "^2.0.0",
     "svelte": "^3.31.2",
-    "xmldom": "^0.4.0"
+    "xmldom": "^0.4.0",
+    "svelte-check": "^1.0.0",
+    "svelte-preprocess": "^4.0.0",
+    "@rollup/plugin-typescript": "^6.0.0",
+    "typescript": "^3.9.3",
+    "tslib": "^2.0.0",
+    "@tsconfig/svelte": "^1.0.0"
   },
   "dependencies": {
     "idb": "^5.0.8",
@@ -44,6 +51,5 @@
     "workbox-precaching": "^6.0.2",
     "workbox-routing": "^6.0.2",
     "workbox-strategies": "^6.0.2"
-  },
-  "type": "module"
+  }
 }

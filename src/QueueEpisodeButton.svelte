@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
     import AddEpisodeToQueueIcon from "./icons/AddEpisodeToQueueIcon.svelte";
     import EpisodeAddedToQueueIcon from "./icons/EpisodeAddedToQueueIcon.svelte";
 
-    export let queued;
+    export let queued: boolean;
 </script>
 
 <style>

@@ -1,4 +1,4 @@
-<script context="module">
+<script context="module" lang="ts">
   export const sizes = {
     mini: "mini",
     medium: "medium",
@@ -6,25 +6,12 @@
   };
 </script>
 
-<script>
+<script lang="ts">
   import ArrowLeftIcon from "../icons/ArrowLeftIcon.svelte";
   import ArrowRightIcon from "../icons/ArrowRightIcon.svelte";
   import DeleteIcon from "../icons/DeleteIcon.svelte";
   import PlayPauseButton from "./PlayPauseButton.svelte";
-  import {
-    play,
-    seek,
-    seekBackward,
-    seekForward,
-    pause,
-    playerInfo,
-    playing,
-    paused,
-    noEpisode,
-    seekBackwardSeconds,
-    seekForwardSeconds,
-    forgetEpisode,
-  } from "../playerService";
+  import player from "../player/player";
   import * as bodyScroll from "../toggleBodyScroll";
   import EpisodeTimeline from "../EpisodeTimeline.svelte";
   import dragToClose from "../actions/dragToCloseAction";
@@ -33,10 +20,25 @@
   import EpisodeDescription from "../queue/EpisodeDescription.svelte";
   import { removeEpisode } from "../queueService";
   import TinyButton from "./TinyButton.svelte";
-
-  $: disabled = $playerInfo.status === noEpisode;
+  import { ButtonStatus } from "./nowPlayingTypes";
+  import {
+    seekBackwardSeconds,
+    seekForwardSeconds,
+  } from "../player/playerConstants";
 
   export let size = sizes.medium;
+
+  const playerStore = player.playerStore;
+
+  $: playerInfo = $playerStore;
+  $: disabled = playerInfo.state === "noEpisode";
+  $: playPauseButtonStatus =
+    playerInfo.state === "hasEpisode"
+      ? playerInfo.playing
+        ? ButtonStatus.Playing
+        : ButtonStatus.Paused
+      : ButtonStatus.Disabled;
+
   $: maximized = size === sizes.maximized;
   let dragDownDistance = 0;
   let containerHeightWhenMaximized = 0;
@@ -84,31 +86,125 @@
   }
 
   function togglePlayPause() {
-    if ($playerInfo.status === playing) {
-      pause();
-    } else if ($playerInfo.status === paused) {
-      play();
+    if (playerInfo.state === "noEpisode") return;
+
+    if (playerInfo.playing) {
+      player.pause();
+    } else {
+      player.play();
     }
   }
 
   function handleSeekBackward() {
-    seekBackward();
+    player.seekBackward();
   }
 
   function handleSeekForward() {
-    seekForward();
+    player.seekForward();
   }
 
   function handleDiscard() {
-    const e = $playerInfo.episode;
-    forgetEpisode();
-    removeEpisode(e.episodeId);
+    if (playerInfo.state === "noEpisode") return;
+
+    player.discardEpisode();
+    removeEpisode(playerInfo.episode.episodeId);
   }
 
   function handleTimeChange({ detail: { second } }) {
-    seek(second);
+    player.seek(second);
   }
 </script>
+
+<div
+  class="container"
+  class:draggingDown
+  class:maximized
+  class:mini={size === sizes.mini}
+  use:dragToClose
+  on:click={handleClickComponent}
+  on:dragdown={maximized ? handleDragDown : undefined}
+  on:dragend={maximized ? handleDragEnd : undefined}
+  on:closethroughdrag={maximized ? handleCloseThroughDrag : undefined}
+  style={`${
+    maximized && draggingDown
+      ? `height:${containerHeightWhenMaximized - dragDownDistance / 3}px`
+      : ""
+  }`}
+>
+  <button
+    class="closeBar"
+    on:click|stopPropagation={handleMinimizeClick}
+    title="Minimize"
+    tabindex={maximized ? undefined : -1}
+  />
+  <div class="text" bind:this={textElement}>
+    {#if playerInfo.state === "hasEpisode"}
+      <div class="showTitle">{playerInfo.episode.showTitle || ""}</div>
+      <h2 class="episodeTitle">{playerInfo.episode.episodeTitle || ""}</h2>
+      <section class="episodeDescription">
+        <EpisodeDescription
+          episodeDescription={playerInfo.episode.episodeDescription}
+        />
+      </section>
+    {/if}
+  </div>
+  <div class="timeline">
+    {#if playerInfo.state === "hasEpisode"}
+      <EpisodeTimeline
+        durationSeconds={playerInfo.durationSeconds}
+        currentSecond={playerInfo.currentSecond}
+        on:change={handleTimeChange}
+      />
+    {/if}
+  </div>
+  <div class="buttons">
+    <span>
+      <TinyButton
+        {disabled}
+        title={`Back ${seekBackwardSeconds} Seconds`}
+        on:click={handleSeekBackward}
+      >
+        <span>-{seekBackwardSeconds}s</span>
+        <ArrowLeftIcon />
+      </TinyButton>
+    </span>
+    <span class="play-pause-wrapper">
+      <PlayPauseButton
+        on:toggle={togglePlayPause}
+        status={playPauseButtonStatus}
+        backgroundImageUrl={playerInfo.state === "hasEpisode" &&
+        playerInfo.episode.showImageUrl
+          ? showImageUrlThumb(playerInfo.episode.showImageUrl)
+          : ""}
+      />
+    </span>
+    <span>
+      <TinyButton
+        {disabled}
+        title={`Forward ${seekForwardSeconds} Seconds`}
+        on:click={handleSeekForward}
+      >
+        <span>+{seekForwardSeconds}s</span>
+        <ArrowRightIcon />
+      </TinyButton>
+    </span>
+    <span class="delete-wrapper">
+      <TinyButton {disabled} title="Discard Episode" on:click={handleDiscard}>
+        <DeleteIcon />
+      </TinyButton>
+    </span>
+  </div>
+</div>
+
+<svelte:head>
+  {#if maximized}<style>
+      body,
+      html {
+        /* Prevent pull-to-refresh and "glow" effect below address bar while dragging down */
+        overscroll-behavior-y: none;
+      }
+    </style>{/if}
+</svelte:head>
 
 <style>
   .container {
@@ -343,80 +439,3 @@
     min-width: 50px;
   }
 </style>
-
-<div
-  class="container"
-  class:draggingDown
-  class:maximized
-  class:mini={size === sizes.mini}
-  use:dragToClose
-  on:click={handleClickComponent}
-  on:dragdown={maximized ? handleDragDown : undefined}
-  on:dragend={maximized ? handleDragEnd : undefined}
-  on:closethroughdrag={maximized ? handleCloseThroughDrag : undefined}
-  style={`${maximized && draggingDown ? `height:${containerHeightWhenMaximized - dragDownDistance / 3}px` : ''}`}>
-  <button
-    class="closeBar"
-    on:click|stopPropagation={handleMinimizeClick}
-    title="Minimize"
-    tabindex={maximized ? '' : '-1'} />
-  <div class="text" bind:this={textElement}>
-    <div class="showTitle">{$playerInfo.episode?.showTitle || ''}</div>
-    <h2 class="episodeTitle">{$playerInfo.episode?.episodeTitle || ''}</h2>
-    <section class="episodeDescription">
-      {#if $playerInfo.episode}
-        <EpisodeDescription
-          episodeDescription={$playerInfo.episode.episodeDescription} />
-      {/if}
-    </section>
-  </div>
-  <div class="timeline">
-    <EpisodeTimeline
-      durationSeconds={$playerInfo.durationSeconds}
-      currentSecond={$playerInfo.currentSecond}
-      on:change={handleTimeChange} />
-  </div>
-  <div class="buttons">
-    <span>
-      <TinyButton
-        {disabled}
-        title={`Back ${seekBackwardSeconds} Seconds`}
-        on:click={handleSeekBackward}>
-        <span>-{seekBackwardSeconds}s</span>
-        <ArrowLeftIcon />
-      </TinyButton>
-    </span>
-    <span class="play-pause-wrapper">
-      <PlayPauseButton
-        on:toggle={togglePlayPause}
-        status={$playerInfo.status === noEpisode ? 'disabled' : $playerInfo.status}
-        backgroundImageUrl={$playerInfo.episode && $playerInfo.episode.showImageUrl ? showImageUrlThumb($playerInfo.episode.showImageUrl) : ''} />
-    </span>
-    <span>
-      <TinyButton
-        {disabled}
-        title={`Forward ${seekForwardSeconds} Seconds`}
-        on:click={handleSeekForward}>
-        <span>+{seekForwardSeconds}s</span>
-        <ArrowRightIcon />
-      </TinyButton>
-    </span>
-    <span class="delete-wrapper">
-      <TinyButton {disabled} title="Discard Episode" on:click={handleDiscard}>
-        <DeleteIcon />
-      </TinyButton>
-    </span>
-  </div>
-</div>
-
-<svelte:head>
-  {#if maximized}
-    <style>
-      body,
-      html {
-        /* Prevent pull-to-refresh and "glow" effect below address bar while dragging down */
-        overscroll-behavior-y: none;
-      }
-    </style>
-  {/if}
-</svelte:head>

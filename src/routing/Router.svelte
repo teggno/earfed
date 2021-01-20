@@ -1,10 +1,7 @@
-<script context="module">
-  import { writable } from "svelte/store";
-
+<script context="module" lang="ts">
   export const registerRouteFn = {};
-  export const activeRoute = writable({ activePath: "/" });
 
-  export function pushState(innerState) {
+  export function pushState(innerState: any) {
     history.pushState(
       { ...history.state, innerState: execFnOrGetValue(innerState) },
       ""
@@ -22,16 +19,31 @@
       ? fnOrValue(history.state.innerState)
       : fnOrValue;
   }
+
+  interface Route {
+    path: string;
+    getProps: GetProps;
+    component: SvelteComponent;
+  }
+
+  interface GetProps {
+    (innerState: any): any;
+  }
+
+  function getPropsFallback() {
+    return {};
+  }
 </script>
 
-<script>
-  import { onMount, setContext } from "svelte";
+<script lang="ts">
+  import { onMount, setContext, SvelteComponent } from "svelte";
   import page from "page";
+  import { activeRoute } from "./routing";
 
   export let basePath = "/";
 
-  let routes = [];
-  let currentRoute;
+  let routes = [] as Route[];
+  let currentRoute: Route | undefined;
   let currentComponentProps = {};
 
   setContext(registerRouteFn, doRegisterRoute);
@@ -54,7 +66,7 @@
     };
   });
 
-  function opener(route) {
+  function opener(route: Route) {
     return (context) => {
       currentRoute = route;
       refreshCurrentComponentProps(context.state.innerState);
@@ -67,7 +79,11 @@
       : {};
   }
 
-  function doRegisterRoute(path, component, getProps) {
+  function doRegisterRoute(
+    path: string,
+    component: SvelteComponent,
+    getProps: GetProps | undefined
+  ) {
     const newItem = {
       path,
       component,
@@ -78,10 +94,6 @@
     return () => {
       routes = routes.filter((r) => r !== newItem);
     };
-  }
-
-  function getPropsFallback() {
-    return {};
   }
 </script>
 

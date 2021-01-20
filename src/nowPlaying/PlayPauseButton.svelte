@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import PauseIcon from "../icons/PauseIcon.svelte";
   import PlayIcon from "../icons/PlayIcon.svelte";
   import { fade } from "svelte/transition";
@@ -6,13 +6,10 @@
   import { createEventDispatcher, onMount } from "svelte";
   import { hitTest } from "../dom/hitTest";
   import { animationTargetRectSetterFactory } from "../animationTargetRect";
+  import { ButtonStatus } from "./nowPlayingTypes";
 
-  export var status = disabled;
-  export var backgroundImageUrl = "";
-
-  export const disabled = "disabled";
-  const playing = "playing";
-  const paused = "paused";
+  export let status: ButtonStatus = ButtonStatus.Disabled;
+  export let backgroundImageUrl = "";
 
   const setAnimationTargetRect = animationTargetRectSetterFactory();
   onMount(() => {
@@ -46,7 +43,7 @@
   let buttonDown = false;
 
   function handleTouchStart() {
-    if (status === disabled) return;
+    if (status === ButtonStatus.Disabled) return;
     buttonDown = true;
   }
 
@@ -172,8 +169,8 @@
   bind:this={button}
   class:buttonDown
   on:click|stopPropagation
-  disabled={status === disabled}
-  title={playing ? 'Pause' : 'Play'}>
+  disabled={status === ButtonStatus.Disabled}
+  title={ButtonStatus.Playing ? 'Pause' : 'Play'}>
   {#if backgroundImageUrl}
     <img
       src={backgroundImageUrl}
@@ -181,7 +178,7 @@
       class="showImage"
       crossorigin="anonymous" />
   {/if}
-  {#if status === playing}
+  {#if status === ButtonStatus.Playing}
     <span
       class="icon"
       in:fade={{ duration: 240, delay: 60, easing: easing.expoOut }}>

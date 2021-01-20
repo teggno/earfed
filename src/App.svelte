@@ -1,39 +1,39 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
-  import AddShowRss from "./subscriptions/AddShowRss.svelte";
   import { initAnimationTargetRect } from "./animationTargetRect";
-  import AppleShowPage from "./search/AppleShowPage.svelte";
   import BottomBar from "./BottomBar.svelte";
-  import { showImageUrlMedium } from "./config";
-  import { areEpisodesEqual } from "./episode";
+  import type AppleEpisode from "./domain/AppleEpisode";
+  import type RssEpisode from "./domain/RssEpisode";
+  import { refreshUserDataEpisodes } from "./episodeService";
   import {
     connectNotificationBar,
     supportsNotificationBar,
   } from "./notificationBarService";
   import NowPlaying, { sizes } from "./nowPlaying/NowPlaying.svelte";
-  import * as playerService from "./playerService";
+  import player from "./player/player";
+  import QueuePage from "./queue/QueuePage.svelte";
   import {
     episodeAfter,
     firstEpisode,
     lastPlayedEpisode,
     queueState,
   } from "./queueService";
-  import { refreshUserDataEpisodes } from "./episodeService";
   import Route from "./routing/Route.svelte";
   import Router from "./routing/Router.svelte";
+  import AppleShowPage from "./search/AppleShowPage.svelte";
   import Search from "./search/Search.svelte";
-  import Subscriptions from "./subscriptions/Subscriptions.svelte";
+  import AddShowRss from "./subscriptions/AddShowRss.svelte";
   import RssShowPage from "./subscriptions/RssShowPage.svelte";
+  import Subscriptions from "./subscriptions/Subscriptions.svelte";
+  import { loaded } from "./threeState";
   import { setEpisodeEnded, updatePositionSeconds } from "./userData/episodes";
   import virtualKeyboardDetector, {
     virtualkeyboard,
   } from "./virtualKeyboardDetector";
-  import { loaded } from "./threeState";
-  import QueuePage from "./queue/QueuePage.svelte";
 
   initAnimationTargetRect();
 
-  let showImageUrls;
+  let showImageUrls: string[] | undefined;
   let virtualKeyboardVisible = false;
   let nowPlayingVisible = true;
 
@@ -42,6 +42,7 @@
     const unsubscribers = [
       connectNotificationBarToPlayerService(),
       startUpdatingDbWithPlayerStatus(),
+      playSubsequentEpisodeWhenEnded(),
       preloadNotificationBarShowImages(),
       virtualKeyboardDetector(),
       watchVirtualKeyboard(),
@@ -55,54 +56,80 @@
     };
   });
 
-  function setLastPlayedEpisode() {
-    lastPlayedEpisode().then((episode) => {
-      if (!episode) return;
-      playerService.play(episode, true);
-    });
+  async function setLastPlayedEpisode() {
+    const episode = await lastPlayedEpisode();
+    if (!episode) return;
+
+    player.setEpisode(episode);
+    if (episode.positionSeconds) {
+      player.seek(episode.positionSeconds);
+    }
   }
 
   function connectNotificationBarToPlayerService() {
-    const updater = connectNotificationBar(playerService);
-    let currentEpisode;
-    return playerService.playerInfo.subscribe((info) => {
-      if (info.episode && !areEpisodesEqual(info.episode, currentEpisode)) {
-        updater(info.episode);
+    const updater = connectNotificationBar(player);
+
+    let previousEpisode: AppleEpisode | RssEpisode | undefined;
+    return player.playerStore.subscribe((info) => {
+      if (info.state === "hasEpisode") {
+        const hasEpisodeChanged =
+          info.episode.uniqueEpisodeId !== previousEpisode?.uniqueEpisodeId;
+        if (hasEpisodeChanged) {
+          updater({
+            showTitle: info.episode.showTitle,
+            episodeTitle: info.episode.episodeTitle,
+            showImageUrlMedium: notificationBarImageUrl(info.episode),
+          });
+        }
+        previousEpisode = info.episode;
+      } else {
+        previousEpisode = undefined;
       }
-      currentEpisode = info.episode;
     });
   }
 
   function startUpdatingDbWithPlayerStatus() {
-    return playerService.playerInfo.subscribe(
-      async ({ episode, status, currentSecond }) => {
-        if (!episode) return;
+    return player.playerStore.subscribe(async (playerState) => {
+      if (playerState.state === "noEpisode") return;
 
-        if (status == playerService.playing) {
-          await updatePositionSeconds(
-            episode.episodeId,
-            currentSecond,
-            new Date()
-          );
-          refreshUserDataEpisodes();
-        } else if (status === playerService.ended) {
-          const episodeToPlayNext = await getEpisodeToPlayNext(episode);
-          if (episodeToPlayNext) {
-            playerService.play(episodeToPlayNext);
-          } else {
-            playerService.forgetEpisode();
-          }
-          await setEpisodeEnded(episode.episodeId, new Date());
-          refreshUserDataEpisodes();
-        }
+      const { episode, currentSecond } = playerState;
+      if (playerState.playing) {
+        await updatePositionSeconds(
+          episode.episodeId,
+          currentSecond,
+          new Date()
+        );
+        refreshUserDataEpisodes();
+      } else if (playerState.ended) {
+        await setEpisodeEnded(episode.episodeId, new Date());
+        refreshUserDataEpisodes();
       }
-    );
+    });
   }
 
-  async function getEpisodeToPlayNext(currentEpisode) {
-    const episode =
-      (await episodeAfter(currentEpisode)) || (await firstEpisode());
-    return episode && areEpisodesEqual(currentEpisode, episode)
+  function playSubsequentEpisodeWhenEnded() {
+    return player.playerStore.subscribe(async (playerState) => {
+      if (playerState.state === "hasEpisode" && playerState.ended) {
+        const subsequentEpisode = await getEpisodeToPlayNext(
+          playerState.episode
+        );
+        if (subsequentEpisode) {
+          player.setEpisode(subsequentEpisode);
+          if (subsequentEpisode.positionSeconds) {
+            player.seek(subsequentEpisode.positionSeconds);
+          }
+          player.play();
+        }
+      }
+    });
+  }
+
+  async function getEpisodeToPlayNext(
+    currentEpisode: AppleEpisode | RssEpisode
+  ) {
+    const episode = (await episodeAfter(currentEpisode)) || firstEpisode();
+    return episode &&
+      currentEpisode?.uniqueEpisodeId === episode.uniqueEpisodeId
       ? undefined
       : episode;
   }
@@ -114,23 +141,24 @@
         list.state === loaded
           ? Object.keys(
               list.data.reduce((prev, queueItem) => {
-                prev[queueItem.showImageUrl] = true;
+                const url = notificationBarImageUrl(queueItem);
+                if (url) prev[url] = true;
                 return prev;
-              }, {})
-            ).map(showImageUrlMedium)
+              }, {} as { [key: string]: boolean })
+            )
           : [];
     });
   }
 
   function watchVirtualKeyboard() {
-    window.addEventListener(virtualkeyboard, handleVirtualKeyboard);
+    window.addEventListener(virtualkeyboard as any, handleVirtualKeyboard);
 
     function handleVirtualKeyboard({ detail: { visible } }) {
       virtualKeyboardVisible = visible;
     }
 
     return () => {
-      window.removeEventListener(virtualkeyboard, handleVirtualKeyboard);
+      window.removeEventListener(virtualkeyboard as any, handleVirtualKeyboard);
     };
   }
 
@@ -202,6 +230,12 @@
     }
   }
 
+  function notificationBarImageUrl(episode: {
+    showImageUrlMedium: string | undefined;
+  }) {
+    return episode.showImageUrlMedium;
+  }
+
   function registerServiceWorker() {
     if (!("serviceWorker" in navigator)) return Promise.resolve();
 
@@ -219,29 +253,26 @@
   }
 </script>
 
-<style>
-  .withBottomBarPadding {
-    padding-bottom: var(--bottom-bar-height);
-  }
-</style>
-
 <div class:withBottomBarPadding={!virtualKeyboardVisible}>
   <main>
     <Router>
-      <Route component={QueuePage} path="" getProps={() => ({ queueState })} />
+      <Route component={QueuePage} path="" />
       <Route component={Subscriptions} path="subscriptions" />
       <Route
         component={Search}
         path="search"
-        getProps={(innerState) => ({ ...innerState, queueState })} />
+        getProps={(innerState) => innerState}
+      />
       <Route component={AddShowRss} path="subscriptions/addrss" />
       <Route component={RssShowPage} path="subscriptions/shows/rss" />
       <Route
         component={AppleShowPage}
-        path="search/shows/apple/:collectionId" />
+        path="search/shows/apple/:collectionId"
+      />
       <Route
         component={AppleShowPage}
-        path="subscriptions/shows/apple/:collectionId" />
+        path="subscriptions/shows/apple/:collectionId"
+      />
     </Router>
   </main>
   {#if !virtualKeyboardVisible}
@@ -262,7 +293,18 @@
        specifying CORS-->
   {#if showImageUrls}
     {#each showImageUrls as showImageUrl}
-      <link rel="preload" href={showImageUrl} as="image" crossorigin />
+      <link
+        rel="preload"
+        href={showImageUrl}
+        as="image"
+        crossorigin="anonymous"
+      />
     {/each}
   {/if}
 </svelte:head>
+
+<style>
+  .withBottomBarPadding {
+    padding-bottom: var(--bottom-bar-height);
+  }
+</style>

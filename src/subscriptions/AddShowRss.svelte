@@ -1,20 +1,14 @@
-<script>
+<script lang="ts">
   import navigate from "../routing/navigate";
   import { makeUrl } from "./RssShowPage.svelte";
 
   let url = "";
 
-  function handleSubmit(e) {
+  function handleSubmit(e: Event) {
     e.preventDefault();
     navigate("/subscriptions/shows/rss?" + makeUrl(url.trim()));
   }
 </script>
-
-<style>
-  input {
-    width: 100%;
-  }
-</style>
 
 <form on:submit={handleSubmit}>
   <div>
@@ -23,3 +17,9 @@
   </div>
   <div><button>Confirm</button></div>
 </form>
+
+<style>
+  input {
+    width: 100%;
+  }
+</style>
