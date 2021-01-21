@@ -38,9 +38,11 @@
 
 <form on:submit={handleSubmit}>
   <div class="fieldWrapper" class:focused class:buttonVisible>
-    <div class="searchIconWrapper">
-      <SearchIcon />
-    </div>
+    {#if !searchText}
+      <div class="searchIconWrapper">
+        <SearchIcon />
+      </div>
+    {/if}
     <input
       id="searchField"
       aria-label="Enter Search Text"
