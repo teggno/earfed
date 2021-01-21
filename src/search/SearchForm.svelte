@@ -7,7 +7,8 @@
 
   const dispatch = createEventDispatcher();
 
-  let focused = false;
+  export let focused = false;
+
   $: buttonDisabled = !searchText;
   $: buttonVisible = searchText || focused;
 

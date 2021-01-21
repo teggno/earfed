@@ -25,6 +25,8 @@
   export let pageYOffset = undefined;
   export let showingShows = true;
 
+  let searched = false;
+  let searchFormFocused: boolean;
   let shows: AppleCollection[] = [];
   const foundEpisodesStore = writableThreeState<AppleTrack[]>();
 
@@ -40,6 +42,7 @@
     )
   );
   $: episodes = $episodesStore;
+  $: searchOnTop = searched || searchFormFocused;
 
   onMount(() => {
     const debounced = debounce(handleScroll);
@@ -66,6 +69,7 @@
   }
 
   function search() {
+    searched = true;
     return Promise.all([
       searchShows(searchText).then(({ results }) =>
         results
@@ -113,8 +117,12 @@
   }
 </script>
 
-<div class="searchFormWrapper">
-  <SearchForm {searchText} on:search={handleSearch} />
+<div class="searchFormWrapper" class:searchOnTop>
+  <SearchForm
+    bind:focused={searchFormFocused}
+    {searchText}
+    on:search={handleSearch}
+  />
 </div>
 {#if shows.length && episodes.state === loaded && episodes.data.length}
   <div>
@@ -147,5 +155,18 @@
 <style>
   .searchFormWrapper {
     padding: var(--spacing-3);
+    /*the goal here is to initially have the search form vertically 
+    centered between the mini player and the top of the page*/
+    transform: translateY(
+      calc(
+        (100vh - var(--mini-player-bottom) - var(--mini-player-height)) / 2 -
+          50%
+      )
+    );
+    transition: transform 0.4s;
+  }
+
+  .searchOnTop {
+    transform: none;
   }
 </style>
