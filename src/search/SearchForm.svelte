@@ -2,10 +2,14 @@
   import { createEventDispatcher } from "svelte";
   import SearchIcon from "../icons/SearchIcon.svelte";
   import { fade } from "svelte/transition";
+
   export let searchText = "";
+
   const dispatch = createEventDispatcher();
 
   let focused = false;
+  $: buttonDisabled = !searchText;
+  $: buttonVisible = searchText || focused;
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -32,8 +36,7 @@
 </script>
 
 <form on:submit={handleSubmit}>
-  <!-- <label for="searchField">Search</label> -->
-  <div class="fieldWrapper" class:focused>
+  <div class="fieldWrapper" class:focused class:buttonVisible>
     <div class="searchIconWrapper">
       <SearchIcon />
     </div>
@@ -51,8 +54,8 @@
       on:blur={handleBlur}
       bind:value={searchText}
     />
-    {#if focused}
-      <button transition:fade title="Search"
+    {#if true}
+      <button transition:fade title="Search" disabled={buttonDisabled}
         ><SearchIcon title="Search" /></button
       >
     {/if}
@@ -68,28 +71,35 @@
     border: var(--input-border);
     border-radius: var(--input-border-radius);
     background: var(--color-input-background);
+    position: relative;
 
     --font-size: var(--font-size-medium);
     --left-icon-size: calc(var(--assumed-normal-lh) * var(--font-size));
     --height: calc(var(--assumed-normal-lh) * var(--font-size-large));
+    --button-width: calc(var(--height) + var(--input-padding));
   }
 
   input {
     flex-grow: 1;
     flex-shrink: 0;
     border: 0;
-    margin: var(--input-padding) 0;
+    margin: var(--input-padding);
     padding: 0;
     background: transparent;
     align-self: stretch;
     height: var(--height);
     font-size: var(--font-size);
+    z-index: 2;
   }
 
   input:focus,
   input:focus-visible {
     /*remove focus indication because it mus be given to .fieldWrapper */
     box-shadow: none;
+  }
+
+  .buttonVisible input {
+    padding: 0 var(--button-width) 0 0;
   }
 
   .searchIconWrapper {
@@ -115,10 +125,23 @@
     background-color: transparent;
     display: flex;
     padding: var(--input-padding);
+    position: absolute;
+    right: 0;
+    top: 0;
   }
-
-  button :global(*) {
+  button :global(svg) {
     width: var(--height);
     height: var(--height);
+    fill: var(--color-accent);
+  }
+
+  button:disabled {
+    z-index: 1;
+  }
+
+  button:disabled :global(svg) {
+    width: var(--height);
+    height: var(--height);
+    fill: var(--color-disabled);
   }
 </style>
