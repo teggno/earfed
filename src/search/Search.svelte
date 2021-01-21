@@ -3,6 +3,7 @@
   import { derived } from "svelte/store";
   import { episodes as userDataEpisodesStore } from "../episodeService";
   import ListLayout from "../layouts/ListLayout.svelte";
+  import PageTitle from "../PageTitle.svelte";
   import { appleUniqueEpisodeId } from "../providers";
   import { searchEpisodes, searchShows } from "../providers/apple/api";
   import {
@@ -20,6 +21,8 @@
   import EpisodeItem from "./EpisodeItem.svelte";
   import SearchForm from "./SearchForm.svelte";
   import ShowList from "./ShowList.svelte";
+  import { scale } from "svelte/transition";
+  import { linear } from "svelte/easing";
 
   export let searchText = "";
   export let pageYOffset = undefined;
@@ -118,6 +121,7 @@
 </script>
 
 <div class="searchFormWrapper" class:searchOnTop>
+  <div class="title">Search</div>
   <SearchForm
     bind:focused={searchFormFocused}
     {searchText}
@@ -154,6 +158,7 @@
 
 <style>
   .searchFormWrapper {
+    position: relative;
     padding: var(--spacing-3);
     /*the goal here is to initially have the search form vertically 
     centered between the mini player and the top of the page*/
@@ -168,5 +173,21 @@
 
   .searchOnTop {
     transform: none;
+  }
+
+  .title {
+    font-size: var(--font-size-large);
+    overflow-y: hidden;
+    transition: all 0.2s;
+    opacity: 1;
+    max-height: calc(
+      var(--assumed-normal-lh) * var(--font-size-large) + 2 * var(--spacing-1)
+    );
+    padding: var(--spacing-1) 0;
+  }
+
+  .searchOnTop .title {
+    max-height: 0;
+    opacity: 0;
   }
 </style>
