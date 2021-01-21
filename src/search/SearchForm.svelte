@@ -54,7 +54,7 @@
       on:blur={handleBlur}
       bind:value={searchText}
     />
-    {#if true}
+    {#if buttonVisible}
       <button transition:fade title="Search" disabled={buttonDisabled}
         ><SearchIcon title="Search" /></button
       >
