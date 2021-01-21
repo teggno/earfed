@@ -69,7 +69,9 @@
     border-radius: var(--input-border-radius);
     background: var(--color-input-background);
 
-    --icon-size: calc(var(--assumed-normal-lh) * var(--font-size-large));
+    --font-size: var(--font-size-medium);
+    --left-icon-size: calc(var(--assumed-normal-lh) * var(--font-size));
+    --height: calc(var(--assumed-normal-lh) * var(--font-size-large));
   }
 
   input {
@@ -80,8 +82,8 @@
     padding: 0;
     background: transparent;
     align-self: stretch;
-    height: var(--icon-size);
-    font-size: var(--font-size-large);
+    height: var(--height);
+    font-size: var(--font-size);
   }
 
   input:focus,
@@ -90,17 +92,18 @@
     box-shadow: none;
   }
 
+  .searchIconWrapper {
+    display: flex;
+    justify-content: center;
+    height: var(--left-icon-size);
+    width: var(--left-icon-size);
+    transition: all 0.4s;
+  }
+
   .searchIconWrapper :global(svg) {
     width: 100%;
     height: 100%;
     fill: var(--color-input-placeholder);
-  }
-  .searchIconWrapper {
-    display: flex;
-    justify-content: center;
-    height: var(--icon-size);
-    width: var(--icon-size);
-    transition: all 0.4s;
   }
   .focused .searchIconWrapper {
     width: 0;
@@ -115,7 +118,7 @@
   }
 
   button :global(*) {
-    width: var(--icon-size);
-    height: var(--icon-size);
+    width: var(--height);
+    height: var(--height);
   }
 </style>
