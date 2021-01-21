@@ -47,6 +47,7 @@
       virtualKeyboardDetector(),
       watchVirtualKeyboard(),
       presentNowPlaying(),
+      syncWindowHeightToBody(),
     ];
 
     setLastPlayedEpisode();
@@ -55,6 +56,21 @@
       unsubscribers.forEach((u) => u());
     };
   });
+
+  function syncWindowHeightToBody() {
+    // I tried setting the body's min-height just using CSS. But there always was some
+    // problem in some mobile browser. Now, as this app doesn't run without JS anyway,
+    // it doesn't hurt using JS for setting the minHeight either.
+    handleResize();
+    function handleResize() {
+      document.body.style.minHeight = `${window.innerHeight}px`;
+    }
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }
 
   async function setLastPlayedEpisode() {
     const episode = await lastPlayedEpisode();
