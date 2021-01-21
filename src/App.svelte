@@ -237,7 +237,7 @@
       clearTimeout(timeoutShow);
       timeoutShow = setTimeout(() => {
         nowPlayingVisible = true;
-      }, 400);
+      }, 1200);
     }
 
     function hide() {
