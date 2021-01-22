@@ -13,6 +13,7 @@
   } from "../providers/apple/appleValidation";
   import { enqueueAppleTrack } from "../queueService";
   import { replaceState } from "../routing/Router.svelte";
+  import Tabs from "../tabs/Tabs.svelte";
   import { loaded, whenLoaded, writableThreeState } from "../threeState";
   import type { AppleTrack } from "../userData/episodeTypes";
   import type { AppleCollection } from "../userData/showTypes";
@@ -23,11 +24,19 @@
 
   export let searchText = "";
   export let pageYOffset = undefined;
-  export let showingShows = true;
+
+  let tabItems = [
+    { title: "Shows", disabled: false },
+    { title: "Episodes", disabled: false },
+  ];
+  // selectedTabIndex is exported because it might come from history state
+  export let selectedTabIndex: number | undefined;
+  $: showingShows = selectedTabIndex === 0;
 
   let searched = false;
   let searchFormFocused: boolean;
   let shows: AppleCollection[] = [];
+
   const foundEpisodesStore = writableThreeState<AppleTrack[]>();
 
   const episodesStore = derived(
@@ -87,10 +96,23 @@
       shows = appleCollections;
       foundEpisodesStore.setLoaded(appleTracks);
 
-      if (showingShows && !shows.length && appleTracks.length) {
-        showingShows = false;
-      } else if (!showingShows && !appleTracks.length && shows.length) {
-        showingShows = true;
+      tabItems = tabItems.map((item, index) => ({
+        ...item,
+        disabled:
+          (index === 0 && !shows.length) ||
+          (index === 1 && !appleTracks.length),
+      }));
+
+      if (
+        selectedTabIndex === undefined ||
+        tabItems[selectedTabIndex].disabled
+      ) {
+        const indexOfFirstEnabled = tabItems.findIndex(
+          (item) => !item.disabled
+        );
+        console.log(indexOfFirstEnabled);
+        selectedTabIndex =
+          indexOfFirstEnabled === -1 ? undefined : indexOfFirstEnabled;
       }
     });
   }
@@ -102,18 +124,13 @@
     });
   }
 
-  function handleShowsClick() {
-    showingShows = true;
-    replaceState((old) => ({ ...old, showingShows }));
-  }
-
-  function handleEpisodesClick() {
-    showingShows = false;
-    replaceState((old) => ({ ...old, showingShows }));
-  }
-
   async function handleQueueEpisode(track: AppleTrack) {
     enqueueAppleTrack(track);
+  }
+
+  function handleTabChange({ detail: { selectedIndex } }) {
+    selectedTabIndex = selectedIndex;
+    replaceState((old) => ({ ...old, selectedTabIndex }));
   }
 </script>
 
@@ -125,24 +142,21 @@
     on:search={handleSearch}
   />
 </div>
-{#if shows.length && episodes.state === loaded && episodes.data.length}
-  <div>
-    <button on:click={handleShowsClick} type="button" disabled={showingShows}
-      >Shows ({shows.length})</button
-    >
-    <button
-      on:click={handleEpisodesClick}
-      type="button"
-      disabled={!showingShows}>Episodes ({episodes.data.length})</button
-    >
-  </div>
+
+{#if selectedTabIndex !== undefined}
+  <Tabs
+    items={tabItems}
+    value={tabItems[selectedTabIndex]}
+    on:change={handleTabChange}
+    let:item
+  >
+    {item.title}
+  </Tabs>
 {/if}
 {#if shows.length && showingShows}
-  <h2>Shows</h2>
   <ShowList {shows} />
 {/if}
 {#if episodes.state === loaded && episodes.data.length && (!showingShows || !shows.length)}
-  <h2>Episodes</h2>
   <ListLayout items={episodes.data} let:item={episode}>
     <EpisodeItem
       {episode}
