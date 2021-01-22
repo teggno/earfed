@@ -6,6 +6,7 @@ const audioEventsToListenTo = [
   "pause",
   "timeupdate",
   "ended",
+  "abort",
 ] as const;
 
 /** @returns a svelte store that wraps a HTMLAudioElement */
