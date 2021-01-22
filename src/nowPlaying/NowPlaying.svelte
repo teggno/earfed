@@ -40,6 +40,14 @@
       : ButtonStatus.Disabled;
 
   $: maximized = size === sizes.maximized;
+  $: durationSeconds =
+    playerInfo.state === "hasEpisode"
+      ? isNaN(playerInfo.durationSeconds) ||
+        !isFinite(playerInfo.durationSeconds)
+        ? playerInfo.episode.durationSeconds
+        : playerInfo.durationSeconds
+      : undefined;
+
   let dragDownDistance = 0;
   let containerHeightWhenMaximized = 0;
   let textElement;
@@ -151,7 +159,7 @@
   <div class="timeline">
     {#if playerInfo.state === "hasEpisode"}
       <EpisodeTimeline
-        durationSeconds={playerInfo.durationSeconds}
+        {durationSeconds}
         currentSecond={playerInfo.currentSecond}
         on:change={handleTimeChange}
       />
