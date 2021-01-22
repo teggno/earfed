@@ -195,6 +195,7 @@
     };
 
     function handleTouchStart() {
+      console.log("touch start: scrolling enabled", scrollingEnabled());
       if (!scrollingEnabled()) return;
       clearTimeout(timeoutShow);
       document.addEventListener("touchend", handleTouchEnd);
@@ -206,6 +207,7 @@
     }
 
     function handleScroll() {
+      console.log("scroll: scrolling enabled", scrollingEnabled());
       clearTimeout(timeoutScrollCheck);
       if (nowPlayingVisible && !scrolling) {
         hide();
