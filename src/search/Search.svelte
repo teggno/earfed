@@ -3,7 +3,6 @@
   import { derived } from "svelte/store";
   import { episodes as userDataEpisodesStore } from "../episodeService";
   import ListLayout from "../layouts/ListLayout.svelte";
-  import PageTitle from "../PageTitle.svelte";
   import { appleUniqueEpisodeId } from "../providers";
   import { searchEpisodes, searchShows } from "../providers/apple/api";
   import {
@@ -21,8 +20,6 @@
   import EpisodeItem from "./EpisodeItem.svelte";
   import SearchForm from "./SearchForm.svelte";
   import ShowList from "./ShowList.svelte";
-  import { scale } from "svelte/transition";
-  import { linear } from "svelte/easing";
 
   export let searchText = "";
   export let pageYOffset = undefined;
@@ -158,6 +155,10 @@
 
 <style>
   .searchFormWrapper {
+    --title-font-size: var(--font-size-large);
+    --assumed-title-height: calc(
+      var(--assumed-normal-lh) * var(--title-font-size)
+    );
     position: relative;
     padding: var(--spacing-3);
     /*the goal here is to initially have the search form vertically 
@@ -165,7 +166,7 @@
     transform: translateY(
       calc(
         (100vh - var(--mini-player-bottom) - var(--mini-player-height)) / 2 -
-          50%
+          50% + var(--assumed-title-height) / 2
       )
     );
     transition: transform 0.4s;
@@ -176,18 +177,15 @@
   }
 
   .title {
+    position: absolute;
+    top: 0;
     font-size: var(--font-size-large);
-    overflow-y: hidden;
-    transition: all 0.2s;
+    transform: translateY(-100%);
     opacity: 1;
-    max-height: calc(
-      var(--assumed-normal-lh) * var(--font-size-large) + 2 * var(--spacing-1)
-    );
-    padding: var(--spacing-1) 0;
+    transition: all 0.2s;
   }
 
   .searchOnTop .title {
-    max-height: 0;
     opacity: 0;
   }
 </style>
