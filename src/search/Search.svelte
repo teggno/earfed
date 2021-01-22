@@ -182,10 +182,11 @@
     font-size: var(--font-size-large);
     transform: translateY(-100%);
     opacity: 1;
-    transition: all 0.2s;
+    transition: all 0.4s 0.2s;
   }
 
   .searchOnTop .title {
+    transition: all 0.2s;
     opacity: 0;
   }
 </style>
