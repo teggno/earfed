@@ -22,11 +22,6 @@
     }
   }
 
-  function handleTouchStart(e) {
-    e.target.select();
-    e.preventDefault();
-  }
-
   function handleFocus() {
     focused = true;
   }
@@ -44,7 +39,6 @@
       </div>
     {/if}
     <input
-      id="searchField"
       aria-label="Enter Search Text"
       placeholder="Podcast or Episode"
       type="search"
@@ -52,7 +46,6 @@
       autocorrect="off"
       autocomplete="off"
       autocapitalize="off"
-      on:touchstart={handleTouchStart}
       on:focus={handleFocus}
       on:blur={handleBlur}
       bind:value={searchText}
