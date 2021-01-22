@@ -26,6 +26,7 @@
   import RssShowPage from "./subscriptions/RssShowPage.svelte";
   import Subscriptions from "./subscriptions/Subscriptions.svelte";
   import { loaded } from "./threeState";
+  import { scrollingEnabled } from "./toggleBodyScroll";
   import { setEpisodeEnded, updatePositionSeconds } from "./userData/episodes";
   import virtualKeyboardDetector, {
     virtualkeyboard,
@@ -194,6 +195,7 @@
     };
 
     function handleTouchStart() {
+      if (!scrollingEnabled()) return;
       clearTimeout(timeoutShow);
       document.addEventListener("touchend", handleTouchEnd);
       touching = true;

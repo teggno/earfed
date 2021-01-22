@@ -1,4 +1,4 @@
-let scrollingEnabled = true;
+let scrollingEnabledInternal = true;
 
 let offsetBeforeScrollDisabled = 0;
 
@@ -8,23 +8,27 @@ let offsetBeforeScrollDisabled = 0;
 // this more complicated way to do it.
 
 export function disable() {
-  if (!scrollingEnabled) return;
+  if (!scrollingEnabledInternal) return;
 
   offsetBeforeScrollDisabled = window.scrollY;
 
   document.body.style.position = "fixed";
   document.body.style.overflow = "hidden";
   document.body.style.top = `-${offsetBeforeScrollDisabled}px`;
-  scrollingEnabled = false;
+  scrollingEnabledInternal = false;
 }
 
 export function enable() {
-  console.log("scrollingEnabled", scrollingEnabled);
-  if (scrollingEnabled) return;
+  console.log("scrollingEnabled", scrollingEnabledInternal);
+  if (scrollingEnabledInternal) return;
 
   document.body.style.removeProperty("position");
   document.body.style.removeProperty("overflow");
   document.body.style.removeProperty("top");
   window.scrollTo(0, offsetBeforeScrollDisabled);
-  scrollingEnabled = true;
+  scrollingEnabledInternal = true;
+}
+
+export function scrollingEnabled() {
+  return scrollingEnabledInternal;
 }
