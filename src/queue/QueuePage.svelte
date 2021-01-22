@@ -132,9 +132,6 @@
 
 <style>
   ul {
-    /* --padding-bottom: calc(
-      var(--mini-player-height) + var(--mini-player-bottom)
-    ); */
     list-style: none;
     margin: 0;
     padding: 0 0 var(--padding-bottom) 0;

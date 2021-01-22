@@ -58,7 +58,6 @@
     if (maximized || disabled) return;
 
     dragDownDistance = 0;
-    // maximized = true;
     size = sizes.maximized;
     tick().then(() => {
       bodyScroll.disable();
@@ -86,8 +85,10 @@
   }
 
   function minimize() {
+    console.log("minimize");
     size = sizes.medium;
     tick().then(() => {
+      console.log("tick");
       bodyScroll.enable();
       textElement.scrollTo(0, 0);
     });
