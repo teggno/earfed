@@ -1,31 +1,30 @@
 <script lang="ts">
-    import AddEpisodeToQueueIcon from "./icons/AddEpisodeToQueueIcon.svelte";
-    import EpisodeAddedToQueueIcon from "./icons/EpisodeAddedToQueueIcon.svelte";
+  import AddEpisodeToQueueIcon from "./icons/AddEpisodeToQueueIcon.svelte";
+  import EpisodeAddedToQueueIcon from "./icons/EpisodeAddedToQueueIcon.svelte";
 
-    export let queued: boolean;
+  export let queued: boolean;
 </script>
 
-<style>
-    .added {
-        fill: var(--color-disabled);
-        padding: 10px;
-    }
-    button {
-        border: 0 none;
-        padding: 10px;
-    }
-
-    button:active {
-        transform: var(--button-press-transform);
-    }
-</style>
-
 {#if queued}
-    <div class="added">
-        <EpisodeAddedToQueueIcon />
-    </div>
+  <div class="added">
+    <EpisodeAddedToQueueIcon />
+  </div>
 {:else}
-    <button on:click title="Add to Queue" on:touchstart|passive>
-        <AddEpisodeToQueueIcon />
-    </button>
+  <button on:click title="Add to Queue" on:touchstart|passive>
+    <AddEpisodeToQueueIcon />
+  </button>
 {/if}
+
+<style>
+  .added {
+    fill: var(--color-disabled);
+    padding: 10px;
+  }
+  button {
+    border: 0 none;
+    padding: 10px;
+  }
+  button:active {
+    transform: var(--button-press-transform);
+  }
+</style>
