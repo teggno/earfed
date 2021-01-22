@@ -19,7 +19,6 @@ export function disable() {
 }
 
 export function enable() {
-  console.log("scrollingEnabled", scrollingEnabledInternal);
   if (scrollingEnabledInternal) return;
 
   document.body.style.removeProperty("position");

@@ -85,10 +85,8 @@
   }
 
   function minimize() {
-    console.log("minimize");
     size = sizes.medium;
     tick().then(() => {
-      console.log("tick");
       bodyScroll.enable();
       textElement.scrollTo(0, 0);
     });
