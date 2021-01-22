@@ -19,6 +19,7 @@ export function disable() {
 }
 
 export function enable() {
+  console.log("scrollingEnabled", scrollingEnabled);
   if (scrollingEnabled) return;
 
   document.body.style.removeProperty("position");
