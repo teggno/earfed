@@ -118,6 +118,10 @@ textarea {
   border-radius: var(--input-border-radius);
 }
 
+button {
+  margin: 0;
+}
+
 input::placeholder {
   color: var(--color-input-placeholder);
 }
