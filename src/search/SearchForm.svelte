@@ -88,7 +88,10 @@
     z-index: 2;
   }
 
-  input:focus,
+  input:focus {
+    /*remove focus indication because it mus be given to .fieldWrapper */
+    box-shadow: none;
+  }
   input:focus-visible {
     /*remove focus indication because it mus be given to .fieldWrapper */
     box-shadow: none;
@@ -110,6 +113,10 @@
     width: 100%;
     height: 100%;
     fill: var(--color-input-placeholder);
+  }
+
+  .focused {
+    box-shadow: var(--focus-shadow);
   }
   .focused .searchIconWrapper {
     width: 0;
