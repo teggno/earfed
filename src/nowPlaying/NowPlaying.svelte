@@ -279,7 +279,7 @@
   .showTitle {
     font-size: var(--font-size-small);
     padding-left: var(--spacing-3);
-    color: var(--color-text-muted);
+    color: var(--color-text-muted-little);
     text-align: center;
   }
 
