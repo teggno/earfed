@@ -11,6 +11,8 @@
   } from "./notificationBarService";
   import NowPlaying, { sizes } from "./nowPlaying/NowPlaying.svelte";
   import player from "./player/player";
+  import { initGlobalProgressbar } from "./progressbar/globalProgressbar";
+  import GlobalProgressbar from "./progressbar/GlobalProgressbar.svelte";
   import QueuePage from "./queue/QueuePage.svelte";
   import {
     episodeAfter,
@@ -33,6 +35,7 @@
   } from "./virtualKeyboardDetector";
 
   initAnimationTargetRect();
+  initGlobalProgressbar();
 
   let showImageUrls: string[] | undefined;
   let virtualKeyboardVisible = false;
@@ -272,6 +275,7 @@
 </script>
 
 <div class:withBottomBarPadding={!virtualKeyboardVisible}>
+  <GlobalProgressbar />
   <main>
     <Router>
       <Route component={QueuePage} path="" />

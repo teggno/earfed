@@ -3,6 +3,7 @@
   import { derived } from "svelte/store";
   import { episodes as userDataEpisodesStore } from "../episodeService";
   import ListLayout from "../layouts/ListLayout.svelte";
+  import { getGlobalProgressbar } from "../progressbar/globalProgressbar";
   import { appleUniqueEpisodeId } from "../providers";
   import { searchEpisodes, searchShows } from "../providers/apple/api";
   import {
@@ -14,7 +15,13 @@
   import { enqueueAppleTrack } from "../queueService";
   import { replaceState } from "../routing/Router.svelte";
   import Tabs from "../tabs/Tabs.svelte";
-  import { loaded, whenLoaded, writableThreeState } from "../threeState";
+  import {
+    anyLoading,
+    lastValueWhileLoading,
+    loaded,
+    whenLoaded,
+    writableThreeState,
+  } from "../threeState";
   import type { AppleTrack } from "../userData/episodeTypes";
   import type { AppleCollection } from "../userData/showTypes";
   import { debounce } from "../utils";
@@ -24,23 +31,23 @@
 
   export let searchText = "";
   export let pageYOffset = undefined;
+  // selectedTabIndex is exported because it might come from history state
+  export let selectedTabIndex: number | undefined;
 
   let tabItems = [
     { title: "Shows", disabled: false },
     { title: "Episodes", disabled: false },
   ];
-  // selectedTabIndex is exported because it might come from history state
-  export let selectedTabIndex: number | undefined;
-  $: showingShows = selectedTabIndex === 0;
 
   let searched = false;
   let searchFormFocused: boolean;
-  let shows: AppleCollection[] = [];
 
-  const foundEpisodesStore = writableThreeState<AppleTrack[]>();
+  const progress = getGlobalProgressbar();
 
+  const appleShowsStore = writableThreeState<AppleCollection[]>();
+  const appleEpisodesStore = writableThreeState<AppleTrack[]>();
   const episodesStore = derived(
-    [userDataEpisodesStore, foundEpisodesStore],
+    [userDataEpisodesStore, appleEpisodesStore],
     whenLoaded(([userDataEpisodes, appleEpisodes]) =>
       appleEpisodes.map((ae) => ({
         ...ae,
@@ -50,7 +57,15 @@
       }))
     )
   );
-  $: episodes = $episodesStore;
+  const enqueueingStore = writableThreeState<undefined>();
+
+  $: shows = $appleShowsStore;
+
+  const episodesWithLastLoadedValue = derived(
+    episodesStore,
+    lastValueWhileLoading()
+  );
+  $: episodes = $episodesWithLastLoadedValue;
   $: searchOnTop = searched || searchFormFocused;
 
   onMount(() => {
@@ -65,8 +80,14 @@
       });
     }
 
+    const unsubscribe = derived(
+      [appleShowsStore, episodesStore, enqueueingStore],
+      anyLoading
+    ).subscribe((loading) => (loading ? progress.show() : progress.hide()));
     return () => {
       window.removeEventListener("scroll", debounced);
+      progress.hide();
+      unsubscribe();
     };
   });
 
@@ -79,6 +100,8 @@
 
   function search() {
     searched = true;
+    appleShowsStore.setLoading();
+    appleEpisodesStore.setLoading();
     return Promise.all([
       searchShows(searchText).then(({ results }) =>
         results
@@ -93,13 +116,13 @@
           .map(({ appleTrack }) => appleTrack)
       ),
     ]).then(([appleCollections, appleTracks]) => {
-      shows = appleCollections;
-      foundEpisodesStore.setLoaded(appleTracks);
+      appleShowsStore.setLoaded(appleCollections);
+      appleEpisodesStore.setLoaded(appleTracks);
 
       tabItems = tabItems.map((item, index) => ({
         ...item,
         disabled:
-          (index === 0 && !shows.length) ||
+          (index === 0 && !appleCollections.length) ||
           (index === 1 && !appleTracks.length),
       }));
 
@@ -125,7 +148,9 @@
   }
 
   async function handleQueueEpisode(track: AppleTrack) {
-    enqueueAppleTrack(track);
+    enqueueingStore.setLoading();
+    await enqueueAppleTrack(track);
+    enqueueingStore.setLoaded(undefined);
   }
 
   function handleTabChange({ detail: { selectedIndex } }) {
@@ -153,10 +178,10 @@
     {item.title}
   </Tabs>
 {/if}
-{#if shows.length && showingShows}
-  <ShowList {shows} />
+{#if shows.state === loaded && shows.data.length && selectedTabIndex === 0}
+  <ShowList shows={shows.data} />
 {/if}
-{#if episodes.state === loaded && episodes.data.length && (!showingShows || !shows.length)}
+{#if episodes.state === loaded && episodes.data.length && selectedTabIndex === 1}
   <ListLayout items={episodes.data} let:item={episode}>
     <EpisodeItem
       {episode}
