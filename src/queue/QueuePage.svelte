@@ -6,9 +6,10 @@
   import orderable from "../actions/orderableAction";
   import { putEpisodeOrder } from "../userData/episodeOrder";
   import { queueState, refreshOrder } from "../queueService";
-  import { loaded } from "../threeState";
+  import { lastValueWhileLoading, loaded } from "../threeState";
   import type AppleEpisode from "../domain/AppleEpisode";
   import type RssEpisode from "../domain/RssEpisode";
+  import { derived } from "svelte/store";
 
   let expandedEpisode: { uniqueEpisodeId: string } | undefined;
   let indexOfPreviouslyExpandedEpisode = -1;
@@ -17,8 +18,9 @@
   let indexOfOrderedItem: number | undefined;
 
   const playerStore = player.playerStore;
+  const queueStateLastValue = derived(queueState, lastValueWhileLoading());
 
-  $: qs = $queueState;
+  $: qs = $queueStateLastValue;
   $: playerInfo = $playerStore;
   $: currentEpisode =
     playerInfo.state === "hasEpisode" ? playerInfo.episode : undefined;
