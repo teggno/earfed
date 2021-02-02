@@ -32,7 +32,7 @@
   export let searchText = "";
   export let pageYOffset = undefined;
   // selectedTabIndex is exported because it might come from history state
-  export let selectedTabIndex: number | undefined;
+  export let selectedTabIndex: number | undefined = undefined;
 
   let tabItems = [
     { title: "Shows", disabled: false },

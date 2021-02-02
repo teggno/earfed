@@ -112,16 +112,15 @@
     return player.playerStore.subscribe(async (playerState) => {
       if (playerState.state === "noEpisode") return;
 
-      const { episode, currentSecond } = playerState;
+      const {
+        episode: { episodeId },
+        currentSecond,
+      } = playerState;
       if (playerState.playing) {
-        await updatePositionSeconds(
-          episode.episodeId,
-          currentSecond,
-          new Date()
-        );
+        await updatePositionSeconds(episodeId, currentSecond, new Date());
         refreshUserDataEpisodes();
       } else if (playerState.ended) {
-        await setEpisodeEnded(episode.episodeId, new Date());
+        await setEpisodeEnded(episodeId, new Date());
         refreshUserDataEpisodes();
       }
     });
